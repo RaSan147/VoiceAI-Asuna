@@ -44,7 +44,6 @@ BREAK_POINT = False
 # Basic imports
 
 print('			 00%',end='\r')
-import code
 from platform import system as os_name
 os_name=os_name()
 
@@ -102,7 +101,7 @@ import pkg_resources, traceback
 print('			 38%',end='\r')
 
 #personal lib
-from bbc_news import task
+from bbc_news import bbc_news
 from basic_conv_pattern import *
 from errors import LeachKnownError, LeachNetworkError, LeachPermissionError, LeachCorruptionError, LeachICancelError,Error404
 from print_text2 import xprint, remove_style
@@ -609,8 +608,8 @@ def inputer(msg='', only_type=False):
 	return y
 
 
-def asker(out=''):
-	tnt(out)
+def asker(out='', self =None, true_func = OSsys.null, false_func=OSsys.null):
+	tnt(out, toaster = True)
 	Ques2 = inputer()
 	Ques2 = Ques2.lower()
 	while Ques2 not in cond:
@@ -619,8 +618,10 @@ def asker(out=''):
 		Ques2 = Ques2.lower()
 	if Ques2 in cond:
 		if Ques2 in yes:
+			true_func()
 			return True
 		else:
+			false_func()
 			return False
 
 print('			 70%',end='\r')
@@ -733,6 +734,7 @@ def slowtyper(*args, wait_time = nap_time):
 	global typer
 	typer = Thread(target=slowtype, args=(*args,))
 	typer.start()
+	return
 
 
 def tnt(txt, y=nap_time):
@@ -782,7 +784,8 @@ def off_install(direc, pack, bit=1):
 
 
 # off_install()
-off_install('PIP/wikipedia-1.4.0.tar.gz', 'wikipedia')
+OSsys.install_req('https://github.com/RaSan147/Wikipedia/archive/refs/tags/v1.1.1.zip', "wikipedia")
+import wikipedia
 
 
 asd=time_on()
@@ -836,7 +839,7 @@ print('			 80%',end='\r')
 
 #install_req('mega.py')
 requirements_all = ['pafy','mutagen', 'comtypes', 'six', "yt-dlp", "requests"]
-requirements_win = ["pypiwin32"]
+requirements_win = ["pywin32"]
 
 OSsys.import_missing_libs()
 import requests
@@ -970,10 +973,12 @@ def ins_n_imp_voice():
 
 
 vmodule = ins_n_imp_voice()
+SPEAKER_BUSY = False
 
 
-def speakup(text):
-	global vmodule, speakers, droid, talk_aloud_temp
+
+def speak_(text):
+	global vmodule, speakers, droid, talk_aloud_temp, SPEAKER_BUSY
 	text = tnt_helper(text, 'talk')
 	# talk_aloud_temp = False
 	if vmodule == 'pyttsx3':
@@ -987,11 +992,16 @@ def speakup(text):
 		# Use female English voice
 		engine.setProperty('voice', en_voice_id)
 		
+		SPEAKER_BUSY = True
+		
 		engine.say(text)
 		engine.startLoop(False)
 		# engine.iterate() must be called inside externalLoop()
 		engine.iterate()
 		engine.endLoop()
+		
+		SPEAKER_BUSY = False
+		
 
 
 	elif vmodule == 'gtts':
@@ -1009,8 +1019,14 @@ def speakup(text):
 
 del tnt
 
+def speakup(text):
+	x = Thread(target=speak_, args= (text,))
+	x.start()
+	# if join: x.join()
+	# speak_(text)
 
-def tnt(text, speed=nap_time, force = False):
+
+def tnt(text, speed=nap_time, force = False, toaster =None):
 	global typer, speakers
 	slowtyper(text, wait_time=speed)
 	rr = re.compile('/s([\d\.]*)/')
@@ -1080,6 +1096,7 @@ def curr_dir():
 
 
 def i_slim(in_dat):
+	in_dat = in_dat.strip()
 	in_dat = re.sub('\s{2,}', ' ', in_dat)
 	in_dat = in_dat.lower()
 	in_dat = in_dat.replace("'", "")
@@ -1101,7 +1118,6 @@ clean()
 Ctitle('Project Alice')
 
 def locker():
-	# ins_n_imp('wikipedia')
 	clean()
 	slowtype("Please enter your User name: ")
 	Name = inputer()
@@ -1150,52 +1166,41 @@ def wolfram(text):
 	if r.text == "Wolfram|Alpha did not understand your input": return False
 	return r.text
 def wikisearch(uix):
-	if check_internet() == True and check_installed('wikipedia') == True:
+	if check_internet() == True:
 		wolf = wolfram(uix)
 		if not wolf:
-			tnt("/y/I don't know the answer ...\nShall I Google?/=/")
-			if asker(): searcher(uix)
+			asker("/y/I don't know the answer ...\nShall I Google?/=/", true_func=lambda:searcher(uix))
 			return
 		tnt (wolf)
 		sleep(2)
-		tnt('\nDo you want to know some more? ')
-		if not asker(): return
-		import wikipedia
-		if uix in [i.lower() for i in wikipedia.search(uix)]:
-			tnt('\n' + wikipedia.summary(uix, sentences=4))
-			tnt('\nDo you want to know some more? ')
-			q = asker()
-			if q == True:
-				ny = wikipedia.page(uix)
-				web_go(ny.url)
-		elif wikipedia.search(uix) != []:
-			uix = wikipedia.search(uix)[0]
-			tnt('Did you mean ' + uix + '? ')
-			q = asker()
-			if q == True:
-				tnt('\n' + wikipedia.summary(wikipedia.search(uix)[0], sentences=4))
-				tnt('\nDo you want to know some more?  ')
-				q = asker()
-				if q == True:
+
+		def _wiki(uix):
+			if uix in [i.lower() for i in wikipedia.search(uix)]:
+				tnt('\n' + wikipedia.summary(uix, sentences=2))
+				def _go_to_page():
 					ny = wikipedia.page(uix)
 					web_go(ny.url)
-		else:
-			tnt("\nCouldn't find " + uix + "!\nWould you like to search instead?  ")
-			q = asker()
-			if q == True:
-				searcher(uix)
+				
+				if not asker('Do you want to know some more? ', true_func=_go_to_page): return
+				_go_to_page()
+				
+			elif wikipedia.search(uix) != []:
+				uix = wikipedia.search(uix)[0]
+				
+				if asker('Did you mean ' + uix + '? ', true_func= lambda: _wiki(uix)):
+					_wiki(uix)
 			else:
-				tnt('\nOk then.')
-	elif check_internet() == False:
+				
+				if asker("Couldn't find " + uix + "!\nWould you like to search instead?  ", true_func= lambda: searcher(uix)):
+					searcher(uix)
+				#else:
+				#	tnt('\nOk then.')
+		
+		if asker('Do you want to know some more? ' , true_func= lambda: _wiki(uix)):
+			_wiki(uix)
+		
+	else:
 		tnt('No internet connection!')
-	elif check_installed('wikipedia') == False:
-		if check_internet() == True:
-			tnt('You need to install Wikipidia for that type of commands.')
-			ins_n_imp('wikipedia')
-			if check_installed('wikipedia') == True:
-				wikisearch(uix)
-			else:
-				tnt("Sorry I can't show you the results without wikipedia.\n")
 
 
 '''def test1():
@@ -1256,12 +1261,13 @@ def set_timer(text):
 
 
 def go_youtube(search):
-	domain = search.split("youtube", 1)[1]
-	query_string = parse.urlencode({"search_query": domain})
-	html_content = request.urlopen("http://www.youtube.com/results?" + query_string)
-	search_results = re.findall(r'href=\"\/watch\?v=(.{11})',
+	topic = search.split("youtube ", 1)[1]
+	query_string = parse.urlencode({"search_query":topic})
+	# print(query_string)
+	html_content = request.urlopen("https://www.youtube.com/results?" + query_string)
+	search_results = re.search(r'watch\?v=(.{11})',
 								  html_content.read().decode())  # finds all links in search result
-	webbrowser.open("http://www.youtube.com/watch?v={}".format(search_results[0]))
+	webbrowser.open("http://www.youtube.com/watch?v={}".format(search_results.group(1)))
 
 
 ########################################
@@ -1304,7 +1310,7 @@ if reloaded == False:
 # ******uncomment following line******#
 # tnt(outtxt)
 
-escape = ["exit", "close", "shut down", "quit", "bye", "esc"]
+escape = ["exit", "close", "shut down", "quit", "bye", "esc", "tata", "see ya", "see you"]
 
 
 
@@ -1363,13 +1369,17 @@ def L(arg):
 def Ltuple(arg):
 	return L(tuple(arg))
 
+def read_rest_news():
+	tnt(*bbc_news.last_news[5:])
+
+
 
 ui = ""
 ui1 = ""
 ui2 = ""
 def basic_talk2(INPUT_CODE):
 	global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT
-	ui = QUEUE[INPUT_CODE]
+	ui = i_slim(QUEUE[INPUT_CODE])
 	while len(QUEUE) > 1:
 		sleep(1)
 	# ui = QUEUE[code]
@@ -1417,6 +1427,8 @@ def basic_talk2(INPUT_CODE):
 def basic_output(INPUT):
 	global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT
 	ui = i_slim(INPUT)
+	if ui == "":
+		return
 	
 	if ui in li_hi:
 		if flags.hi_bit<2:
@@ -1448,13 +1460,13 @@ def basic_output(INPUT):
 
 	elif ui in li_what_ur_name:
 
-		outtxt = "My name is " + sysData.aiName
+		outtxt = choice(["My name is ", "I am ", "Its "]) + sysData.aiName
 		if flags.what_u_name_bit == 1:
 			outtxt += "\nIf you want, you can change my name."
 			tnt(outtxt)
-			FCyuiName()
+			# FCyuiName()
 		else:
-			tnt(outtxt)
+			tnt(outtxt)	
 		flags.what_u_name_bit += 1
 
 	elif re.search('((replay)|(pause)|(stop)|(resume)|(mute)|(continue))(\s((the )?(music)|(song))|(it))?', ui):
@@ -1569,12 +1581,11 @@ def basic_output(INPUT):
 	elif ui in li_tell_time1:
 		tell_time()
 
-	elif ui == 'read the news':
+	elif re.search('read (the )?(latest )?news', ui):
 		if check_internet():
-
-			news = task(bbc_topic)
-
-			tnt(news)
+			news = bbc_news.task(bbc_topic)
+			tnt(*news[:5])
+			asker("Do you want to read more?", true_func=lambda: tnt(*news[5:15]))
 		else:
 			tnt('No internet!')
 
@@ -1588,10 +1599,11 @@ def basic_output(INPUT):
 
 			elif uiopen in ["latest news", "news update", 'news']:
 				if check_internet():
+					news = bbc_news.task(bbc_topic)
+					tnt(*news[:5])
+					asker("Do you want to hear the rest?", true_func=read_rest_news)
 
-					news = task(bbc_topic)
 
-					tnt(news)
 				else:
 					tnt('No internet!')
 
@@ -1602,17 +1614,21 @@ def basic_output(INPUT):
 				wikisearch(uiopen)
 
 	elif ui.startswith(li_who):
-
-		who = [i for i in li_who if ui.startswith(i) == True]
-		reg_ex = re.search(who[0] + ' (.+)', ui)
-		if len(ui) != len(who[0]) and reg_ex:
-			uiopen = reg_ex.group(1)
-			if uiopen in li_r_u:
-				tnt(choice(li_AamI) % sysData.aiName)
-			elif uiopen in li_Qcreator:
-				tnt(choice(li_Acreator) % choice(li_syn_created))
-			else:
-				find_person(uiopen)
+		if ui in li_who_r_u:
+			tnt(choice(li_AamI) % sysData.aiName)
+		elif ui == "who am i":
+			tnt("You are " + uName + ", a human being. Far more intelligent than me.")
+		else:
+			who = [i for i in li_who if ui.startswith(i) == True]
+			reg_ex = re.search(who[0] + ' (.+)', ui)
+			if len(ui) != len(who[0]) and reg_ex:
+				uiopen = reg_ex.group(1)
+				if uiopen in li_r_u:
+					tnt(choice(li_AamI) % sysData.aiName)
+				elif uiopen in li_Qcreator:
+					tnt(choice(li_Acreator) % choice(li_syn_created))
+				else:
+					find_person(uiopen)
 
 	elif ui in li_check_int:
 		if check_internet() == False:

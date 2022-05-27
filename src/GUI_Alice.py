@@ -513,7 +513,8 @@ url_reddit = ['https://www.reddit.com', 'reddit', 'redit']
 url_bing = ['https://www.bing.com', 'bing', 'microsoft search']
 url_insta = ['https://www.instagram.com', 'instagram', 'insta']
 url_apple = ['http://apple.com/', 'apple website', 'apple.com']
-url_microsoft = ['http://microsoft.com/', 'microsoft website', 'microsoft.com', 'microsoft site', 'microsoft page', "microsoft"]
+url_microsoft = ['http://microsoft.com/', 'microsoft website', 'microsoft.com', 'microsoft site', 'microsoft page']
+url_pornhub = ['https://www.pornhub.com/', 'pornhub website', 'pornhub']
 
 goog_supp = ['http://support.google.com/', 'support', 'supports']
 goog_docs = ['http://docs.google.com/', 'doc', 'docs']
@@ -822,7 +823,8 @@ def off_install(direc, pack, bit=1):
 
 
 # off_install()
-off_install('PIP/wikipedia-1.4.0.tar.gz', 'wikipedia')
+OSsys.install_req('https://github.com/RaSan147/Wikipedia/archive/refs/tags/v1.1.1.zip', "wikipedia")
+import wikipedia
 
 
 asd=time_on()
@@ -892,7 +894,7 @@ if os_name == "Windows":
 # install_req()
 #install_req('openpyxl')
 # install_req()
-i
+
 import yt_plugin
 
 print('			 85%',end='\r')
@@ -1019,6 +1021,7 @@ def ins_n_imp_voice():
 
 vmodule = ins_n_imp_voice()
 SPEAKER_BUSY = False
+
 
 
 def speak_(text):
@@ -1164,7 +1167,6 @@ clean()
 Ctitle('Project Alice')
 
 def locker():
-	# ins_n_imp('wikipedia')
 	clean()
 	slowtype("Please enter your User name: ")
 	Name = inputer()
@@ -1213,50 +1215,41 @@ def wolfram(text):
 	if r.text == "Wolfram|Alpha did not understand your input": return False
 	return r.text
 def wikisearch(uix):
-	if check_internet() == True and check_installed('wikipedia') == True:
+	if check_internet() == True:
 		wolf = wolfram(uix)
 		if not wolf:
-			
-			asker("/y/I don't know the answer ...\nShall I Google?/=/", true_func=partial(searcher, uix))
+			asker("/y/I don't know the answer ...\nShall I Google?/=/", true_func=lambda:searcher(uix))
 			return
 		tnt (wolf)
 		sleep(2)
 
 		def _wiki(uix):
-			import wikipedia
 			if uix in [i.lower() for i in wikipedia.search(uix)]:
 				tnt('\n' + wikipedia.summary(uix, sentences=2))
+				def _go_to_page():
+					ny = wikipedia.page(uix)
+					web_go(ny.url)
 				
-				if not asker('Do you want to know some more? '): return
-				ny = wikipedia.page(uix)
-				web_go(ny.url)
+				if not asker('Do you want to know some more? ', true_func=_go_to_page): return
+				_go_to_page()
+				
 			elif wikipedia.search(uix) != []:
 				uix = wikipedia.search(uix)[0]
 				
-				if asker('Did you mean ' + uix + '? '):
-					tnt('\n' + wikipedia.summary(wikipedia.search(uix)[0], sentences=2))
-					if asker('Do you want to know some more?  '):
-						ny = wikipedia.page(uix)
-						web_go(ny.url)
+				if asker('Did you mean ' + uix + '? ', true_func= lambda: _wiki(uix)):
+					_wiki(uix)
 			else:
 				
-				if asker("Couldn't find " + uix + "!\nWould you like to search instead?  "):
+				if asker("Couldn't find " + uix + "!\nWould you like to search instead?  ", true_func= lambda: searcher(uix)):
 					searcher(uix)
-				else:
-					tnt('\nOk then.')
+				#else:
+				#	tnt('\nOk then.')
 		
-		asker('Do you want to know some more? ' , true_func=partial(_wiki, uix))
+		if asker('Do you want to know some more? ' , true_func= lambda: _wiki(uix)):
+			_wiki(uix)
 		
-	elif check_internet() == False:
+	else:
 		tnt('No internet connection!')
-	elif check_installed('wikipedia') == False:
-		if check_internet() == True:
-			tnt('You need to install Wikipidia for that type of commands.')
-			ins_n_imp('wikipedia')
-			if check_installed('wikipedia') == True:
-				wikisearch(uix)
-			else:
-				tnt("Sorry I can't show you the results without wikipedia.\n")
 
 
 '''def test1():
@@ -1432,7 +1425,7 @@ def Ltuple(arg):
 	return L(tuple(arg))
 
 def read_rest_news():
-	tnt(*bbc_news.last_news[5:])
+	tnt("\n".join(bbc_news.last_news[5:]))
 
 
 
@@ -1660,11 +1653,12 @@ def basic_output(INPUT):
 		tell_time()
 		
 
-	elif re.search('read (the )?(latest )?news', ui):
+	elif re.search('(read )?(the )?(latest )?news', ui):
 		if check_internet():
-			news = task(bbc_topic)
-			tnt(*news[:5])
-			asker()
+			news = bbc_news.task(bbc_topic)
+			tnt("\n".join(news[:5]))
+			while SPEAKER_BUSY: sleep(1)
+			asker("Do you want to hear the rest?", true_func=read_rest_news)
 		else:
 			tnt('No internet!')
 
@@ -1679,7 +1673,8 @@ def basic_output(INPUT):
 			elif uiopen in ["latest news", "news update", 'news']:
 				if check_internet():
 					news = bbc_news.task(bbc_topic)
-					tnt(news)
+					tnt("\n".join(news[:5]))
+					while SPEAKER_BUSY: sleep(1)
 					asker("Do you want to hear the rest?", true_func=read_rest_news)
 
 
@@ -1779,7 +1774,7 @@ def send_message(message):
 
 if os_name=="Windows":
 	import speech_recognition as sr
-import speech_recognition as sr
+
 class VR_:
 	"""Voice Recognizer"""
 	
@@ -2017,6 +2012,7 @@ class DemoApp(MDApp):
 		self.ev[code] = [true_func, false_func]
 
 	def trigger_ev(self, code, trigger):
+		if code not in self.ev.keys(): return 0
 		if trigger:
 			self.ev[code][0]()
 		else:
@@ -2105,7 +2101,7 @@ class DemoApp(MDApp):
 	def not_allowed_(self):
 		self.dialog2=MDDialog(title= "Not Allowed", text= 'Please fill this page first', 
 							size_hint=(0.8, 0.8),
-							buttons=[MDRaisedButton(text='Close', on_release=partial(self.close_dialog, 'dialog2'))])
+							buttons=[MDFlatButton(text='Close', on_release=partial(self.close_dialog, 'dialog2'))])
 		self.dialog2.open()
 
 	def on_stop(self, *args):
@@ -2224,18 +2220,18 @@ def asker(message="", self=demoapp, true_func= OSsys.null, false_func=OSsys.null
 	code = time_on()
 
 	def _yes(*_):
-		self.close_dialog("dialog2")
+		self.close_dialog("dialog_ask")
 		self.trigger_ev(code, True)
 	def _no(*_):
-		self.close_dialog("dialog2")
+		self.close_dialog("dialog_ask")
 		self.trigger_ev(code, False)
 	
 	self.set_ev(code, true_func, false_func)
-	self.dialog2=MDDialog(title= message, 
+	self.dialog_ask=MDDialog(title= message, 
 							size_hint=(0.8, 0.8),
-							buttons=[MDRaisedButton(text='Yes', on_release=_yes), MDRaisedButton(text='No', on_release=_no)])
+							buttons=[MDFlatButton(text='Yes', on_release=_yes), MDFlatButton(text='No', on_release=_no)])
 							
-	self.dialog2.open()
+	self.dialog_ask.open()
 		
 	return None
 

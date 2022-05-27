@@ -262,6 +262,7 @@ class XprintClass:
 		self.no_colors = self.no_code = False
 
 	def remove_style(self,text):
+		text = re.sub("/s\d*[.]?\d*/", "", text)
 		return re.sub("/[argybpcw \=uih_]+/","", text)
 
 XprintEngine = XprintClass()
