@@ -421,7 +421,7 @@ class Engine(object):
         self._driverLoop = True
         self.proxy.runAndWait()
 
-    def startLoop(self, useDriverLoop=True):
+    def startLoop(self, useDriverLoop=True, error = True):
         """
         Starts an event loop to process queued commands and callbacks.
 
@@ -432,7 +432,8 @@ class Engine(object):
         @raise RuntimeError: When the loop is already running
         """
         if self._inLoop:
-            raise RuntimeError('run loop already started')
+            if error:
+                raise RuntimeError('run loop already started')
         self._inLoop = True
         self._driverLoop = useDriverLoop
         self.proxy.startLoop(self._driverLoop)
@@ -505,7 +506,9 @@ This text should be spoken at pitch five.
 <pitch absmiddle="10"/>
     <partofsp part="noun"> A </partofsp> is the first letter <silence msec="1500"/> of the alphabet.""")
     exit()
-    speak("""<volume level="50">
+    speak("""<voice required="Gender=Female;">
+    
+    <volume level="50">
 This text should be spoken at volume level fifty.
 
    <volume level="100">
@@ -525,5 +528,8 @@ All text which follows should be spoken at volume level eighty.
 </rate>
 <rate speed="0"/>
 All text which follows should be spoken at rate 0.
-
+<spell>
+These words should be spelled out.
+</spell>
+These words should not be spelled out.
 <emph> boo </emph>!""")

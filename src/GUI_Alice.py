@@ -14,7 +14,8 @@ func_ver = '37'
 
 '''
 
-QUEUE = {}
+from queue import Queue
+QUEUE = Queue()
 
 #: *****************************************************************************
 #:					This code was created by Ratul Hasan					 *
@@ -87,6 +88,7 @@ os_name=os_name()
 from os import system
 from sys import exit as sys_exit, executable as sys_executable, getsizeof
 import ctypes
+import importlib.util
 
 exit = sys_exit
 
@@ -141,7 +143,7 @@ print('			 38%',end='\r')
 from bbc_news import bbc_news
 from basic_conv_pattern import *
 from errors import LeachKnownError, LeachNetworkError, LeachPermissionError, LeachCorruptionError, LeachICancelError,Error404
-from print_text2 import xprint, remove_style
+from print_text3 import xprint, remove_style
 
 from fsys import Fsys_, Datasys_, Netsys_, IOsys_
 Fsys = Fsys_()
@@ -243,8 +245,12 @@ class OSsys_:  # fc=0700
 			pkg_name: Package name to search if installed
 			alias: if the pip package name is different from lib name,
 				then used alias (not required here) [beautifulsoup4 (pip)=> bs4 (lib name)] """
-
-		if pkg_name not in self.get_installed():
+		if isinstance(pkg_name, (list, tuple)):
+			alias = pkg_name[1]
+			pkg_name = pkg_name[0]
+		if alias is None:
+			alias = pkg_name
+		if not self.check_installed(alias):
 			if not check_internet():
 				xprint("/rh/No internet! Failed to install requirements/=/\n/ruh/Closing in 5 seconds/=/")
 				return False
@@ -253,7 +259,7 @@ class OSsys_:  # fc=0700
 			self.install(pkg_name, alias)
 			IOsys.delete_last_line()
 
-		if pkg_name not in self.get_installed():
+		if not self.check_installed(alias):
 			xprint('/r/Failed to install and load required Library: "%s"/y/\nThe app will close in 5 seconds/=/'%pkg_name)
 			try:
 				pass #leach_logger('00006||%s||%s'%(pkg_name, str(Netsys.check_internet("https://pypi.org", '00006'))))
@@ -262,13 +268,14 @@ class OSsys_:  # fc=0700
 			return False
 		return True
 
-	def get_installed(self):  # fc=0703 v
-		"""returns a list of installed libraries"""
+	def check_installed(self, pkg: str|list):
 
-		import pkg_resources as pkg_r
-		reload(pkg_r)
+		# 
+		if not isinstance(pkg, str):
+			print(555555555555555,pkg,55555555555555)
+			pkg = pkg[1]
+		return bool(importlib.util.find_spec(pkg))
 
-		return [pkg.key for pkg in pkg_r.working_set]
 
 
 	def catch_KeyboardInterrupt(self, func, f_code, *args):  # fc=0705 v
@@ -306,6 +313,7 @@ class OSsys_:  # fc=0700
 		failed = False
 		
 		for i in requirements_all:
+			# print(i)
 			if not OSsys.install_req(i):
 				failed = True
 				break
@@ -335,11 +343,15 @@ class OSsys_:  # fc=0700
 		if config.disable_lib_check:
 			return 0
 
-		all_libs = OSsys.get_installed()
+		for i in requirements_all+requirements_win:
+			if not OSsys.check_installed(i):
+				print(i)
+
+		print('5'*50)
 		
-		has_all_libs = all(i in all_libs for i in requirements_all)
+		has_all_libs = all(OSsys.check_installed(i) for i in requirements_all)
 		if os_name=="Windows":
-			has_all_libs = has_all_libs and all(i in all_libs for i in requirements_win)
+			has_all_libs = has_all_libs and all(OSsys.check_installed(i) for i in requirements_win)
 		
 		
 		# print(has_all_libs, all_libs)
@@ -470,16 +482,16 @@ def check_internet(host='google', timeout=3):
 		#except socket.timeout:
 			#return False
 
-def check_installed(pkg):
-	reload(pkg_resources)
-	if type(pkg)==list:
-		out=True
-		for i in pkg:
-			out= out and (i.lower() in  [x.key.lower() for x in pkg_resources.working_set])
-		return out
-	#installed_packages = pkg_resources.working_set
-	#installed_packages_list = [i.key for i in installed_packages]
-	else: return (pkg.lower() in  [i.key.lower() for i in pkg_resources.working_set])
+# def check_installed(pkg):
+# 	reload(pkg_resources)
+# 	if type(pkg)==list:
+# 		out=True
+# 		for i in pkg:
+# 			out= out and (i.lower() in  [x.key.lower() for x in pkg_resources.working_set])
+# 		return out
+# 	#installed_packages = pkg_resources.working_set
+# 	#installed_packages_list = [i.key for i in installed_packages]
+# 	else: return (pkg.lower() in  [i.key.lower() for i in pkg_resources.working_set])
 
 
 def check_version(package):
@@ -699,66 +711,9 @@ def clean():
 	else:
 		_ = system('clear')
 
-def text_styling_markup(text):
-	''' for custom text stypling like html
-	print(tnt_helper('/<style= col: red>/ 69'))'''
-	if '/<' not in text:
-		return text
-	while re.search('/<(.*)>/', text):
-		a = re.search('/<(.*?)>/', text)
-		if a:
-			style = a.group(1)
-
-			text = text.replace(a.group(0), '')
-	return text
-
-custom_type_codes = ['/u/', '/a/', '/y/', '/g/', '/k/', '/b/', '/r/', '/h/', '/bu/', '/hu/', '/=/']
 
 
-def tnt_helper(text, bit=0):
-	''' i) custom_type_codes are used for custom commands to
-	 simplify the code
-	ii) other text modifications are made here and passes optimized
-	 text for the typing and speaking engine respectively'''
-	if bit==0: bit='type'
 
-	# pattern [[xx//yy]]
-	if '//' in text:
-		while re.search('\[\[(.*?)//(.*?)\]\]', text):
-			a = re.search('\[\[(.*?)//(.*?)\]\]', text)
-			if bit == 'talk':
-				text = text.replace(a.group(0), a.group(2))
-			elif bit == 'type':
-				text = text.replace(a.group(0), a.group(1))
-	while re.search('==(.*)==', text):
-		a = re.search('===([^(==)]*)===', text)
-		if a:
-			text = text.replace('==='+a.group(0)+'===', '/hu/' + a.group(1) + '/=/')
-		a = re.search('==(.*?)==', text)
-		if a:
-			text = text.replace('=='+a.group(0)+'==', '/u/' + a.group(1) + '/=/')
-
-	# text =text.replace(a.group(0),a.group(1))
-	if bit == 'type':
-
-		text= text_styling_markup(text)
-		'''text_styling_markup(text) for custom text stypling like html
-		print(tnt_helper('/<style= col: red>/ 69'))'''
-
-		'''text = text.replace('/u/', '/h/\033[4;37;40m')  # UNDERLINE
-		text = text.replace('/a/', '\033[4;34;40m')  # LINK
-		text = text.replace('/y/', '\033[1;33;40m')  # DID YOU MEAN...?
-		text = text.replace('/g/', '\033[1;32;40m')  # YES SURE
-		text = text.replace('/k/', '\033[0;30;40m')  # HIDDEN
-		text = text.replace('/b/', '\033[1;37;40m')  # BRIGHT
-		text = text.replace('/r/', '\033[1;31;40m')  # WARNING
-		text = text.replace('/h/', '\033[1;30;43m')  # HIGHLIGHT
-		text = text.replace('/bu/', '\033[1;37;40m\033[4;37;40m')  # Brightlight+Underline
-		text = text.replace('/hu/', '\033[0;37;40m\033[4;30;43m')  # Highlight+Underline
-		text = text.replace('/=/', '\033[0m')'''
-	else:
-		text=re.sub("/[argybpcw \=uih_]+/","", text)
-	return text
 
 # print("\033[4;37;40m hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
 nap_time = 0.03
@@ -767,7 +722,7 @@ nap_time = 0.03
 
 def slowtype(*args):
 	wait_ = nap_time
-	xprint (*args, highlighter=True, wait_time=wait_, run_at_start=tnt_helper)
+	xprint (*args, highlighter=True, wait_time=wait_)
 def slowtyper(*args, wait_time = nap_time):
 	"""thread to start slowtype engine"""
 	global typer
@@ -789,16 +744,16 @@ def install(pack, alias=0):
 	#import subprocess
 	if alias == 0:
 		alias = pack
-	if check_installed(alias) == True:
+	if OSsys.check_installed(alias) == True:
 		# slowtype(pack+ ' is already installed\n')
 		return True
 	elif check_internet(host='pypi'):
 		subprocess.call([sys.executable, "-m", "pip", "install", "--user",'--disable-pip-version-chec','--quiet', pack])
 
-		if check_installed(alias) == False:
+		if OSsys.check_installed(alias) == False:
 			print('method 1 failed\nretrying with method 2(' + pack + ')')
 			subprocess.call([sys.executable, "-m", "pip", "install", pack])
-		return check_installed(alias)
+		return OSsys.check_installed(alias)
 	else:
 		tnt('/r/Failed! \nPossible cause: No internet connection./=/\n')
 		not_installed.append(alias)
@@ -809,15 +764,15 @@ def off_install(direc, pack, bit=1):
 	"""install package offline"""
 	global not_installed
 	#import subprocess
-	if check_installed(pack) == True:
+	if OSsys.check_installed(pack) == True:
 		if bit == 0:
 			tnt('Already installed')
 	else:
 		subprocess.call([sys.executable, "-m", "pip", "install", "--user", direc])
-		if check_installed(pack) == False:
+		if OSsys.check_installed(pack) == False:
 			print('method 1 failed\nretrying with method 2(' + pack + ')')
 			subprocess.call([sys.executable, "-m", "pip", "install", direc])
-		if check_installed(pack) == False:
+		if OSsys.check_installed(pack) == False:
 			tnt('/r/Failed! \nPossible cause: File not found or Corrupted./=/\n')
 			not_installed.append(pack)
 
@@ -853,7 +808,7 @@ def install_req(pkg, alias=0, msg=''):
 	if alias == 0:
 		alias = pkg
 	out=True
-	if not check_installed(alias):
+	if not OSsys.check_installed(alias):
 		slowtype(
 			msg if msg != '' else alias + " is missing. Do you want to download it from here?\n*Data charge may apply*")
 		permit = inputer("/r/Yes to continue or no to cancel??\n*If no some error will occur*/=/\n")
@@ -877,8 +832,8 @@ print('			 80%',end='\r')
 #	print(chr(i))
 
 #install_req('mega.py')
-requirements_all = ["kivy", "kivymd", 'pafy','mutagen', 'comtypes', 'six', "yt-dlp", "requests", "plyer"]
-requirements_win = ["pywin32"]
+requirements_all = ["kivy", "kivymd", 'pafy','mutagen', 'comtypes', 'six', "yt_dlp", "requests", "plyer"]
+requirements_win = [("pywin32", "win32api")]
 
 OSsys.import_missing_libs()
 import requests
@@ -1000,7 +955,7 @@ def ins_n_imp_voice():
 
 		except ValueError:
 			ins_frm_imp('gtts', 'gTTS')
-			if check_installed('gtts') == True:
+			if OSsys.check_installed('gtts') == True:
 				voice_module = 'gtts'
 			else:
 				print(no_voice_error)
@@ -1026,7 +981,7 @@ SPEAKER_BUSY = False
 
 def speak_(text):
 	global vmodule, speakers, droid, talk_aloud_temp, SPEAKER_BUSY
-	text = tnt_helper(text, 'talk')
+	text = remove_style(text)
 	# talk_aloud_temp = False
 	if vmodule == 'pyttsx3':
 		global engine
@@ -1042,7 +997,7 @@ def speak_(text):
 		SPEAKER_BUSY = True
 		
 		engine.say(text)
-		engine.startLoop(False)
+		engine.startLoop(False,error=False)
 		# engine.iterate() must be called inside externalLoop()
 		engine.iterate()
 		engine.endLoop()
@@ -1077,7 +1032,7 @@ def speakup(text):
 
 def tnt(text, speed=nap_time, force = False, toaster =None):
 	global typer, speakers
-	slowtyper(text, wait_time=speed)
+	xprint(text, wait_time=speed)
 	rr = re.compile('/s([\d\.]*)/')
 	ss = re.compile('/s[\d\.]*/')
 
@@ -1425,7 +1380,11 @@ def Ltuple(arg):
 	return L(tuple(arg))
 
 def read_rest_news():
-	tnt("\n".join(bbc_news.last_news[5:]))
+	news= bbc_news.last_news
+	if news is None:
+		tnt("No news found")
+		return
+	tnt("\n".join(news[5:]))
 
 
 
@@ -1434,8 +1393,9 @@ ui1 = ""
 ui2 = ""
 def basic_talk2(INPUT_CODE):
 	global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT
-	ui = i_slim(QUEUE[INPUT_CODE])
-	while len(QUEUE) > 1:
+	ui = i_slim(QUEUE.get())
+	while not QUEUE.empty():
+		print("QUEUE NOT EMPTY")
 		sleep(1)
 	# ui = QUEUE[code]
 	if ui in li_redo:
@@ -1598,14 +1558,14 @@ def basic_output(INPUT):
 
 		tnt('Installing ' + uiopen + '\n')
 		install(uiopen)
-		if check_installed(uiopen) == False:
+		if OSsys.check_installed(uiopen) == False:
 			tnt('/r/Could not install!/=/')
 		else:
 			tnt('/g/Successfully installed %s/=/'%uiopen)
 	elif ui.startswith('upgrade ') or ui.startswith('update '):
 		reg_ex = re.search('up...?.. (.+)', ui)
 		uiopen = reg_ex.group(1)
-		if check_installed(uiopen) == False:
+		if OSsys.check_installed(uiopen) == False:
 			install(uiopen)
 		else:
 			old_v = check_version(uiopen)
@@ -1656,6 +1616,9 @@ def basic_output(INPUT):
 	elif re.search('(read )?(the )?(latest )?news', ui):
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
+			if not news:
+				tnt('No news found!')
+				return
 			tnt("\n".join(news[:5]))
 			while SPEAKER_BUSY: sleep(1)
 			asker("Do you want to hear the rest?", true_func=read_rest_news)
@@ -1673,6 +1636,9 @@ def basic_output(INPUT):
 			elif uiopen in ["latest news", "news update", 'news']:
 				if check_internet():
 					news = bbc_news.task(bbc_topic)
+					if not news:
+						tnt('No news found!')
+						return
 					tnt("\n".join(news[:5]))
 					while SPEAKER_BUSY: sleep(1)
 					asker("Do you want to hear the rest?", true_func=read_rest_news)
@@ -1753,21 +1719,25 @@ tasks= []
 
 print("init2")
 import concurrent.futures
+
 def send_message(message):
 	"""send message to command control panel ("basic_talk2")"""
+	QUEUE.put(message)
 	code = time_on()
-	QUEUE[code] = message
+
 	# x = Thread(target= basic_talk2, args=(code,))
 	# x.start()
 	# x.join()
 
-	with concurrent.futures.ThreadPoolExecutor() as executor:
-		print("send_message")
-		future = executor.submit(basic_talk2, code)
-		return_value = future.result()
-		print("return_value")
+	return_value = basic_talk2(code)
+
+	# with concurrent.futures.ThreadPoolExecutor() as executor:
+	# 	print("send_message")
+	# 	future = executor.submit(basic_talk2, message)
+	# 	return_value = future.result()
+	# 	print("return_value")
 	
-	QUEUE.pop(code)
+	# QUEUE.pop(code)
 	return return_value
 
 
@@ -1808,7 +1778,7 @@ class VR_:
 
 		
 		while True:
-			if (not self.mute) and (out not in escape) and (len(QUEUE) == 0) and (out != "reload"):
+			if (not self.mute) and (out not in escape) and (QUEUE.empty()) and (out != "reload"):
 				if BREAK_POINT: return
 				with sr.Microphone() as source:
 					print("Listening...")
@@ -2185,11 +2155,54 @@ demoapp = DemoApp()
 
 del tnt, asker
 
-	
+class Toaster_:
+	__all__ = ["new", "update", "_update"]
+	def __init__(self):
+		self.queue = Queue()
+		self.BUSY = False
+		
+	def make_not_busy(self, wait_time=2.5):
+		def func():
+			sleep(wait_time)
+			self.BUSY = False
+		t = Thread(target=func)
+		t.start()
+
+	def next(self):
+		# return self.queue.get()
+		if self.queue.empty() or self.BUSY:
+			return None
+
+		self.BUSY = True
+		text, wait_time= self.queue.get()
+
+		
+		toast(text, duration=wait_time)
+		self.make_not_busy(wait_time)
+
+		self.BUSY = False
+
+		if not self.queue.empty():
+			return True
+
+		
+	def update(self, *text, sep= ' ', wait_time=2.5):
+		""" Uses xprint and parse string"""
+		text = str(sep).join(map(str, text))
+		self.queue.put((text, wait_time))
+		while self.next() is True:
+			pass
+		
+	def new(self):
+		self.__init__()
+
+Toaster = Toaster_()
+
+
 def tnt(text, speed=nap_time, force = False, toaster = True):
 	global typer, speakers
 	if toaster:
-		toast(remove_style(text))
+		Toaster.update(remove_style(text))
 	rr = re.compile('/s([\d\.]*)/')
 	ss = re.compile('/s[\d\.]*/')
 
@@ -2217,6 +2230,7 @@ def tnt(text, speed=nap_time, force = False, toaster = True):
 	
 def asker(message="", self=demoapp, true_func= OSsys.null, false_func=OSsys.null):
 	tnt(message, toaster = True)
+	message = remove_style(message)
 	code = time_on()
 
 	def _yes(*_):

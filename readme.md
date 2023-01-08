@@ -8,3 +8,10 @@ Welcome to project Alice.
 * My/Our main goal is to create a Multi platform accessable voice assistant.
 
 * our additional plan is to create their animated avatar and make it available online (via Browsers)
+
+
+
+# How To:
+* **First** install the [REQUIREMENTS](/REQUIREMENTS.md)
+* For GUI USE: run the `src/GUI_Alice.py` script
+* For CLI USE: run the `src/Alice.py` script

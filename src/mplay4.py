@@ -8,8 +8,18 @@ if os_name == 'nt':
 	class PlaysoundException(Exception):
 		pass
 
+	def _ignore_playsound_exception(func):
+		"""Decorator to ignore PlaysoundException."""
+		def wrapper(*args, **kwargs):
+			try:
+				func(*args, **kwargs)
+			except PlaysoundException:
+				pass
+		return wrapper
+
 	# TODO: detect errors in all mci calls
 	class _PlatformSpecificAudioClip(object):
+		
 		def directsend(self, command):
 			buf = c_buffer(255)
 			command = ''.join(command).encode(getfilesystemencoding())
@@ -21,10 +31,12 @@ if os_name == 'nt':
 				exceptionMessage = ('\n	Error ' + str(errorCode) + ' for command:'
 									'\n		' + command.decode() +
 									'\n	' + errorBuffer.value.decode())
-				raise PlaysoundException(exceptionMessage)
+
+				if self.error:	raise PlaysoundException(exceptionMessage)
 			return buf.value
 
-		def __init__(self, filename):
+		def __init__(self, filename, error=True):
+			self.error = error
 			#filename = filename.replace('/', '\\')
 			self.filename = filename
 			self._alias = 'yui_' + str(random.random())
@@ -92,9 +104,14 @@ else:
 
 class AudioClip:
 
-	def __init__(self, filename):
+	def __init__(self, filename, error="all"):
 		"""Create an AudioClip for the given filename."""
-		self._clip = _PlatformSpecificAudioClip(filename)
+		self._error = error != "ignore"
+		self._clip = _PlatformSpecificAudioClip(filename, self._error)
+
+	def show_error(self):
+		self._clip.error = True
+		self._error = True # show all errors
 
 	def play(self, start_ms=None, end_ms=None):
 		"""
@@ -162,9 +179,9 @@ class AudioClip:
 		return self._clip.isvolume()
 
 	
-def load(filename):
+def load(filename, error="all"):
 	"""Return an AudioClip for the given filename."""
-	return AudioClip(filename)
+	return AudioClip(filename, error)
 
 if __name__=='__main__':
         x= load('songs/Date.m4a')

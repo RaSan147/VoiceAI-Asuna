@@ -393,7 +393,7 @@ def play_youtube(search, sleep_play = False):
         xprint("/y/Can only play on Windows/=/")
         return
     if play_music==True:
-        music=mplay.load(song_name)
+        music=mplay.load(song_name, error="ignore")
         try:
             music.play()
             if sleep_play:

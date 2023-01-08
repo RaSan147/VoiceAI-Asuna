@@ -45,7 +45,7 @@ def linker(x):
 def googler(link):
 	global googles_li
 	for i in googles_li:
-		if x in i:
+		if link in i:
 			web_go(i[0])
 def searcher(x):
 	loc= x.replace(' ','+')

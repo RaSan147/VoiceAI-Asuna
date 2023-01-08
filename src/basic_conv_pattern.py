@@ -74,7 +74,8 @@ for x in li_do_u_know2:
 			li_whats += (s + 'what' + x + t,)
 			li_who += (s + 'who' + x + t,)
 			li_where += (s + 'where' + x + t,)
-print(li_who)
+			
+			
 li_tell_time =('time', 'the time', 'current time')
 li_tell_time1 = li_tell_time + ('tell time', 'tell the time')
 

@@ -205,7 +205,12 @@ class OSsys_:  # fc=0700
 			alias: if the pip package name is different from lib name,
 				then used alias (not required here) [beautifulsoup4 (pip)=> bs4 (lib name)] """
 
-		if pkg_name not in self.get_installed():
+		if alias is None:
+			alias = pkg_name
+
+		
+
+		if not check_installed(alias):
 			if not check_internet():
 				xprint("/rh/No internet! Failed to install requirements/=/\n/ruh/Closing in 5 seconds/=/")
 				return False
@@ -214,7 +219,7 @@ class OSsys_:  # fc=0700
 			self.install(pkg_name, alias)
 			IOsys.delete_last_line()
 
-		if pkg_name not in self.get_installed():
+		if not check_installed(alias):
 			xprint('/r/Failed to install and load required Library: "%s"/y/\nThe app will close in 5 seconds/=/'%pkg_name)
 			try:
 				pass #leach_logger('00006||%s||%s'%(pkg_name, str(Netsys.check_internet("https://pypi.org", '00006'))))
@@ -322,6 +327,7 @@ class OSsys_:  # fc=0700
 			if failed:
 				traceback.print_exc()
 				xprint("/r/Failed to load required libraries.\n/=//yh/Possible cause 1st initialization without internet")
+				exit()
 
 			else:
 				self.import_missing_libs(failed=True)
@@ -651,14 +657,15 @@ def delthisline():
 	sys.stdout.write('\x1b[2K')
 
 
-def clean():
-	# for windows
-	if os_name == 'Windows':
-		_ = system('cls')
-	# for mac and linu
-	# x(here, os.name is 'posix')
-	else:
-		_ = system('clear')
+# def clean():
+# 	# return 0
+# 	# for windows
+# 	if os_name == 'Windows':
+# 		_ = system('cls')
+# 	# for mac and linu
+# 	# x(here, os.name is 'posix')
+# 	else:
+# 		_ = system('clear')
 
 def text_styling_markup(text):
 	''' for custom text stypling like html
@@ -995,7 +1002,7 @@ def speak_(text):
 		SPEAKER_BUSY = True
 		
 		engine.say(text)
-		engine.startLoop(False)
+		engine.startLoop(False, error = False)
 		# engine.iterate() must be called inside externalLoop()
 		engine.iterate()
 		engine.endLoop()
@@ -1113,12 +1120,12 @@ def i_slim(in_dat):
 
 
 print('			 100%',end='\r')
-clean()
+IOsys.clear_screen()
 
 Ctitle('Project Alice')
 
 def locker():
-	clean()
+	IOsys.clear_screen()
 	slowtype("Please enter your User name: ")
 	Name = inputer()
 
@@ -1300,7 +1307,7 @@ if reloaded == False:
 		outtxt = wb + uName
 	# tnt(outtxt)
 	sleep(1)
-	clean()
+	IOsys.clear_screen()
 
 	ui = ""
 	uibit1 = 0
@@ -1370,7 +1377,10 @@ def Ltuple(arg):
 	return L(tuple(arg))
 
 def read_rest_news():
-	tnt(*bbc_news.last_news[5:])
+	news = bbc_news.last_news
+	if news is None:
+		return tnt("No news available")
+	tnt(*news[5:])
 
 
 
@@ -1425,7 +1435,7 @@ def basic_talk2(INPUT_CODE):
 			
 			
 def basic_output(INPUT):
-	global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT
+	global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
 	ui = i_slim(INPUT)
 	if ui == "":
 		return
@@ -1584,8 +1594,11 @@ def basic_output(INPUT):
 	elif re.search('read (the )?(latest )?news', ui):
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
-			tnt(*news[:5])
-			asker("Do you want to read more?", true_func=lambda: tnt(*news[5:15]))
+			if news is None:
+				tnt('No news available')
+			else:
+				tnt(*news[:5])
+				asker("Do you want to read more?", true_func=lambda: tnt(*news[5:15]))
 		else:
 			tnt('No internet!')
 
@@ -1600,8 +1613,11 @@ def basic_output(INPUT):
 			elif uiopen in ["latest news", "news update", 'news']:
 				if check_internet():
 					news = bbc_news.task(bbc_topic)
-					tnt(*news[:5])
-					asker("Do you want to hear the rest?", true_func=read_rest_news)
+					if news is None:
+						tnt("No news available")
+					else:
+						tnt(*news[:5])
+						asker("Do you want to hear the rest?", true_func=read_rest_news)
 
 
 				else:
