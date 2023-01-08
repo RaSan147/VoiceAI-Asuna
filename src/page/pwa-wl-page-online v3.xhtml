@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+<meta id="seoTitle" property="og:title" content="${PY_PROJ_NAME}" />
+
+<meta id="seoImg" property="og:image" content="https://i.ibb.co/D4KnFRC/emo-angel-titled-w400.png" />
+
+
+
+
+
+<meta id="seoDescription" name="description" content="Just a demo webpage for Manga.">
+
+
+
+<link rel="manifest" href="/manifest.webmanifest">
+
+
+
+<title>Web Leach</title>
+
+
+
+<link id='icon' rel="icon" href="/favicon.ico" onerror="alt_href(this, alt_icons)">
+
+
+
+<!-- <script src="https://kit.fontawesome.com/1a9e874525.js" crossorigin="anonymous"></script> -->
+
+<style>html{background-color: #222;}
+
+/*body{display: none;}*/
+
+</style>
+
+
+
+<script>
+
+
+
+const log = console.log,
+
+	byId = document.getElementById.bind(document),
+
+	byClass = document.getElementsByClassName.bind(document),
+
+	byTag = document.getElementsByTagName.bind(document),
+
+	byName = document.getElementsByName.bind(document),
+
+	createElement = document.createElement.bind(document);
+
+
+
+	const alt_icons = ["https://cdn.jsdelivr.net/gh/Ratulhasan14789/Web-Leach_pub@main/resources/icon.ico", "/icon.ico"],
+
+	alt_logos = ['https://i.ibb.co/D4KnFRC/emo-angel-titled-w400.png',
+
+			'emo_angel_titled_w400.png'
+
+		];
+
+
+
+	function called(by,func){
+
+		log(by, ' called ', func)
+
+	}
+
+	async function null_func(){return null}
+
+
+
+	async function alt_(elm, src_list) {
+
+		/*elm: element
+
+			src_list: list of links
+
+			attt: src or href*/
+
+		if (src_list.length==0) {
+
+			elm.onerror = "";
+
+			return true;
+
+		}
+
+
+
+		elm.src = src_list[0];
+
+		elm.onerror = function () {
+
+			alt_(elm, src_list.slice(1))
+
+		};
+
+	}
+
+
+
+	async function alt_href(elm, href_list) {
+
+		/*elm: element
+
+			src_list: list of links
+
+			attt: src or href*/
+
+		if (href_list.length==0) {
+
+			elm.onerror = "";
+
+			return true;
+
+		}
+
+
+
+		elm.href = href_list[0];
+
+		elm.onerror = function () {
+
+			alt_href(elm, href_list.slice(1))
+
+		};
+
+	}
+
+
+
+
+
+	async function load_link(rel, href_list) {
+
+		for (let i = 0; i < href_list.length; i++) {
+
+			let link = createElement('link');
+
+			link.rel = rel;
+
+			if(rel=='stylesheet'){
+
+				link.type = "text/css";
+
+				link.media = 'all';}
+
+			link.href = href_list[i];
+
+			document.head.appendChild(link);
+
+		}
+
+	}
+
+
+
+	async function load_css(links){
+
+		load_link("stylesheet", links)
+
+	}
+
+
+
+	function load_font(gfont){
+
+		load_css(["https://fonts.googleapis.com/css?family=" + gfont])
+
+	}
+
+
+
+	// load_css(['/?scripts/main.css']) // for web leach python server
+
+	// load_css(['/?scripts/chapter_list.css']) // for web leach python server
+
+
+
+	function switch_icon() {
+
+		load_link("icon", alt_icons)
+
+	}
+
+
+
+	switch_icon()
+
+
+
+</script>
+
+
+
+
+
+</head>
+
+
+
+
+
+<body align="center">
+
+<h1 id="no_js" style="color: white; background-color: red;">
+
+	<i>"javascript"</i> IS DISABLED. THIS SITE WON'T WORK WITHOUT <i>"javascript"</i>!
+
+</h1>
+
+
+
+<script>
+
+	byId("no_js").style.display = "none"
+
+</script>
+
+<div id="brightness">
+
+</div>
+
+
+
+
+
+<div id='TopBar' class='top_bar'>
+
+	<button class="open-sidebar-btn" onclick="sidebar_control.toggleNavL()" style='float: left;'>&#9776; <span
+
+			class='nav-btn-text'>Sidebar</span></button>
+
+	<div id="app_header">
+
+		<span id="app_name_container">
+
+			<span style='font-size: 22px; color: #AAA;'> | </span><a id='app_name' href='/'> WL Reader</a></span>
+
+	</div>
+
+	<button class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span><span
+
+			class='nav-btn-text'>Effects</span> <span class="fa fa-light fa-wand-magic-sparkles">🛠️</span></span></button>
+
+</div>
+
+
+
+
+
+<div id="sidebar_bg"></div> <!-- trigger to close Sidebar-->
+
+<div id="popup-container">
+
+<!-- POP_UP items -->
+
+</div>
+
+
+
+<!-- Load CSS after displaying some element -->
+
+<link rel="stylesheet" href="/assets/style/main.css">
+
+<link rel="stylesheet" href="/assets/style/chapter_list.css">
+
+<!--<link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@18657a9/css/all.min.css" rel="stylesheet" type="text/css" />-->
+
+
+
+
+
+<DIV id = "CHAPTER" class = "subpage">
+
+
+
+<div id="mySidebarL" class="sidebar sidebarL">
+
+	<span style="text-align:left; float:left;" class="close-sidebar disable_selection" id="close-sidebarL" onclick = "sidebar_control.closeNavL()">&times;</span>
+
+
+
+
+
+	<div id="find-this-chapter"><span class="fa fa-solid fa-map-location-dot">🧭</span></div>
+
+
+
+	<div>
+
+		<div id="more_btn" class="accordion accordion-button" onclick="show_ch_menus()">Menu</div>
+
+
+
+
+
+
+
+		<p class="proj-panel disable_selection" id="sidebar-proj-panel">Project Directories</p>
+
+		<div style="display: flex; justify-content: center; align-items: center;">
+
+
+
+			<div class="search-box">
+
+				<button class="btn-search">
+
+					<span id="proj_search_icn"><span class="fa fa-light fa-magnifying-glass" style="line-height:1.8">🔍</span></span>
+
+				</button>
+
+				<input type="text" class="input-search" id="proj_search_input" placeholder="Type to Search...">
+
+			</div>
+
+
+
+		</div>
+
+
+
+		<hr>
+
+		<div id="ch-search-panel-body">
+
+			<!-- add links here -->
+
+		</div>
+
+	</div>
+
+
+
+	<div class='sidebar-end'></div>
+
+
+
+</div>
+
+
+
+<div id="mySidebarR" class="sidebar sidebarR theme-tools">
+
+	<span style='right:0; text-align:right;margin-right: 20px;' class="close-sidebar disable_selection"
+
+		id="close-sidebarR" onclick = "sidebar_control.closeNavR()">&times;</span> <!-- × -->
+
+
+
+	<div class="sidebar-content">
+
+		<div class="accordion"><span>Image Border</span>
+
+			<div id="S-image-border" class='tron-switch'>
+
+				<div class='tron-switch-span' id='S-image-border-mode'>OFF</div>
+
+			</div>
+
+		</div>
+
+
+
+		<div class="accordion-panel">
+
+			<div class='accordion-panel-container'>
+
+				<span class="accordion-panel-heading">
+
+					<b>Border Color</b><br>
+
+				</span>
+
+				<form>
+
+					<label class="rad-label">
+
+						<input type="radio" class="rad-input" name="border-color" value=1 checked="checked" />
+
+						<span class="rad-design" style="background:black;"></span>
+
+						<span class="rad-text">Black</span>
+
+					</label>
+
+
+
+					<label class="rad-label">
+
+						<input type="radio" class="rad-input" name="border-color" value=2 />
+
+						<span class="rad-design" style="background:white;"></span>
+
+						<span class="rad-text">White</span>
+
+					</label>
+
+
+
+					<label class="rad-label">
+
+						<input type="radio" class="rad-input" name="border-color" value=3 />
+
+						<span class="rad-design" style="background:var(--theme-color);"></span>
+
+						<span class="rad-text" id="add_theme_name">Theme </span>
+
+					</label></form>
+
+
+
+				<span class="accordion-panel-heading"><b>Border Width</b></span>
+
+
+
+
+
+				<div class="range-input">
+
+					<input class="ranger" type="range" name="border-width" id="border-width-input" min="0" max="10"
+
+						step='1' oninput="page_styler.change_style()">
+
+					<br>
+
+					<div style="width:90%">
+
+						<div class='slider-tick'>|||||||||||</div>
+
+						<div class='slider-tick-label'>
+
+							<span style='float:left;font-weight: 50;font-size: 13px;'>thin</span><span
+
+								style='float:right;font-weight: 900;font-size: 10px;'>THICK</span>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+
+
+
+
+		<div class="accordion"><span>Spacing</span>
+
+			<div id="S-image-space" class='tron-switch'>
+
+				<div class='tron-switch-span' id='S-image-space-mode'>ON</div>
+
+			</div>
+
+		</div>
+
+		<div class="accordion-panel">
+
+			<p><b>ON:</b> makes a gap between each media <br>
+
+				<b>OFF:</b>removes space between media</p>
+
+		</div>
+
+		
+
+		
+
+		<div class="accordion">
+
+			<span>Change Brightness</span>
+
+		</div>
+
+
+
+		<div class="accordion-panel">
+
+			<span class="accordion-panel-heading">
+
+				<b>Brightness Level</b><br>
+
+			</span>
+
+
+
+			<div class="range-input">
+
+				<input class="ranger" type="range" name="brightness" id="brightness-input" min="0" max="10" step='1'
+
+					value="10">
+
+				<br>
+
+				<div style="width:90%">
+
+					<div class='slider-tick'>|||||||||||</div>
+
+					<div class='slider-tick-label'>
+
+						<span style='float:left;font-weight: 50;font-size: 13px;'>Dark</span>
+
+						<span style='float:right;font-weight: 900;font-size: 11px;'>Bright</span>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+
+
+
+
+    <div class="accordion"><span>Pre-Loading</span>
+
+			<div id="S-pre-loading" class='tron-switch'>
+
+
+
+				<div class='tron-switch-span' id='S-pre-loading-mode'>OFF</div>
+
+			</div>
+
+		</div>
+
+		<div class="accordion-panel">
+
+			<p><b>ON:</b> Auto load next chapter So that you won't have to wait! <br>
+
+				<b>OFF:</b>Won't do that (Data Saving)</p>
+
+				<br>
+
+				<p id="preload-progress"></p>
+
+			
+
+		</div>
+
+
+
+
+
+		<br>
+
+		<div class='sidebar-end'></div>
+
+	</div>
+
+</div>
+
+
+
+
+
+<div id="chapter-description">
+
+
+
+
+
+	<div style="width: 95vw; max-width: 700px; margin: 0 auto;">
+
+		<div class='poster'>
+
+			<img src='/assets/emo_angel_titled_w400.png' id="logo-img" onerror="alt_(this, alt_logos)" class="poster-img">
+
+		</div>
+
+		<div style="padding: 16px; text-align:left; float: left;">
+
+			<h2 class="page_title"><u>Project:&nbsp;</u><span id="proj_name"></span> </h2>
+
+			<h2 class="page_title"><u>Page:&nbsp;</u><span id="page_title"></span></h2>
+
+			<a id='go2main' href='../index.html' onclick="handle_json_request(this.href, event)">
+
+				<u> Go to Page list</u>
+
+			</a>
+
+			<br><br><br>
+
+		</div>
+
+	</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<center><br>
+
+
+
+
+
+	<div id="myModal" class="modal">
+
+		<div class="modal_bg" style="background-color:rgba(0, 0, 0, 0.9);" onclick="modal_img.close_image_modal()">
+
+		</div>
+
+		<span class="close-image-modal">&times;</span>
+
+		<div id="image-modal-content">
+
+			<div style="text-align: center;">
+
+				<img id="modal-img" alt="Failed to load image">
+
+			</div>
+
+
+
+			<span id="modal-modal-caption-gap" style="padding: 100px 1px 1px 0; display: block;" onclick="modal_img.close_image_modal()"></span>
+
+
+
+		</div>
+
+		<div id="modal-caption-box">
+
+			<div id="modal-caption">1</div>
+
+		</div>
+
+
+
+		<span class="view_arrow disable_selection" id="prev_view" onclick="modal_img.change_image(-1)">
+
+			<p>&#10094;</p>
+
+				</span>
+
+		<span class="view_arrow disable_selection" id="next_view" onclick="modal_img.change_image(1)">
+
+			<p>&#10095;</p>
+
+				</span>
+
+	</div>
+
+
+
+
+
+	<div id="images" style="position: relative"></div>
+
+</center>
+
+<br>
+
+<br>
+
+
+
+
+
+
+
+</DIV>
+
+
+
+<DIV id = "CHAPTER-LIST" class = "subpage">
+
+
+
+<div id="manga-description">
+
+
+
+	<div style="width: 95vw; max-width: 700px; margin: 0 auto;">
+
+	<div class='poster'>
+
+		<img src='/assets/emo_angel_titled_w400.png' id="manga-img" class="poster-img">
+
+	</div>
+
+	<div class="description_container" >
+
+		<h2 class="page_title"><u>Project:</u>&nbsp;<span id="manga_name"></span> </h2>
+
+		<p class ="description page_title"><u>Description:</u>&nbsp;<span id ="description-text" ></span></p>
+
+		<p class ="tag-list page_title"><u>Tag list:</u> <span id ="tag-list"></span><p>
+
+		<div class ="rating page_title"><h3><u>Rating:</u> <span id ="manga-stars"></span></h3></div>
+
+		<br><br><br>
+
+	</div>
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+<h2 style="text-align: center; color:var(--theme-color-text)">~Chapters~</h2>
+
+<hr style="width: 80%;">
+
+<center>
+
+<div id='allA'></div>
+
+</center>
+
+
+
+</DIV>
+
+
+
+
+
+<footer id='footer' style="align-self: center;">
+
+	<pre>
+
+
+
+</pre>
+
+
+
+	<center>
+
+
+
+	<div class='pagination' id='pagination'>
+
+
+
+		<span id='pagination-prev'>
+
+
+
+			<div class='paginationA display'>Prev Page</div>
+
+		</span>
+
+		<span id='pagination-next'>
+
+			<div class='paginationA disable_selection'>Next Page</div>
+
+		</span>
+
+	</div>
+
+
+
+
+
+	<br><br>
+
+		<hr width='95%'>
+
+		<hr width='89%'>
+
+	</center>
+
+	<p style="color: darkgray;">Made by RaSan147 with Web leach</p>
+
+	<br><br>
+
+</footer>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+class Config {
+
+	constructor() {
+
+		this.page_type = "${PY_PAGE_TYPE}";
+
+		this.popup_msg_open = false;
+
+		this.total_popup = 0;
+
+		this.Debugging = false;
+
+		this.allow_Debugging = true;
+
+
+
+		this.Hammered_modal = 0;
+
+		this.is_touch_device = 'ontouchstart' in document.documentElement;
+
+
+
+		this.themes = ["Tron"]
+
+
+
+
+
+		this.is_webkit = navigator.userAgent.indexOf('AppleWebKit') != -1
+
+		this.is_edge = navigator.userAgent.indexOf('Edg') != -1
+
+
+
+
+
+
+
+		this.previous_type = null;
+
+	}
+
+}
+
+
+
+var config = new Config();
+
+
+
+byId(config.page_type).style.display = "contents";
+
+
+
+
+
+var panel2disable = [];
+
+
+
+
+
+class Datas {
+
+	constructor() {
+
+		this.images_loc = ${PY_IMAGES_LOC};
+
+		this.pages_list = ${PY_PAGES_LIST};
+
+		this.current_page_index = ${PY_CURRENT_PAGE_INDEX};
+
+		
+
+		this.new_pages = ${PY_NEW_PAGES}; // index of new pages
+
+		
+
+		this.sp_flags = ${PY_SP_FLAGS};
+
+		
+
+		this.proj_name = "${PY_PROJ_NAME}";
+
+		
+
+		this.current_page_name = "WL-"+ this.proj_name + " " + this.current_page_index;
+
+		this.last_opened = null;
+
+
+
+		this.default_style = ${PY_DEFAULT_STYLE}; // may vary depending on project
+
+		
+
+		this.current_style = this.default_style;
+
+		this.theme = 0;
+
+
+
+		this.discuss_id = "${PY_DISCUSS_ID}";
+
+		this.description = "${PY_DESCRIPTION}";
+
+		this.stars = ${PY_STARS};
+
+		this.tags = ${PY_TAGS};
+
+
+
+		this.poster_loc = "${PY_POSTER_LOC}";
+
+
+
+		this.cssVar = document.querySelector(':root');
+
+
+
+		this.has_script = {};
+
+
+
+		this.last_opened_manga = [];
+
+		this.allow_preload = 0;
+
+
+
+	}
+
+
+
+	init(){
+
+		this.images_loc = [];
+
+		this.pages_list = [];
+
+		this.current_page_index = null;
+
+		this.new_pages = [];
+
+		this.current_page_name = "Web Leach";
+
+		this.last_opened = null;
+
+		this.last_opened_manga = null;
+
+		this.default_style = [];
+
+		this.current_style = [];
+
+		this.theme = 0;
+
+		this.discuss_id = "";
+
+		this.stars = 0;
+
+		
+
+		this.allow_preload = 0; // used globally
+
+
+
+	}
+
+
+
+
+
+
+
+	get_css(key) {
+
+		return getComputedStyle(this.cssVar).getPropertyValue(key);
+
+
+
+	}
+
+
+
+	set_css(key, value) {
+
+		this.cssVar.style.setProperty(key, value);
+
+	}
+
+
+
+
+
+}
+
+
+
+var datas = new Datas();
+
+
+
+// function SEOpatch(){
+
+// 	var poster = "https://i.ibb.co/D4KnFRC/emo-angel-titled-w400.png"
+
+// 	if(datas.poster_loc!=""){
+
+// 		poster =datas.poster_loc;
+
+// 	}
+
+// 	byId("seoImg").setAttribute("content", poster)
+
+// 	byId("seoDescription").setAttribute("content", d
+
+// }
+
+
+
+
+
+config.previous_type = config.current_type;
+
+
+
+
+
+if (!config.allow_Debugging){
+
+	log = null_func;
+
+	called = null_func;
+
+}
+
+
+
+
+
+
+
+function fuck(x="") {
+
+	alert("fuck " + x);
+
+}
+
+
+
+
+
+function helped_user(set = 0) {
+
+	if (set != 0) {
+
+		localStorage.setItem('?helped-user', set);
+
+		return;
+
+	}
+
+	var helped = localStorage.getItem('?helped-user');
+
+	if (helped == 'undefined' || helped == null) {
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+
+
+
+
+
+
+class Tools {
+
+	// various tools for the page
+
+	sleep(ms) {
+
+		// sleeps for a given time in milliseconds
+
+		return new Promise(resolve => setTimeout(resolve, ms));
+
+	}
+
+
+
+	set_brightness(input = 0) {
+
+		// sets the brightness of the screen
+
+
+
+		var val;
+
+		var input_ = byId('brightness-input');
+
+		var brightness = byId('brightness');
+
+		if (!input) {
+
+			val = sessionStorage.getItem('bright');
+
+			if (val) {
+
+				val = parseInt(val);
+
+				input_.value = val;
+
+			} else {
+
+				input = 1;
+
+			}
+
+		}
+
+		if (input) {
+
+			val = input_.value;
+
+			//   int to string
+
+			sessionStorage.setItem('bright', val);
+
+		}
+
+
+
+		// to make sure opacity is not -1.11022e-16
+
+		if (val == 10) {brightness.style.opacity = 0;return;}
+
+
+
+
+
+		brightness.style.opacity = 0.7 - (val * 0.07);
+
+	}
+
+
+
+
+
+	onlyInt(str){
+
+	if(this.is_defined(str.replace)){
+
+	return parseInt(str.replace(/\D+/g, ""))}
+
+	return 0;
+
+	}
+
+
+
+	del_child(elm){
+
+		if(typeof(elm)=="string"){
+
+			elm = byId(elm)
+
+		}
+
+
+
+		while (elm.firstChild) {
+
+			elm.removeChild(elm.lastChild);
+
+		}
+
+	}
+
+	toggle_bool(bool){
+
+		return bool !== true;
+
+	}
+
+
+
+	exists(name){
+
+		return (typeof window[name] !== 'undefined')
+
+	}
+
+
+
+	hasClass(element, className, partial = false) {
+
+		if (partial) {
+
+			className = ' ' + className;
+
+		} else {
+
+			className = ' ' + className + ' ';
+
+		}
+
+
+
+		return (' ' + element.className + ' ').indexOf(className) > -1;
+
+	}
+
+
+
+	addClass(element, className) {
+
+		if (!this.hasClass(element, className)) {
+
+			element.classList.add(className);
+
+		}
+
+	}
+
+
+
+	enable_debug(){
+
+		if(!config.allow_Debugging){
+
+			alert("Debugging is not allowed");
+
+			return;
+
+		}
+
+		if(config.Debugging){
+
+			return
+
+		}
+
+		config.Debugging = true;
+
+		var script = createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init() };
+
+	}
+
+
+
+
+
+	is_in(item, array) {
+
+		return array.indexOf(item) > -1;
+
+	}
+
+
+
+	is_defined(obj){
+
+		return typeof(obj) !== "undefined"
+
+	}
+
+
+
+	toggle_scroll(allow = 2, by = "someone") {
+
+		if (allow == 0) {
+
+			document.body.classList.add('overflowHidden');
+
+		} else if (allow == 1) {
+
+			document.body.classList.remove('overflowHidden');
+
+		} else {
+
+			document.body.classList.toggle('overflowHidden');
+
+		}
+
+	}
+
+}
+
+
+
+var tools = new Tools();
+
+// tools.enable_debug()
+
+function alt_script(sources, name){
+
+	if(sources.length == 0) {return 0;}
+
+	if (datas.has_script[name]==1) {return 0;}
+
+	var x = createElement("script");
+
+	x.src = sources[0];
+
+	function validate(){
+
+		if (tools.exists(name)){
+
+		datas.has_script[name] = 1;
+
+		}
+
+		else{
+
+		alt_script(sources.slice(1), name)
+
+
+
+	}
+
+	}
+
+
+
+	x.onload = validate;
+
+	x.onerror = validate;
+
+
+
+	document.head.appendChild(x)
+
+}
+
+
+
+alt_script(["https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js", "assets/scripts/hammer.min.js"], "Hammer")
+
+//load_font("Koulen") //not implemented yet
+
+
+
+
+
+
+
+</script>
+
+
+
+<script src="/assets/script/main v2.js"></script>
+
+<script>
+
+//load_css("https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@18657a9/css/all.min.css")
+
+</script>
+
+</body>
+
+
+
+</html>
+
