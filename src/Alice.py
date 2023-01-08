@@ -104,7 +104,7 @@ print('			 38%',end='\r')
 from bbc_news import bbc_news
 from basic_conv_pattern import *
 from errors import LeachKnownError, LeachNetworkError, LeachPermissionError, LeachCorruptionError, LeachICancelError,Error404
-from print_text2 import xprint, remove_style
+from PRINT_TEXT3 import xprint, remove_style
 
 from fsys import Fsys_, Datasys_, Netsys_, IOsys_
 Fsys = Fsys_()

@@ -5,10 +5,9 @@ Inspired by Kubas Google API:
 https://www.sololearn.com/learn/1099/?ref=app
 '''
 import urllib.request as RE
+from urllib.error import URLError
 import xml.etree.ElementTree as ET
-import re
-from time import sleep
-from print_text2 import xprint
+
 
 def check_internet(host='https://www.google.com/', timeout=3):
 	if host == 'fast':
@@ -21,7 +20,7 @@ def check_internet(host='https://www.google.com/', timeout=3):
 		try:
 			RE.urlopen(host, timeout=timeout)
 			return True
-		except RE.URLError:
+		except URLError:
 			return False
 
 
@@ -68,7 +67,7 @@ class BBC_News:
 		news_list.append(report)
 		for i in tree.iter('item'):
 			# print(i)
-			news = '/hui/{}:/=/\n{}\n'.format(i.find('title').text, i.find('description').text)
+			news = '/hui/ {}: /=/\n  {}\n'.format(i.find('title').text, i.find('description').text)
 			news += "/s1/" + '\n'
 			report += news
 			news_list.append(news)
@@ -81,7 +80,9 @@ class BBC_News:
 	def task(self, Topic):
 		if __name__ == '__main__':
 			if check_internet(bbc_topics[Topic]):
-				xprint(self.news_report(Topic), wait_time= 0.03)
+				from PRINT_TEXT3 import xprint
+				xprint(*self.news_report(Topic), wait_time= 0.03)
+				# print(*self.news_report(Topic))
 			else:
 				print('Could not access the server')
 		else:

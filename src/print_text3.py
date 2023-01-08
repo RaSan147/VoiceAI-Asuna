@@ -5,7 +5,7 @@ from shutil import get_terminal_size
 from math import ceil
 
 
-wait_time = 0
+wait_time = 0.0
 def null_func(*a):
 	return a[0]
 
@@ -65,12 +65,12 @@ class XprintClass:
 		else:
 			return self.__dict__[name]
 			
-	def make_str(self, *text, sep = " ", end="\n", highlighter=False):
+	def make_str(self, *text, sep:str = " ", end:str="\n", highlighter=False) -> str:
 		text= str(sep).join(map(str, text)) + str(end)
 		text = self.tnt_helper(text, highlighter)
 		return text
 
-	def text_styling_markup(self, text): #not in use
+	def text_styling_markup(self, text:str) -> str: #not in use
 		''' for custom text stypling like html
 		print(tnt_helper('/<style= col: red>/ 69'))'''
 		if '/<' not in text:
@@ -222,22 +222,19 @@ class XprintClass:
 					elif text[i+1]=='s':
 						
 						sys.stdout.flush()
-						if text[i+3]=='/':
-							try:
+						try:
+							if text[i+3]=='/':
 								sleep(float(text[i+2]))
-								i+=3
-							except:
-								i-=3
-						elif text[i+4]=='/':
-							try:
-								sleep(float(text[i+2:i+4]))
 								i+=4
-							except: i-=4
-						elif text[i+5]=='/':
-							try:
-								sleep(float(text[i+2:i+5]))
+							elif text[i+4]=='/':
+								sleep(float(text[i+2:i+4]))
 								i+=5
-							except: i-=5
+							elif text[i+5]=='/':
+								sleep(float(text[i+2:i+5]))
+								i+=6
+							continue
+						except:
+							pass
 			if has_code==True:
 				has_code = False
 				self.custom_style = self.custom_style_temp.copy()
@@ -281,8 +278,8 @@ class XprintClass:
 		"""text: must be parsed string (sep, end are parsed)"""
 		
 		self.tnt_helper(text, highlighter)
-		text = re.sub("/s\d*[.]?\d*/", "", text)
-		return re.sub("/[argybpcw \=uih_]+/","", text)
+		text = re.sub(r"/s\d*[.]?\d*/", "", text)
+		return re.sub(r"/[argybpcw \=uih_]+/","", text)
 		
 from queue import Queue
 
