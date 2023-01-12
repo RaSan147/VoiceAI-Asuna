@@ -1,4 +1,4 @@
-__all__ ={ 'os_name',}
+__all__ = { 'os_name',}
 
 
 from platform import system as os_name

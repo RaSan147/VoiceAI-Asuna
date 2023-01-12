@@ -72,7 +72,12 @@ def trans_str(txt, dicts):  # fc=0904 v
 def flatten2D(arr):  # fc=0905
 	functools_reduce(operator_iconcat, arr, [])
 
-def is_json(data=None, raise_=False): # fc=xxxx
+def is_json(data, raise_=False): # fc=xxxx
+	"""checks if a string is a valid json
+	data: string or file object or ioBase to check
+	raise_: if True, raises the error instead of returning None
+	returns: True if valid, False if invalid"""
+
 	if isinstance(data, (io.TextIOBase,
 	io.BufferedIOBase,
 	io.RawIOBase,
@@ -81,14 +86,14 @@ def is_json(data=None, raise_=False): # fc=xxxx
 	elif isinstance(data, (str, bytes)): 
 		func = json.loads
 	else:
-		return None
+		return False
 	try:
 		func(data)
 		return True
 	except Exception as e:
 		# if logger: traceback.print_exc()
 		if raise_: raise e
-		return None
+		return False
 
 
 

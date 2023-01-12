@@ -109,7 +109,7 @@ def dec2base(n,base):
 
 
 
-def base2dec(n, base, _type=int):
+def base2dec(n, base, _type:type=int):
 	if n =='':
 		return ''
 	out=0
@@ -133,13 +133,13 @@ def dt_():
 	"""
 	return str(datetime.now()+ timedelta(hours=6))
 
-def compressed_dt(_dt= None):
+def compressed_dt(_dt= ''):
 
 	# OLD VERSION# dt_now= int((dt_() if _dt is None else _dt).replace('-','').replace(' ','').replace('.','').replace(':',''))
-
-	xtime = str(time.time()).split('.')
+	_dt = str(time.time()) if _dt is None else _dt
+	xtime = _dt.split('.')
 	return dec2base(xtime[0], 63) +'.'+ dec2base(xtime[1], 63)
-	return dec2base(dt_now,63)
+	# return dec2base(dt_now,63)
 
 cdt_ = compressed_dt
 
@@ -157,7 +157,7 @@ def compressed_ip(ip):
 			if i:
 				ip_now[n] = int(i, 16)
 				joint = "#" # if IPv6
-				junk = [randint(0,65535) for i in range(4)]
+				junk = [randint(0,65535) for _ in range(4)]
 	else:
 		ip_now= ip.split('.')
 	new_dec2base = partial(dec2base, base=63)
@@ -236,7 +236,31 @@ def hash_bin64(data):
 
 
 
-def humanbytes(B):
+def fmbytes(B=0):
+	'Return the given bytes as a file manager friendly KB, MB, GB, or TB string'
+
+	B = B
+	KB = 1024
+	MB = (KB ** 2) # 1,048,576
+	GB = (KB ** 3) # 1,073,741,824
+	TB = (KB ** 4) # 1,099,511,627,776
+
+
+	if B/TB>1:
+		return '%.2f TB  '%(B/TB)
+	if B/GB>1:
+		return '%.2f GB  '%(B/GB)
+	if B/MB>1:
+		return '%.2f MB  '%(B/MB)
+	if B/KB>1:
+		return '%.2f KB  '%(B/KB)
+	if B>1:
+		return '%i bytes'%B
+
+	return "%i byte"%B
+
+
+def humanbytes(B=0):
 	'Return the given bytes as a human friendly KB, MB, GB, or TB string'
 	B = B
 	KB = 1024

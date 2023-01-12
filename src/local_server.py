@@ -39,6 +39,7 @@ class Config:
 		# FILE INFO
 		self.MAIN_FILE = os.path.realpath(__file__)
 		self.MAIN_FILE_dir = os.path.dirname(self.MAIN_FILE)
+		self.temp_file = "Alice_data/temp/"
 
 		print(tools.text_box("Running File: ",self.MAIN_FILE))
 
@@ -151,16 +152,6 @@ config = Config()
 
 # FEATURES
 # ----------------------------------------------------------------
-# * PAUSE AND RESUME
-# * UPLOAD WITH PASSWORD
-# * FOLDER DOWNLOAD (uses temp folder)
-# * VIDEO PLAYER
-# * DELETE FILE FROM REMOTEp (RECYCLE BIN) # PERMANENTLY DELETE IS VULNERABLE
-# * File manager like NAVIGATION BAR
-# * RELOAD SERVER FROM REMOTE [DEBUG PURPOSE]
-# * MULTIPLE FILE UPLOAD
-# * FOLDER CREATION
-# * Pop-up messages (from my Web leach repo)
 
 
 #TODO:
@@ -232,7 +223,7 @@ class UserHandler:
 		pass
 
 	def u_path(self, username):
-		return os.path.join(self.data_dir, username)
+		return os.path.join(config.data_dir, username)
 
 	def get_user_data(self, username, pointer):
 		user_path = self.u_path(username)
@@ -245,7 +236,7 @@ class UserHandler:
 		return None
 		
 	def create_user(self, username, password):
-		hash = hashlib.sha256(username, salt=password)
+		hash = hashlib.sha256(username+password)
 		id = hashlib.sha1(str(time.time()) + username).hexdigest()
 		u_data = {
 			"username": username,

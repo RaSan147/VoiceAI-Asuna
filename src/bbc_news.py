@@ -66,8 +66,11 @@ class BBC_News:
 		report += '\nThis are the latest News at the BBC:\n(updated on:%s)\n' % lastupdate
 		news_list.append(report)
 		for i in tree.iter('item'):
-			# print(i)
-			news = '/hui/ {}: /=/\n  {}\n'.format(i.find('title').text, i.find('description').text)
+			title = i.find('title')
+			description = i.find('description')
+			if not (title and description):
+				continue
+			news = '/hui/ {}: /=/\n  {}\n'.format(title.text, description.text)
 			news += "/s1/" + '\n'
 			report += news
 			news_list.append(news)
