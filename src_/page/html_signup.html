@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<!-- test1 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+<title>Signup</title>
+
+<link rel="stylesheet" href="./style_page.css">
+</head>
+
+<body>
+
+
+<div>
+	<div id="signup-page">
+		<div id="signup-header">
+			<h1>Signup</h1>
+		</div>
+		<div id="signup-form">
+			<form action="do_signup" method="post" ENCTYPE="multipart/form-data" id="signup">
+				<div id="signup-username">
+					<label for="username">Username</label>
+					<input name="signup" hidden>
+					<input type="text" name="username" id="username" placeholder="Username">
+				</div>
+				<div id="signup-password">
+					<label for="password">Password</label>
+					<input type="password" name="password" id="password" placeholder="Password">
+				</div>
+				<div id="signup-submit">
+					<input id="submit_btn" type="submit" value="Signup">
+				</div>
+			</form>
+		</div>
+
+		<p class="status" id="status"></p>
+
+	</div>
+</div>
+
+
+<div>Already Have account? <a href="/login" style="font-size: medium;">LOGIN</a></div>
+
+
+<style>
+.status {
+	color: rgb(48, 48, 48);
+	display: none;
+	font-size: 1.5em;
+	padding: 5px;
+	margin: 5px;
+	border: solid 2px;
+	border-radius: 4px;
+}
+</style>
+
+<script src="./script_global.js"></script>
+<script src="script_user.js"></script>
+
+
+<script>
+
+user.get_local_data(false);
+
+user.verify_login();
+
+byId("signup").onsubmit = (e) => {
+	e.preventDefault()
+	
+	const formData = new FormData(e.target)
+
+
+	var msg = "";
+	const status = byId('status')
+
+
+	// const filenames = formData.getAll('files').map(v => v.name).join(', ')
+	const request = new XMLHttpRequest()
+	request.open(e.target.method, e.target.action)
+	request.timeout = 3600000;
+	request.onreadystatechange = () => {
+		if (request.readyState === XMLHttpRequest.DONE) {
+			msg = `${request.status}: ${request.statusText}`
+			if (request.status === 0) msg = 'Connection failed'
+			if (request.status === 204 || request.status === 200){
+				var response = JSON.parse(request.responseText);
+				if (response.status == "success"){
+					msg = "Signed up. REDIRECTING...";
+					user.user_name = response.user_name;
+					user.user_id = response.user_id;
+					user.set_local_data();
+					setTimeout(function(){window.location.href = "/";}, 1000);
+				}
+				else{
+					msg = response.message;
+				}
+				
+			}
+			if (request.status === 401) msg = 'Incorrect password'
+
+			status.style.display = 'block'
+			status.innerText = msg
+		}
+	}
+	
+	
+	request.send(formData)
+}
+</script>
