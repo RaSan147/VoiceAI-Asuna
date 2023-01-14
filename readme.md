@@ -13,5 +13,4 @@ Welcome to project Alice.
 
 # How To:
 * **First** install the [REQUIREMENTS](/REQUIREMENTS.md)
-* For GUI USE: run the `src/GUI_Alice.py` script
-* For CLI USE: run the `src/Alice.py` script
+* To Launch the server run the [App_server.py](/src/App_server.py) file

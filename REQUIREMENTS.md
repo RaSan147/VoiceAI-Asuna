@@ -2,9 +2,7 @@
 
 ```
 pip install --upgrade pip wheel
-pip install kivy kivymd pafy mutagen comtypes six yt-dlp requests
-pip install SpeechRecognition pipwin
-pipwin install pyaudio
+pip install pafy mutagen comtypes six yt-dlp requests
 ```
 
 # For windows you also need to install
