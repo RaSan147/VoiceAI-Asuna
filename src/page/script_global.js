@@ -62,6 +62,10 @@ var config = new Config();
 
 class Tools {
 	// various tools for the page
+	refresh() {
+		// refreshes the page
+		window.location.reload();
+	}
 	sleep(ms) {
 		// sleeps for a given time in milliseconds
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -71,6 +75,10 @@ class Tools {
 			return parseInt(str.replace(/\D+/g, ""));
 		}
 		return 0;
+	}
+	c_time() {
+		// returns current time in milliseconds
+		return new Date().getTime();
 	}
 	del_child(elm) {
 		if (typeof(elm) == "string") {
@@ -374,6 +382,11 @@ opacity: 1;
 			this.scroll_disabled = true;
 		}
 	}
+
+	async show(allow_scroll = false) {
+		this.open_popup(allow_scroll)
+	}
+
 	async createPopup(header = "", content = "", hr = true) {
 		this.init()
 		this.made_popup = true;

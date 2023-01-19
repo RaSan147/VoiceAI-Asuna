@@ -72,7 +72,7 @@ def Ctitle(title):  # fc=0001
 				os_system('title ' + title)
 				
 				
-Ctitle('Project Alice (Initializing)')
+Ctitle('Project Asuna (Initializing)')
 import datetime
 print('			 03%',end='\r')
 from random import choice
@@ -135,7 +135,7 @@ m_paused=None
 
 # sign= True
 uiName = "x"
-aiName = "Alice"
+aiName = "Asuna"
 upwmd5 = "8d5e957f297893487bd98fa830fa6413"
 talk_aloud = True
 talk_aloud_temp = True
@@ -347,8 +347,8 @@ import json
 
 class System_Data:
 	def __init__(self):
-		self.local_file = "Alice_data/RAM/pdatas2.json"
-		self.local_dir = "Alice_data/RAM"
+		self.local_file = "Asuna_data/RAM/pdatas2.json"
+		self.local_dir = "Asuna_data/RAM"
 		
 		
 		self.local_data = json.loads(Fsys.reader(self.local_file, on_missing='{}', ignore_missing_log=True))
@@ -397,11 +397,11 @@ flags = Flags()
 ##--------##checkers##start---------####
 ########################################
 def check_signin():
-	if exists("Alice_data/RAM/pdatas2.json") == False:
+	if exists("Asuna_data/RAM/pdatas2.json") == False:
 		return False
 	else:
 		#Fsys.reader()
-		with open("Alice_data/RAM/pdatas2.json") as f:
+		with open("Asuna_data/RAM/pdatas2.json") as f:
 			for i in f.readlines():
 				if i.startswith('sign= '):
 					line = i
@@ -500,7 +500,7 @@ def web_go(link):
 	webbrowser.open_new_tab(link)
 
 
-# web_go('C:/Users/Dell/Documents/Python/Project_Alice/datapy.html')
+# web_go('C:/Users/Dell/Documents/Python/Project_Asuna/datapy.html')
 def linker(link):
 	global links_li
 	for i in links_li:
@@ -572,7 +572,7 @@ def writer(locs, fname, mode, data, bit=0):
 def backup(data_entry):
 	c_time = str(datetime.datetime.now())
 	"""Will backup every command by user"""
-	Fsys.writer("uidb.txt" , "a", str((c_time, data_entry)) + "\n", "Alice_data/RAM",)
+	Fsys.writer("uidb.txt" , "a", str((c_time, data_entry)) + "\n", "Asuna_data/RAM",)
 
 
 def on_win(func,*var):
@@ -631,7 +631,7 @@ def asker(out='', self =None, true_func = OSsys.null, false_func=OSsys.null):
 			return False
 
 print('			 70%',end='\r')
-# exec( reader('Alice_data/brain/brain.py'))
+# exec( reader('Asuna_data/brain/brain.py'))
 
 ########################################
 ####-------##brain##start##--------#####
@@ -641,7 +641,7 @@ print('			 70%',end='\r')
 
 
 # asdf='aaddffghhjjkl'
-# writer('temp_Alice_data/crack/c','aa.txt','w',asdf)
+# writer('temp_Asuna_data/crack/c','aa.txt','w',asdf)
 def delprevline():
 	"""Use this function to delete the last line in the STDOUT"""
 
@@ -1014,7 +1014,7 @@ def speak_(text):
 	elif vmodule == 'gtts':
 		global audionum
 		a = gTTS(text=text, lang='en', slow=False)
-		name = 'Alice_data/RAM/outvoice' + audionum + '.mp3'
+		name = 'Asuna_data/RAM/outvoice' + audionum + '.mp3'
 		a.save(name)
 		audionum = str(int(audionum) + 1)
 	elif vmodule == 'androidhelper':
@@ -1080,7 +1080,7 @@ def tntr_li(li ,speed=None):
 def tnt_ff(x, z, y):
 	slowtyper(x, wait_time=nap_time)
 	try:
-		yt_plugin.mplay.load('Alice_data/ROM/offvoice/outvoice' + z + '.mp3')
+		yt_plugin.mplay.load('Asuna_data/ROM/offvoice/outvoice' + z + '.mp3')
 	except:
 		pass
 
@@ -1122,7 +1122,7 @@ def i_slim(in_dat):
 print('			 100%',end='\r')
 IOsys.clear_screen()
 
-Ctitle('Project Alice')
+Ctitle('Project Asuna')
 
 def locker():
 	IOsys.clear_screen()
@@ -1290,7 +1290,7 @@ if reloaded == False:
 	uitimes = str(datetime.datetime.now())
 	uinput = "==========Code start on (" + uitimes + ") Version:" + Vcode + "=========="
 	uinput = str(uinput) + "\n"
-	Fsys.writer("uidb.txt", "a", uinput, "Alice_data/RAM/")
+	Fsys.writer("uidb.txt", "a", uinput, "Asuna_data/RAM/")
 
 	sleep(1)
 	wb = "\nWelcome back! "

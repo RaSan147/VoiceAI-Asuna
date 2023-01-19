@@ -19,9 +19,13 @@ from DS import GETdict, Flag
 class User(GETdict):
 	"""can get and set user data like a js object"""
 	def __init__(self, username):
+
+
 		self.username = username
 		self.user_path = os.path.join(appConfig.data_dir, username)
 		self.file_path = os.path.join(self.user_path, '__init__.json')
+
+
 
 		self.flags = Flag()
 
@@ -96,12 +100,13 @@ class UserHandler:
 			"username": username,
 			"password": hash.hexdigest(),
 			"created_at": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
-			"last_login": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+			"last_active": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
 			"pointer": 0, # current chat index (100 msg => 1 pointer)
 			"nickname": username, # current user name
 			"bot": None, # user preferred bot name
 			"id": id, #
-			"ai_name": "Alice", # user preferred ai name
+			"ai_name": "Asuna", # user preferred ai name
+			"bot_skin": 1
 		}
 
 		J = json.dumps(u_data)
@@ -140,6 +145,10 @@ class UserHandler:
 				"message": "Wrong password"
 			})
 		
+		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+		print("logged in", user)
+		user.flags.clear() # clear flags
+		
 		return json.dumps({
 			"status": "success",
 			"message": "User logged in",
@@ -160,6 +169,10 @@ class UserHandler:
 			return False
 		if user.get("id") != id:
 			return False
+		
+		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+		user.flags.clear() # clear flags on refresh
+		
 		if return_user:
 			return user
 		return True

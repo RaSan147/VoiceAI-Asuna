@@ -39,7 +39,7 @@ class Config:
 		self.run_req_check = True
 
 		# FILE INFO
-		self.log_location = "./Alice_data/server/"  # fallback log_location = "./"
+		self.log_location = "./Asuna_data/server/"  # fallback log_location = "./"
 
 		self.MAIN_FILE = os.path.realpath(__file__)
 		self.MAIN_FILE_dir = os.path.dirname(self.MAIN_FILE)
@@ -107,7 +107,6 @@ import posixpath
 import shutil
 import socket # For gethostbyaddr()
 import socketserver
-import itertools
 import sys
 import time
 import urllib.parse
@@ -117,10 +116,10 @@ from functools import partial
 from http import HTTPStatus
 import importlib.util
 import re
-from string import Template as _Template # using this because js also use {$var} and {var} syntax and py .format is often unsafe
-import threading
+# from string import Template as _Template # using this because js also use {$var} and {var} syntax and py .format is often unsafe
+
 import subprocess
-import tempfile, random, string, json
+import json
 import traceback
 
 import hashlib
@@ -236,7 +235,7 @@ if serverConfig.reload == True:
 
 
 from user_handler import User, user_handler
-from Alice_raw import basic_output
+from Chat_raw import basic_output
 def message_handler(username, uid, msg):
 	import json
 	out = {
@@ -245,7 +244,7 @@ def message_handler(username, uid, msg):
 		"mid": 1,
 		"rid": 1,
 	}
-	print("Message from %s: %s"%(username, msg))
+	# print("Message from %s: %s"%(username, msg))
 
 	user = user_handler.collection(username, uid)
 	if not user:
@@ -258,6 +257,7 @@ def message_handler(username, uid, msg):
 		return json.dumps(out)
 	
 	reply = basic_output(msg, user)
+
 	if isinstance(reply, dict):
 		out.update(reply)
 	else:
@@ -1087,7 +1087,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 		content_type = self.headers['content-type']
-		print(tools.text_box(content_type))
 
 		if not content_type:
 			return "POST", make_json(False, "Content-Type header doesn't exist")
@@ -1100,19 +1099,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		remainbytes = int(self.headers['content-length'])
 
-		print(self.path)
 		
 		pass_bound()# LINE 1
-		print(tools.text_box("pass bound"))
 
 
 		# get post type
 		post_type = get_type() # LINE 2
-		print(tools.text_box(post_type))
 		if post_type=="login":
 			skip() # newline
 			if url_path == "/do_login":
-				print(tools.text_box("run log in"))
 				return "login", run_log_in()
 			else:
 				return (False, "Invalid post request")
@@ -1126,7 +1121,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			if url_path == "/do_verify":
 				return "verify", verify_user()
 		elif post_type=="chat":
-			print(tools.text_box("is chat"))
 			skip()
 			if url_path == "/chat" and query("send_msg"):
 				return "chat", handle_message()

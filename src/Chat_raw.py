@@ -20,17 +20,25 @@ from OS_sys import os_name, check_internet
 
 import yt_plugin
 from bbc_news import bbc_news
+
+from TIME_sys import from_jstime
+
+
 bbc_topic = 'Asia_url'
+
+
+def log_type(*args, **kwargs):
+	xprint("USER INPUT", *args, **kwargs, end="\n\n")
 
 
 def web_go(link):
 	webbrowser.open_new_tab(link)
 
 
-# web_go('C:/Users/Dell/Documents/Python/Project_Alice/datapy.html')
+# web_go('C:/Users/Dell/Documents/Python/Project_Asuna/datapy.html')
 def linker(link):
 	for i in links_li:
-		print(i[0])
+		# print(i[0])
 		if link in i:
 			web_go(i[0])
 			return True
@@ -114,16 +122,26 @@ def i_slim(in_dat):
 def Rchoice(*args):
 	return choice(args)
 
+message_dict = {
+	"message": "",
+	"render": "innerHTML",
+	"script": ""
+}
+
 
 def basic_output(INPUT, user: User = None, username: str = None):
 	if user is None and username is not None:
 		user = User(username)
+	msg = message_dict.copy()
 	x = _basic_output(INPUT, user)
 	if isinstance(x, dict):
 		x["message"] = remove_style(x["message"])
+		msg.update(x)
 	else:
 		x = remove_style(x)
-	return x
+		msg["message"] = x
+	# combine message_dict and x
+	return msg
 
 
 
@@ -134,12 +152,13 @@ def _basic_output(INPUT, user: User):
 		"username": username,
 		"password": hash.hexdigest(),
 		"created_at": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
-		"last_login": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+		"last_active": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+		"last_message": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
 		"pointer": 0, # current chat index (100 msg => 1 pointer)
 		"nickname": username, # current user name
 		"bot": None, # user preferred bot name
 		"id": id, #
-		"ai_name": "Alice", # user preferred ai name
+		"ai_name": "Asuna", # user preferred ai name
 	}
 	"""
 
@@ -153,10 +172,10 @@ def _basic_output(INPUT, user: User):
 	
 	out = ""
 	
-	#print(user.flags)
+	print(user.flags)
 
 	if user.flags.parrot:
-		print(1)
+		log_type(1)
 		if ui in stop_parrot:
 			user.flags.parrot = False
 			out = "Parrot mode disabled"
@@ -164,45 +183,66 @@ def _basic_output(INPUT, user: User):
 			out = ui
 	
 	elif ui in li_hi:
-		print(2)
+		log_type(2)
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
 		if user.flags.hi_bit<2:
-			out = Rchoice('Hello','Hello '+user.nickname)
+			out = Rchoice('Hello', 'Hey', 'Hey','Hello') +Rchoice('', " there", '')+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
 		else:
 			out = Rchoice('Hello','Yeah!','Yes?','Yeah, need something?')
 		user.flags.hi_bit+=1
+		if user.flags.hi_bit == 5:
+			user.flags.hi_bit = 0
 		case='basic1'
 
 	elif ui in li_hello:
-		print(3)
+		log_type(3)
 		if not user.flags.hello_bit:
 			user.flags.hello_bit = 0
 		if user.flags.hello_bit<2:
-			out = Rchoice('Hi', 'Hey','Hi there','Hey there')
+			out = Rchoice('Hi', 'Hey') +Rchoice('', '', " there")+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
 		else:
 			out = Rchoice('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?')
 		user.flags.hello_bit+=1
+		if user.flags.hello_bit == 5:
+			user.flags.hello_bit = 0
 		case='basic2'
 
+	elif ui.startswith(('change', "change cloth", "change skin")):
+		log_type(4)
+		out = Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
+		case='change_cloth'
+		user.bot_skin = (user.bot_skin + 1)%57
+		if user.bot_skin == 0:
+			user.bot_skin = 1
+
+		_skin = str(user.bot_skin)
+		if len(_skin) == 1:
+			_skin = "0" + _skin
+
+		out = {
+			"message": out,
+			"script": "(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})()"
+		}
+
 	elif ui in li_r_u_fine:
-		print(4)
-		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.")
+		log_type(4)
+		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.") + Rchoice("", "🥰", "😇")
 		case='yui3'
 	elif ui in li_how_r_u:
-		print(5)
+		log_type(5)
 		out = Rchoice("I'm fine!", "I'm doing great.")
 	elif ui in li_loveu:
-		print(6)
+		log_type(6)
 		out = choice(li_relove)
 		case='yui4'
 	elif ui in ('i hate u', 'i hate you'):
-		print(7)
+		log_type(7)
 		out = Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me")
 		case= 'yui5'
 
 	elif ui in li_what_ur_name:
-		print(8)
+		log_type(8)
 
 		out = choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
 		# if user.flags.what_u_name_bit == 1:
@@ -251,12 +291,12 @@ def _basic_output(INPUT, user: User):
 	# 	else:
 	# 		out = ("You can't control music play in your Operating system")
 	elif ui in li_QyuiName:
-		print(9)
+		log_type(9)
 		outtxt = "Yes, you can."
 		out = (outtxt)
 		# FCyuiName()
 	elif ui.startswith(li_play):
-		print(10)
+		log_type(10)
 		what = [i for i in li_play if ui.startswith(i) == True]
 		reg_ex = re.search(what[0] + ' *(.+)', ui)
 		if len(ui) != what[0] and reg_ex:
@@ -294,42 +334,47 @@ def _basic_output(INPUT, user: User):
 	# 		else:
 	# 			out = ('/r/Could not upgrade!/=/')
 	elif ui.startswith(li_can_do):
-		print(11)
+		log_type(11)
 		if ui.startswith(li_goto):
 			what = ''
 			for i in li_goto:
 				if ui.startswith(i):
 					what = i
 					break
-			print(what)
+			log_type(what)
 			# what = [i for i in li_goto if ui.startswith(i) == True]
 			reg_ex = re.search(re.escape(what) + ' (.+)', ui)
 			if reg_ex:
 				uiopen = reg_ex.group(1)
-				print(uiopen)
+				# log_type(uiopen)
 				if uiopen in links:
-					print('link')
+					log_type('link')
 					if linker(uiopen):
 						out = ('Opening ' + uiopen)
 				else:
 					searcher(uiopen)
 
 	elif ui in li_AmyName:
-		print(12)
+		log_type("li_AmyName")
 		out = (choice(li_AmyName) + user.nickname + '.')
 
+	elif ui in start_parrot:
+		log_type("parrot mode")
+		out = ('Parrot mode activated.')
+		parrot_mode = True
 
-	elif ui in ('whats up', 'sup'):
-		print(13)
+
+	elif ui in ('whats up', 'sup', 'what is up'):
+		log_type("What's up")
 		out = ('Just doing my things.')
 
 
 	elif ui in li_tell_time1:
-		print(14)
+		log_type("li_tell_time1")
 		out = tell_time()
 
 	elif re.search('read (the )?(latest )?news', ui):
-		print(15)
+		log_type("read news")
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
 			if news is None:
@@ -340,8 +385,9 @@ def _basic_output(INPUT, user: User):
 		else:
 			out = ('No internet!')
 
+
 	elif ui.startswith(li_whats):
-		print(16)
+		log_type("li_whats")
 		# what = [i for i in li_whats if ui.startswith(i) == True]
 		what = ''
 		for w in li_whats:
@@ -354,17 +400,18 @@ def _basic_output(INPUT, user: User):
 			uiopen = reg_ex.group(1)
 
 			if uiopen in ["you", "yourself"]:
+				log_type("what are you")
 				out = (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
 				return {"message": out, 
 						"render": "innerHTML"
 						}
 							
 			if uiopen in li_WmyName:
-				print(17)
+				log_type("what is my name")
 				out = (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
 
 			elif uiopen in ["latest news", "news update", 'news']:
-				print(18)
+				log_type(18)
 				if check_internet():
 					news = bbc_news.task(bbc_topic)
 					if news is None:
@@ -377,22 +424,18 @@ def _basic_output(INPUT, user: User):
 				else:
 					out = ('No internet!')
 
-			elif uiopen in li_tell_time:
-				print(19)
-				out = tell_time()
-
 			else:
-				print(20)
+				log_type(20)
 				out = wikisearch(uiopen)
 
 	elif ui.startswith(li_who):
-		print(21)
+		log_type(21)
 		
 		if ui in li_who_r_u:
-			print(22)
+			log_type(22)
 			out = (choice(li_AamI) % user.ai_name)
 		elif ui == "who am i":
-			print(23)
+			log_type(23)
 			out = ("You are " + user.nickname + ", a human being. Far more intelligent than me.")
 		else:
 			who = [i for i in li_who if ui.startswith(i) == True]
@@ -400,13 +443,13 @@ def _basic_output(INPUT, user: User):
 			if len(ui) != len(who[0]) and reg_ex:
 				uiopen = reg_ex.group(1)
 				if uiopen in li_r_u:
-					print(24)
+					log_type(24)
 					out = (choice(li_AamI) % user.ai_name)
 				elif uiopen in li_Qcreator:
-					print(25)
+					log_type(25)
 					out = (choice(li_Acreator) % Rchoice(li_syn_created))
 				else:
-					print(26)
+					log_type(26)
 					x = wolfram(uiopen)
 					if x:
 						out = x
@@ -415,32 +458,33 @@ def _basic_output(INPUT, user: User):
 						
 
 	elif ui in li_check_int:
-		print(27)
+		log_type(27)
 		if check_internet() == False:
 			out = ("No internet available.")
 		else:
 			out = ("Internet connection available.")
 
 	elif ui in li_fucku:
-		print(28)
+		log_type(28)
 		out = choice(li_refuck)
 		
 	elif re.search(set_timer_pattern, ui):
-		print(29)
+		log_type(29)
 		x = re.match(set_timer_pattern, ui).group(1)
 		out = "Timer not supported yet."
 		# set_timer(x)
 
 
 	elif ui in escape:
-		print(30)
+		log_type(30)
 		reloaded = False
 		reloader = False
 		BREAK_POINT =True
-		return "exit"
+		print(user.nickname)
+		return choice(li_bye)+Rchoice('', f" {user.nickname}")+ Rchoice('', '!', '.')+ Rchoice('👋😄', '')
 
 	if out == '':
-		print(0)
+		log_type(0)
 		outtxt = "Sorry, I don't understand.\n"
 		out = (outtxt)
 		#ui = inputer()
@@ -456,6 +500,6 @@ def _basic_output(INPUT, user: User):
 if __name__=="__main__":
 	user = User("Ray")
 	while 1:
-		msg = basic_output(input(), user)
+		msg = basic_output(input(), user)["message"]
 		if msg == "exit": break
 		print(remove_style(msg))

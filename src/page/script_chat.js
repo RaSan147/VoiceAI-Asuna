@@ -29,6 +29,12 @@ class ChatHandler{
 				this.send_message();
 			}
 		}
+
+		this.default_reply = {
+			"message": "Sorry, I didn't get that. Try again.",
+			"render": "innerText",
+			"script": ""
+		}
 		
 	}
 
@@ -124,6 +130,7 @@ class ChatHandler{
 			log("script: " + json.script)
 			const script = createElement("script");
 			script.innerText = json.script;
+			script.setAttribute("async", true);
 			msg_ele.appendChild(script);
 		}
 
@@ -136,7 +143,9 @@ class ChatHandler{
 
 		if(msg == "clear") return tools.del_child(this.chats)
 		if(msg == "logout"){
-			that.add_chat(that.replied_msg("Ok bye!!!"), "bot");
+			let reply = this.default_reply;
+			reply.message = "Ok bye!!!";
+			that.replied_msg(reply);
 			await tools.sleep(1000)
 			return user.logout()
 		}
@@ -154,6 +163,7 @@ class ChatHandler{
 		form_.append("username", user.user_name);
 		form_.append("uid", user.user_id);
 		form_.append("message", msg);
+		form_.append("time", tools.c_time());
 
 		const request = new XMLHttpRequest()
 		request.open("POST", form.action, true)

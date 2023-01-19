@@ -2,7 +2,7 @@ class USER{
 	constructor() {
 		this.user_name = null;
 		this.user_id = null;
-
+		this.bot_skin = "01";
 		this.preference = {};
 	}
 
@@ -10,6 +10,7 @@ class USER{
 		// get userdata from localstorage
 		let user_name = localStorage.getItem('uname');
 		let uid = localStorage.getItem('uid');
+		let skin = localStorage.getItem('skin');
 		if (user_name===null||uid===null){
 			if(redirect) this.redirect_2_login();
 			return false;
@@ -20,12 +21,14 @@ class USER{
 		
 		this.user_name = user_name;
 		this.user_id = uid;
+		if(skin) this.bot_skin = skin;
 	}
 
 	set_local_data() {
 		// set userdata to localstorage
 		localStorage.setItem('uname', this.user_name);
 		localStorage.setItem('uid', this.user_id);
+		localStorage.setItem('skin', this.bot_skin);
 	}
 
 	redirect_2_login() {
@@ -55,7 +58,7 @@ class USER{
 				if (request.status === 204 || request.status === 200){
 					var response = JSON.parse(request.responseText);
 					if (response.status){
-						log("verified")
+						console.log("verified")
 						if(!in_home) window.location.href = "/";
 					}
 					else{

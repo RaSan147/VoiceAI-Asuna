@@ -246,12 +246,13 @@ set_timer_pattern = "set ?a? timer of (.*)"
 #db = generate_list('li_')
 
 escape = ["exit", "close", "shut down", "quit", "bye", "esc", "tata", "see ya", "see you"]
+li_bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."
 
 
 m_comm = generate_list('mc_')
 
 
-
+start_parrot = "parrot", "repeat after me", "repeat what i say", "mimic", "mimic me", "parrot mode", "parrot on", "turn parrot on", "start parrot", "start mimic", "start mimicing", "start mimicing me", "start mimicing me", "reply what i say", 'reply what i send', "copy me"
 stop_parrot = "stop", "stop it", "stop mimicing", "stop mimic", "stop parrot", "off", "turn off", "turn parrot off", "cancel", "cancel mimic", "cancel parrot"
 
 
