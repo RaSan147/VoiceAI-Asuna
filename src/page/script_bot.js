@@ -1,6 +1,7 @@
 class Bot_{
 	constructor(){
-		this.avatar = "https://i.ibb.co/mJkDYVm/image-2023-01-13-121437265.png";
+		//this.avatar = "https://i.ibb.co/mJkDYVm/image-2023-01-13-121437265.png";
+		this.avatar = "https://i.ibb.co/7VqWWVH/image.webp"
 		this.active = false;
 		this.status_bull = byId("app_status");
 		this.AI_NAME = "Asuna";

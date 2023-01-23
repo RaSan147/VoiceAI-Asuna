@@ -1,4 +1,4 @@
-Asuna_data
+src/Asuna_data/*
 *.bak
 *test.*
 .vscode

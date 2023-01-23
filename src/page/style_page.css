@@ -20,6 +20,7 @@ button {
 
 * {
 	scrollbar-color: #0f0f0f #454a4d;
+	scroll-behavior: smooth;
 }
 
 
