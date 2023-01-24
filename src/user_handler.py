@@ -73,6 +73,22 @@ class UserHandler:
 	def __init__(self) -> None:
 		self.users = {}
 
+		self.default_user = {
+			"username": "default",
+			"password" : "default",
+			"created_at": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+			"last_active": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+			"pointer": 0, # current chat index (100 msg => 1 pointer)
+			"nickname": "default", # current user name
+			"bot": None, # user preferred bot name
+			"id": "default", #
+			"ai_name": "Asuna", # user preferred ai name
+			"bot_charecter": "Asuna", # user preferred ai avatar
+			"bot_skin": 0,
+			"skin_mode": 0 # 0 = offline, 1 = online
+		}
+
+
 	def u_path(self, username):
 		return os.path.join(appConfig.data_dir, username)
 
@@ -106,13 +122,28 @@ class UserHandler:
 			"bot": None, # user preferred bot name
 			"id": id, #
 			"ai_name": "Asuna", # user preferred ai name
-			"bot_skin": 1
+			"bot_charecter": "Asuna", # user preferred ai avatar
+			"bot_skin": 0,
+			"skin_mode": 0 # 0 = offline, 1 = online
 		}
 
 		J = json.dumps(u_data)
 		F_sys.writer("__init__.json", 'w', J, self.u_path(username))
 
 		return id
+	
+	def update_user(self, username=None, user=None):
+		"""update user data"""
+		if not user:
+			user = self.get_user(username)
+			if user is None:
+				return False
+		
+		# merge data
+		temp = self.default_user.copy()
+		temp.update(user)
+		for key in temp:
+			user[key] = temp[key]
 	
 	def server_signup(self, username, password):
 		# check if username is already taken
@@ -172,6 +203,7 @@ class UserHandler:
 		
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 		user.flags.clear() # clear flags on refresh
+		self.update_user(username)
 		
 		if return_user:
 			return user
