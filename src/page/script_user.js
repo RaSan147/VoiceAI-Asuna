@@ -71,37 +71,39 @@ class USER{
 
 		request.send(formData)
 
+	}
+
+	get_skin_link() {
 		
-		// const form = document.createElement("form");
-		// form.method = "POST";
-		// form.action = "/chat?send_msg";
-		// form.style.display = "none";
-		// form.setAttribute("enctype", "multipart/form-data");
+		const form = document.createElement("form");
+		form.method = "POST";
+		form.action = "/bot_manager";
+		form.style.display = "none";
+		form.setAttribute("enctype", "multipart/form-data");
 
-		// const form_ = new FormData(form);
-		// form_.append("chat", "chat");
-		// form_.append("username", user.user_name);
-		// form_.append("uid", user.user_id);
-		// form_.append("message", msg);
+		const formData = new FormData(form)
+		formData.append("get_skin_link", "get_skin_link")
+		formData.append("username", user.user_name)
+		formData.append("uid", user.user_id)
+		const request = new XMLHttpRequest()
+		request.open("POST", form.action, true)
+		request.onreadystatechange = () => {
+			if (request.readyState === XMLHttpRequest.DONE) {
+				if (request.status === 204 || request.status === 200){
+					var response = JSON.parse(request.responseText);
+					if (response.status){
+						console.log("Loading Avatar")
+						bot.cubism4Model = response.message;
+						bot.anim_loader();
+					}
+					else{
+						log("Failed to get character link")
+					}
+				}
+			}
+		}
 
-		// const request = new XMLHttpRequest()
-		// request.open("POST", form.action, true)
-		// request.onreadystatechange = () => {
-		// 	if (request.readyState === XMLHttpRequest.DONE) {
-		// 		if (request.status === 204 || request.status === 200){
-		// 			var response = JSON.parse(request.responseText);
-		// 			if (response.status){
-		// 				that.success_msg(msg_ele)
-		// 				return that.add_chat(that.make_message(response.message, "bot"), "bot");
-		// 			}
-		// 		}
-		// 		that.not_sent(msg_ele, msg)
-		// 	}
-		// }
-
-		// request.send(form_)
-
-
+		request.send(formData)
 	}
 
 	logout(redirect=true) {

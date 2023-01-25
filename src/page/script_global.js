@@ -503,30 +503,4 @@ function loading_popup() {
 
 
 
-async function toBottom(element, duration=1000) {
-	if (typeof(element) == "string") {
-		element = byId(element);
-	}
 
-	var startTime;
-	var startPos = element.scrollTop;
-	var clientHeight = element.clientHeight;
-	var maxScroll = element.scrollHeight - clientHeight;
-	var scrollIntendedDestination = maxScroll // startPos + value;
-	// low and high bounds for possible scroll destinations
-	var scrollEndValue = Math.min(Math.max(scrollIntendedDestination, 0), maxScroll)
-	// create recursive function to call every frame
-
-	var easeInOutCubic = function(t) {
-		return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-	  }
-
-	var scroll = function(timestamp) {
-	  startTime = startTime || timestamp;
-	  var elapsed = timestamp - startTime;
-	  element.scrollTop = startPos + (scrollEndValue - startPos) * easeInOutCubic(elapsed / duration);
-	  elapsed <= duration && window.requestAnimationFrame(scroll);
-	};
-	// call recursive function
-	if (startPos != scrollEndValue) window.requestAnimationFrame(scroll);
-  }

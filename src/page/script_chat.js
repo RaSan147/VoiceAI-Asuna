@@ -57,7 +57,7 @@ class ChatHandler{
 		this.chats.appendChild(message);
 		// this.chats.appendChild(line_break());
 		if(this.chats.scrollHeight > 100)
-			window.scrollTo({
+			this.page.scrollTo({
 			top: this.chats.scrollHeight,
 			left: 0,
 			behavior: 'smooth'

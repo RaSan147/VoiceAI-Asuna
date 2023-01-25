@@ -389,3 +389,15 @@ window.addEventListener('touchend', (e) => {
 
 
 // r_u_sure()
+
+
+
+const resizer = () => {
+	theme_controller.getViewportSize();
+	document.body.style.height = vh + "px";
+}
+
+window.addEventListener("resize", (_e) => resizer());
+
+document.addEventListener("DOMContentLoaded", (_e) => resizer());
+

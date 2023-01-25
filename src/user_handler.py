@@ -4,11 +4,12 @@ import hashlib
 import time, datetime
 import traceback
 
-
 import F_sys
+import net_sys
 
 from CONFIG import appConfig
 from DS import GETdict, Flag
+import live2d_sys
 
 #############################################
 #                USERS HANDLER              #
@@ -17,7 +18,13 @@ from DS import GETdict, Flag
 
 
 class User(GETdict):
-	"""can get and set user data like a js object"""
+	"""can get and set user data like a js object
+
+	to set item, use dict["key"] = value for the 1st time,
+	then use dict.key or dict["key"] to both get and set value
+	
+	but using dick.key = value 1st, will assign it as attribute and its temporary
+	"""
 	def __init__(self, username):
 
 
@@ -72,6 +79,7 @@ class User(GETdict):
 class UserHandler:
 	def __init__(self) -> None:
 		self.users = {}
+		self.online_avatar = live2d_sys.OnLine()
 
 		self.default_user = {
 			"username": "default",
@@ -85,7 +93,7 @@ class UserHandler:
 			"ai_name": "Asuna", # user preferred ai name
 			"bot_charecter": "Asuna", # user preferred ai avatar
 			"bot_skin": 0,
-			"skin_mode": 0 # 0 = offline, 1 = online
+			"skin_mode": 1 # 0 = offline, 1 = online
 		}
 
 
@@ -124,7 +132,7 @@ class UserHandler:
 			"ai_name": "Asuna", # user preferred ai name
 			"bot_charecter": "Asuna", # user preferred ai avatar
 			"bot_skin": 0,
-			"skin_mode": 0 # 0 = offline, 1 = online
+			"skin_mode": 1 # 0 = offline, 1 = online
 		}
 
 		J = json.dumps(u_data)
@@ -218,6 +226,39 @@ class UserHandler:
 			if not temp or uid is not None:
 				self.users[uid] = User(username)
 		return self.users[uid]
+	
+	def get_skin_link(self, username, uid, retry=0):
+		user = self.collection(username, uid)
+		if not user:
+			print("USER NOT FOUND")
+			return None
+		charecter = user["bot_charecter"]
+		skin = user["bot_skin"]
+		mode = user["skin_mode"]
+		if user.get("skins") and user.get("c_skin_mode")==mode:
+			return user.skins[skin]
+
+		if mode == 0:
+			return 0
+		elif mode == 1:
+			try:
+				_skin = self.online_avatar.get_skin_link(charecter, skin)
+				user.skins = self.online_avatar.get_skins(charecter)
+				user.c_skin_mode = mode
+				return _skin
+			except net_sys.NetErrors:
+				traceback.print_exc()
+				return None
+			except Exception:
+				traceback.print_exc()
+				if retry: return None
+				
+				user["bot_charecter"] = self.default_user["bot_charecter"] 
+				user["bot_skin"] = self.default_user["bot_skin"]
+				user["skin_mode"] = self.default_user["skin_mode"]
+
+				self.get_skin_link(username, uid, 1)
+		return 0
 
 	
 
@@ -230,11 +271,12 @@ user_handler = UserHandler()
 
 # user = User("test")
 
-# if __name__ == "__main__":
-# 	user_handler.create_user("test", "test")
-# 	user = User("test")
-# 	print(user.username)
-# 	user.x = 1 # set temporary data
-# 	user['y'] = 2 # set permanent data
-# 	print(user.x)
-# 	print(user)
+if __name__ == "__main__":
+	user_handler.create_user("test", "test")
+	user = User("test")
+	print(user.username)
+	user.x = 1 # set temporary data
+	user['y'] = 2 # set permanent data
+	print(user.x)
+	print(user)
+	print(user_handler.get_skin_link("test", user["id"]))

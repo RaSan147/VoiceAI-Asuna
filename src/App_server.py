@@ -920,7 +920,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			print(tools.text_box(e.__class__.__name__, e,"\nby ", self.client_address))
 			return
 		post_type, return_box = dealed
-		print(tools.text_box("post_type", post_type, "by", self.client_address))
+		print(tools.text_box("post_type", post_type, "by", self.client_address, "returned", return_box))
 		data = return_box
 		content_type = 'application/json'
 
@@ -1035,7 +1035,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			pass_bound()
 			return user_handler.server_signup(username, password)
 		
-		def verify_user():
+		def uname_id():
+			
 			skip()
 			pass_bound()
 			i_type = get_type()
@@ -1050,24 +1051,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			skip()
 			id = get(strip=True).decode()
 			pass_bound()
+
+			return username, id
+		
+		def verify_user():
+			username, id = uname_id()
 			return make_json(user_handler.server_verify(username, id))
 		
 
 		def handle_message():
-			skip()
-			pass_bound()
-			i_type = get_type()
-			if i_type!="username":
-				return make_json(False, "username not found")
-			skip()
-			username = get(strip=True).decode()
-			pass_bound()
-			i_type = get_type()
-			if i_type!="uid":
-				return make_json(False, "id not found")
-			skip()
-			id = get(strip=True).decode()
-			pass_bound()
+			username, id = uname_id()
+			
 			i_type = get_type()
 			if i_type!="message":
 				return make_json(False, "message not found")
@@ -1075,6 +1069,14 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			message = get(strip=True).decode()
 			pass_bound()
 			return message_handler(username, id, message)
+		
+		
+		def send_skin_link():
+			username, id = uname_id()
+			skin = user_handler.get_skin_link(username, id)
+			success = bool(skin)
+
+			return make_json(success, skin)
 		
 		
 
@@ -1120,6 +1122,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			skip()
 			if url_path == "/do_verify":
 				return "verify", verify_user()
+			
+		elif post_type=="get_skin_link":
+			skip()
+			if url_path == "/bot_manager":
+				return "get_skin_link" , send_skin_link()
+		
 		elif post_type=="chat":
 			skip()
 			if url_path == "/chat" and query("send_msg"):

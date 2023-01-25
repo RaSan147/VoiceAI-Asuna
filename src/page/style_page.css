@@ -2,9 +2,15 @@
 
 body {
 	position: relative;
-	height: 98vh;
+	height: auto;
+	overflow: hidden !important;
 	/* max-width: 100vw; */
 }
+
+html {
+	overflow: hidden !important;
+}
+html,body{margin:0;padding:0}
 
 html,
 body,
@@ -63,7 +69,7 @@ a {
 }
 
 ::-webkit-scrollbar {
-	width: 7px;
+	width: 3px;
 	height: 7px;
 	opacity: 0.3;
 }

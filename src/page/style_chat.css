@@ -5,11 +5,13 @@
 #chat-page{
 	display: block;
 	position: absolute;
-	width: 95%;
-	padding: 20px;
-	padding-top: 50px;
-	margin-bottom: 50px;
-	bottom: 0;
+	width: 98%;
+	margin: 0;
+	margin-bottom: 60px;
+	bottom: 60px;
+	overflow-y: auto;
+	padding: 0 5px;
+	max-height: 100%;
 }
 
 #chat-page.hidden {
@@ -24,12 +26,13 @@
 	position: fixed;
 	bottom: 0;
 	left: 0;
-	width: 100%;
+	width: 100vw;
 	height: 50px;
 	background-color: #580a58;
 	border-top: 2px solid #ddd;
 	padding-top: 3px;
 	z-index: 10;
+	text-align: center;
 }
 
 .chat_input {
@@ -89,9 +92,9 @@
 
 .chats {
 	position: relative;
-	width: 100%;
+	width: auto;
 	height: 100%;
-	padding: 0 10px;
+	padding: 0 3px;
 	/* margin-bottom: 60px; */
 
 	overflow-y: auto;
@@ -119,21 +122,20 @@
 	margin: 10px 0;
 	max-width: 70%;
 	width: max-content;
-	padding: 10px;
+	padding: 7px;
 	border-radius: 10px;
 	margin: 10px 3px;
 	margin-left: auto; 
 	margin-right: 0;
 	color: #fff;
     overflow-wrap: break-word;
-
-	
 }
 
 .message-text.user {
 	background-color: rgba(10, 63, 115, 0.508);
 	left: auto;
 	right: 0;
+
 }
 
 .message-text.bot {

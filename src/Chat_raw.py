@@ -15,7 +15,7 @@ import requests
 from PRINT_TEXT3 import xprint, remove_style
 
 from basic_conv_pattern import *
-from user_handler import User
+from user_handler import User, user_handler
 from OS_sys import os_name, check_internet
 
 import yt_plugin
@@ -212,13 +212,10 @@ def _basic_output(INPUT, user: User):
 		log_type(4)
 		out = Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
 		case='change_cloth'
-		user.bot_skin = (user.bot_skin + 1)%57
-		if user.bot_skin == 0:
-			user.bot_skin = 1
+		total_skins = len(user.skins)
+		user.bot_skin = (user.bot_skin + 1)%total_skins
 
 		_skin = str(user.bot_skin)
-		if len(_skin) == 1:
-			_skin = "0" + _skin
 
 		out = {
 			"message": out,
@@ -498,7 +495,9 @@ def _basic_output(INPUT, user: User):
 # tnt('/<style=a>/===hell===o')
 
 if __name__=="__main__":
-	user = User("Ray")
+	user = user_handler.get_user("Ray")
+	user = user_handler.collection(user.username, user.id)
+	user_handler.get_skin_link(user.username, user.id)
 	while 1:
 		msg = basic_output(input(), user)["message"]
 		if msg == "exit": break
