@@ -63,12 +63,13 @@ def tell_time():
 
 
 def wolfram(text):
-	r = requests.get("http://api.wolframalpha.com/v1/result",
+	print("Wolfram Alpha: " + text)
+	r = requests.get("http://api.wolframalpha.com/v1/spoken",
 	params = {
 		"i": text,
 		"appid": "L32A8W-J8X5U6KG26"
 	})
-	if r.text == "Wolfram|Alpha did not understand your input": return False
+	if r.text in ("Wolfram Alpha did not understand your input", "No spoken result available"): return False
 	return r.text
 
 
@@ -90,11 +91,18 @@ def _wiki(uix):
 
 	return out
 
-def wikisearch(uix):
+import urllib.parse
+def wikisearch(uix, user: User = None):
+
 	if check_internet() == True:
 		wolf = wolfram(uix)
 		if not wolf:
-			return ("/y/I don't know the answer ...\nShall I Google?/=/")
+			safe_string = urllib.parse.quote_plus(uix)
+			link= "https://www.google.com/search?q=" + safe_string
+			return (f"/y/I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?/=/")
+			if user:
+				# TODO: add to user flags for later
+				user.flags 
 		return wolf
 		sleep(2)
 
@@ -104,20 +112,20 @@ def wikisearch(uix):
 
 
 def i_slim(in_dat):
+	in_dat = in_dat.replace("'", " ")
+	in_dat = in_dat.replace("?", " ")
+	in_dat = in_dat.replace("!", " ")
+	in_dat = in_dat.replace(".", " ")
+	in_dat = in_dat.replace(",", " ")
 	in_dat = in_dat.strip()
 	in_dat = re.sub(r'\s{2,}', ' ', in_dat)
-	in_dat = in_dat.lower()
-	in_dat = in_dat.replace("'", "")
-	in_dat = in_dat.replace("?", "")
-	in_dat = in_dat.replace("!", "")
-	in_dat = in_dat.replace(".", "")
-	in_dat = in_dat.replace(",", "")
+	in_dat_low = in_dat.lower()
 	# in_dat = in_dat.replace(" us ", " me")
 	# in_dat = in_dat.replace(" him", " me")
 	# in_dat = in_dat.replace(" her", " me")
 	# in_dat = in_dat.replace(" them", " me")
 
-	return in_dat
+	return in_dat_low, in_dat
 
 def Rchoice(*args):
 	return choice(args)
@@ -134,6 +142,8 @@ def basic_output(INPUT, user: User = None, username: str = None):
 		user = User(username)
 	msg = message_dict.copy()
 	x = _basic_output(INPUT, user)
+	if not x:
+		x = "I don't know what to say..."
 	if isinstance(x, dict):
 		x["message"] = remove_style(x["message"])
 		msg.update(x)
@@ -166,7 +176,7 @@ def _basic_output(INPUT, user: User):
 
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
-	ui = i_slim(INPUT)
+	ui, ui_raw = i_slim(INPUT)
 	if ui == "":
 		return
 	
@@ -391,39 +401,48 @@ def _basic_output(INPUT, user: User):
 			if ui.startswith(w):
 				what = w
 				break
+		if len(ui) == len(what):
+			return 
+		
 		reg_ex = re.search(what + ' (.+)', ui)
+		reg_ex_raw = re.search(what + ' (.+)', ui_raw, flags=re.IGNORECASE)
 
-		if len(ui) != what and reg_ex:
-			uiopen = reg_ex.group(1)
+		
+		if not reg_ex:
+			return ("I don't know.")
 
-			if uiopen in ["you", "yourself"]:
-				log_type("what are you")
-				out = (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
-				return {"message": out, 
-						"render": "innerHTML"
-						}
-							
-			if uiopen in li_WmyName:
-				log_type("what is my name")
-				out = (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
-
-			elif uiopen in ["latest news", "news update", 'news']:
-				log_type(18)
-				if check_internet():
-					news = bbc_news.task(bbc_topic)
-					if news is None:
-						out = ("No news available")
-					else:
-						out = "".join(news[:5])
-						# asker("Do you want to hear the rest?", true_func=read_rest_news)
+		uiopen = reg_ex.group(1)
+		uiopen_raw = reg_ex_raw.group(1)
 
 
+		if uiopen in ["you", "yourself"]:
+			log_type("what are you")
+			out = (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
+			return {"message": out, 
+					"render": "innerHTML"
+					}
+						
+		if uiopen in li_WmyName:
+			log_type("what is my name")
+			out = (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
+
+		elif uiopen in ["latest news", "news update", 'news']:
+			log_type(18)
+			if check_internet():
+				news = bbc_news.task(bbc_topic)
+				if news is None:
+					out = ("No news available")
 				else:
-					out = ('No internet!')
+					out = "".join(news[:5])
+					# asker("Do you want to hear the rest?", true_func=read_rest_news)
+
 
 			else:
-				log_type(20)
-				out = wikisearch(uiopen)
+				out = ('No internet!')
+
+		else:
+			log_type(20)
+			out = wikisearch(uiopen_raw, user)
 
 	elif ui.startswith(li_who):
 		log_type(21)
@@ -435,23 +454,30 @@ def _basic_output(INPUT, user: User):
 			log_type(23)
 			out = ("You are " + user.nickname + ", a human being. Far more intelligent than me.")
 		else:
-			who = [i for i in li_who if ui.startswith(i) == True]
+			who = [i for i in li_who if ui.startswith(i)]
+			if len(ui) == len(who[0]):
+				return 
+			
 			reg_ex = re.search(who[0] + ' (.+)', ui)
-			if len(ui) != len(who[0]) and reg_ex:
-				uiopen = reg_ex.group(1)
-				if uiopen in li_r_u:
-					log_type(24)
-					out = (choice(li_AamI) % user.ai_name)
-				elif uiopen in li_Qcreator:
-					log_type(25)
-					out = (choice(li_Acreator) % Rchoice(li_syn_created))
+			reg_ex_raw = re.search(who[0] + ' (.+)', ui_raw, flags=re.IGNORECASE)
+
+			if not reg_ex:
+				return ("I don't know.")
+			uiopen = reg_ex.group(1)
+			uiopen_raw = reg_ex_raw.group(1)
+			if uiopen in li_r_u:
+				log_type(24)
+				out = (choice(li_AamI) % user.ai_name)
+			elif uiopen in li_Qcreator:
+				log_type(25)
+				out = (choice(li_Acreator) % Rchoice(li_syn_created))
+			else:
+				log_type(26)
+				x = wikisearch(uiopen_raw, user)
+				if x:
+					out = x
 				else:
-					log_type(26)
-					x = wolfram(uiopen)
-					if x:
-						out = x
-					else:
-						out = find_person(uiopen)
+					out = find_person(uiopen_raw)
 						
 
 	elif ui in li_check_int:
