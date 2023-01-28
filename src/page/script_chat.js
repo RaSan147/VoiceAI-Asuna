@@ -150,6 +150,7 @@ class ChatHandler{
 			return user.logout()
 		}
 
+
 		
 
 		const form = document.createElement("form");
@@ -159,7 +160,7 @@ class ChatHandler{
 		form.setAttribute("enctype", "multipart/form-data");
 
 		const form_ = new FormData(form);
-		form_.append("chat", "chat");
+		form_.append("post-type", "send-txt");
 		form_.append("username", user.user_name);
 		form_.append("uid", user.user_id);
 		form_.append("message", msg);
@@ -179,6 +180,7 @@ class ChatHandler{
 				that.not_sent(msg_ele, msg)
 			}
 		}
+
 	
 		request.send(form_)
 

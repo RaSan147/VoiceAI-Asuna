@@ -288,3 +288,6 @@ links_li = tuple(v for k,v in links_dict.items())
 # googles_li = gen_list('goog_')
 
 # print(*links, sep='\n')
+
+if __name__ == '__main__':
+	print(li_whats)

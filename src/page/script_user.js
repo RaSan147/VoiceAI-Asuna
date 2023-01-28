@@ -4,6 +4,8 @@ class USER{
 		this.user_id = null;
 		this.bot_skin = "01";
 		this.preference = {};
+
+		this.get_local_data(false);
 	}
 
 	get_local_data(redirect=true) {
@@ -14,7 +16,7 @@ class USER{
 		if (user_name===null||uid===null){
 			if(redirect) this.redirect_2_login();
 			return false;
-		}
+	}
 
 
 
@@ -43,48 +45,46 @@ class USER{
 	
 		const form = document.createElement("form");
 		form.method = "POST";
-		form.action = "/do_verify";
+		form.action = "?do_verify";
 		form.style.display = "none";
 		form.setAttribute("enctype", "multipart/form-data");
 
-		const formData = new FormData(form)
-		formData.append("verify", "verify")
-		formData.append("username", user.user_name)
-		formData.append("uid", user.user_id)
+		const form_ = new FormData(form)
+		form_.append("post-type", "verify")
+		form_.append("username", user.user_name)
+		form_.append("uid", user.user_id)
 		const request = new XMLHttpRequest()
-		request.open("POST", "do_verify", true)
+		request.open("POST", form.action, true)
 		request.onreadystatechange = () => {
 			if (request.readyState === XMLHttpRequest.DONE) {
 				if (request.status === 204 || request.status === 200){
 					var response = JSON.parse(request.responseText);
 					if (response.status){
-						console.log("verified")
 						if(!in_home) window.location.href = "/";
 					}
 					else{
-						user.logout(redirect);
+						// user.logout(redirect);
 						if(redirect) user.redirect_2_login();
 					}
 				}
 			}
 		}
 
-		request.send(formData)
-
+		request.send(form_)
 	}
 
 	get_skin_link() {
 		
 		const form = document.createElement("form");
 		form.method = "POST";
-		form.action = "/bot_manager";
+		form.action = "?bot_manager";
 		form.style.display = "none";
 		form.setAttribute("enctype", "multipart/form-data");
 
-		const formData = new FormData(form)
-		formData.append("get_skin_link", "get_skin_link")
-		formData.append("username", user.user_name)
-		formData.append("uid", user.user_id)
+		const form_ = new FormData(form)
+		form_.append("post-type", "get_skin_link")
+		form_.append("username", user.user_name)
+		form_.append("uid", user.user_id)
 		const request = new XMLHttpRequest()
 		request.open("POST", form.action, true)
 		request.onreadystatechange = () => {
@@ -103,7 +103,8 @@ class USER{
 			}
 		}
 
-		request.send(formData)
+		request.send(form_)
+
 	}
 
 	logout(redirect=true) {

@@ -14,25 +14,24 @@
 
 
 
-<form action="do_verify" method="post" id="verify" style="display: none;"></form>
-
-
 <div>
 	<div id="login-page">
 		<div id="login-header">
 			<h1>Login</h1>
 		</div>
 		<div id="login-form">
-			<form action="do_login" method="post" ENCTYPE="multipart/form-data" id="login">
-				<div id="login-username">
-					<label for="username">Username</label>
-					<input name="login" hidden>
-					<input type="text" name="username" id="username" placeholder="Username">
-				</div>
-				<div id="login-password">
-					<label for="password">Password</label>
-					<input type="password" name="password" id="password" placeholder="Password">
-				</div>
+			<form action="?do_login" method="post" ENCTYPE="multipart/form-data" id="login">
+				<input name="post-type" value="login" hidden>
+				<table>
+					<tr>
+					<td><label for="username">Username</label></td>
+					<td><input type="text" name="username" id="username" placeholder="Username"></td>
+					</tr>
+					<tr>
+					<td><label for="password">Password</label></td>
+					<td><input type="password" name="password" id="password" placeholder="Password"></td>
+					</tr>
+				</table>
 				<div id="login-submit">
 					<input id="submit_btn" type="submit" value="login">
 				</div>
@@ -49,6 +48,10 @@
 
 
 <style>
+body {
+	margin: 20px;
+}
+
 .status {
 	color: rgb(48, 48, 48);
 	display: none;
@@ -57,6 +60,26 @@
 	margin: 5px;
 	border: solid 2px;
 	border-radius: 4px;
+}
+
+
+#login-page {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+#submit_btn {
+	width: 200px;
+	height: 50px;
+	font-size: 1.5em;
+}
+
+table {
+	border-color: #00000000;
+	border-spacing: 4px;
 }
 </style>
 

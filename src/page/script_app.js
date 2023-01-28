@@ -144,10 +144,11 @@ theme_controller.load_fa()
 
 const MAIN_JS = true;
 const V = "0.0.1";
-// alert(typeof datas === "undefined")
+
 if (typeof datas === "undefined") {window["datas"] = {}} // if datas is not defined
 
 class Local_Data_Manager {
+	// local data manager, UNUSED
 	constructor() { }
 
 
@@ -250,7 +251,6 @@ class Local_Data_Manager {
 
 			return true;
 		}
-		//alert(69)
 		if (config.page_type == "CHAPTER") {
 			return read_chapter_data();
 		}

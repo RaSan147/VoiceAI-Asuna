@@ -5,7 +5,7 @@ import re
 from random import choice
 import webbrowser
 import datetime
-from time import sleep
+from time import sleep, time
 import urllib.parse
 
 import wikipedia
@@ -15,7 +15,6 @@ import requests
 from PRINT_TEXT3 import xprint, remove_style
 
 from basic_conv_pattern import *
-from user_handler import User, user_handler
 from OS_sys import os_name, check_internet
 
 import yt_plugin
@@ -23,9 +22,14 @@ from bbc_news import bbc_news
 
 from TIME_sys import from_jstime
 
+from user_handler import User, user_handler
+from CONFIG import appConfig
 
 bbc_topic = 'Asia_url'
 
+def log_unknown(*args, **kwargs):
+	with open(appConfig.log_unknown, 'a') as f:
+		f.write(str(args) + "\n")
 
 def log_type(*args, **kwargs):
 	xprint("USER INPUT", *args, **kwargs, end="\n\n")
@@ -48,7 +52,7 @@ def linker(link):
 
 def searcher(search_txt):
 	loc = urllib.parse.quote(search_txt)
-	return {"message": f'<a href="https://www.google.com/search?q={loc}">{search_txt}</a>', 
+	return {"message": f'<a href="https://www.google.com/search?q={loc}">{search_txt}</a>',
 		"render": "innerHTML"
 		}
 
@@ -62,47 +66,45 @@ def tell_time():
 
 
 
-def wolfram(text):
-	print("Wolfram Alpha: " + text)
+def wolfram(text, raw=''):
 	r = requests.get("http://api.wolframalpha.com/v1/spoken",
 	params = {
 		"i": text,
 		"appid": "L32A8W-J8X5U6KG26"
 	})
-	if r.text in ("Wolfram Alpha did not understand your input", "No spoken result available"): return False
+	if not r: return False
 	return r.text
 
 
-def _wiki(uix):
+def _wiki(uix, raw=''):
 	if uix in [i.lower() for i in wikipedia.search(uix)]:
 		ny = wikipedia.page(uix)
-		return {"message": wikipedia.summary(uix, sentences=2) + 'f\n<a href={ny.url}">More</a>', 
+		return {"message": wikipedia.summary(uix, sentences=2) + 'f\n<a href={ny.url}">More</a>',
 		"render": "innerHTML"
 		}
-		
-		
+
+
 	elif wikipedia.search(uix) != []:
 		uix = wikipedia.search(uix)[0]
-		
+
 		out = 'Did you mean ' + uix + '? '
 	else:
-		
+		log_unknown(uix, raw)
 		out = "Couldn't find " + uix + "!\nWould you like to search instead?  "
 
 	return out
 
-import urllib.parse
-def wikisearch(uix, user: User = None):
-
+def wikisearch(uix, raw='', user: User = None):
 	if check_internet() == True:
 		wolf = wolfram(uix)
 		if not wolf:
+			log_unknown(uix, raw)
 			safe_string = urllib.parse.quote_plus(uix)
 			link= "https://www.google.com/search?q=" + safe_string
 			return (f"/y/I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?/=/")
 			if user:
-				# TODO: add to user flags for later
-				user.flags 
+				# TODO: add to user flags for later use "yes/no" message
+				user.flags
 		return wolf
 		sleep(2)
 
@@ -137,12 +139,15 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = None):
+def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 	if user is None and username is not None:
 		user = User(username)
+
+	user.add_chat(INPUT, _time, 1)
 	msg = message_dict.copy()
 	x = _basic_output(INPUT, user)
 	if not x:
+		log_unknown(INPUT)
 		x = "I don't know what to say..."
 	if isinstance(x, dict):
 		x["message"] = remove_style(x["message"])
@@ -150,7 +155,9 @@ def basic_output(INPUT, user: User = None, username: str = None):
 	else:
 		x = remove_style(x)
 		msg["message"] = x
-	# combine message_dict and x
+
+	_time = int(time()*1000)
+	user.add_chat(msg["message"], _time, 0)
 	return msg
 
 
@@ -179,9 +186,9 @@ def _basic_output(INPUT, user: User):
 	ui, ui_raw = i_slim(INPUT)
 	if ui == "":
 		return
-	
+
 	out = ""
-	
+
 	print(user.flags)
 
 	if user.flags.parrot:
@@ -191,7 +198,7 @@ def _basic_output(INPUT, user: User):
 			out = "Parrot mode disabled"
 		else:
 			out = ui
-	
+
 	elif ui in li_hi:
 		log_type(2)
 		if not user.flags.hi_bit:
@@ -218,7 +225,7 @@ def _basic_output(INPUT, user: User):
 			user.flags.hello_bit = 0
 		case='basic2'
 
-	elif ui.startswith(('change', "change cloth", "change skin")):
+	elif ui in ('change', "change cloth", "change skin", "change dress"):
 		log_type(4)
 		out = Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
 		case='change_cloth'
@@ -231,6 +238,21 @@ def _basic_output(INPUT, user: User):
 			"message": out,
 			"script": "(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})()"
 		}
+
+
+	elif ui in ('switch room', "change room", "change background"):
+		log_type(4)
+		out = Rchoice("Sure!", "Okay", "Okay, wait a sec!")
+		case='change_room_bg'
+
+		bg = user_handler.room_bg(user=user, command="change")
+
+		out = {
+			"message": out,
+			"script": f"anime.set_bg('{bg}')"
+		}
+
+
 
 	elif ui in li_r_u_fine:
 		log_type(4)
@@ -257,8 +279,8 @@ def _basic_output(INPUT, user: User):
 		# 	out = (outtxt)
 		# 	# FCyuiName()
 		# else:
-		# 	out = (outtxt)	
-		
+		# 	out = (outtxt)
+
 		# if not user.flags.what_u_name_bit:
 		# 	user.flags.what_u_name_bit = 0
 		# user.flags.what_u_name_bit += 1
@@ -402,12 +424,12 @@ def _basic_output(INPUT, user: User):
 				what = w
 				break
 		if len(ui) == len(what):
-			return 
-		
+			return
+
 		reg_ex = re.search(what + ' (.+)', ui)
 		reg_ex_raw = re.search(what + ' (.+)', ui_raw, flags=re.IGNORECASE)
 
-		
+
 		if not reg_ex:
 			return ("I don't know.")
 
@@ -418,10 +440,10 @@ def _basic_output(INPUT, user: User):
 		if uiopen in ["you", "yourself"]:
 			log_type("what are you")
 			out = (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
-			return {"message": out, 
+			return {"message": out,
 					"render": "innerHTML"
 					}
-						
+
 		if uiopen in li_WmyName:
 			log_type("what is my name")
 			out = (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
@@ -442,11 +464,11 @@ def _basic_output(INPUT, user: User):
 
 		else:
 			log_type(20)
-			out = wikisearch(uiopen_raw, user)
+			out = wikisearch(uiopen_raw, raw=ui, user=user)
 
 	elif ui.startswith(li_who):
 		log_type(21)
-		
+
 		if ui in li_who_r_u:
 			log_type(22)
 			out = (choice(li_AamI) % user.ai_name)
@@ -456,8 +478,8 @@ def _basic_output(INPUT, user: User):
 		else:
 			who = [i for i in li_who if ui.startswith(i)]
 			if len(ui) == len(who[0]):
-				return 
-			
+				return
+
 			reg_ex = re.search(who[0] + ' (.+)', ui)
 			reg_ex_raw = re.search(who[0] + ' (.+)', ui_raw, flags=re.IGNORECASE)
 
@@ -478,7 +500,7 @@ def _basic_output(INPUT, user: User):
 					out = x
 				else:
 					out = find_person(uiopen_raw)
-						
+
 
 	elif ui in li_check_int:
 		log_type(27)
@@ -490,7 +512,7 @@ def _basic_output(INPUT, user: User):
 	elif ui in li_fucku:
 		log_type(28)
 		out = choice(li_refuck)
-		
+
 	elif re.search(set_timer_pattern, ui):
 		log_type(29)
 		x = re.match(set_timer_pattern, ui).group(1)
@@ -503,11 +525,12 @@ def _basic_output(INPUT, user: User):
 		reloaded = False
 		reloader = False
 		BREAK_POINT =True
-		print(user.nickname)
+
 		return choice(li_bye)+Rchoice('', f" {user.nickname}")+ Rchoice('', '!', '.')+ Rchoice('👋😄', '')
 
 	if out == '':
 		log_type(0)
+		log_unknown(ui)
 		outtxt = "Sorry, I don't understand.\n"
 		out = (outtxt)
 		#ui = inputer()

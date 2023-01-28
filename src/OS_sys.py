@@ -1,7 +1,7 @@
 """Operating System functions"""
 
-__all__ = ('os_name', 'subprocess_call', 'os_system', 
-			'check_internet', 'null', 'install', 'install_req', 
+__all__ = ('os_name', 'subprocess_call', 'os_system',
+			'check_internet', 'null', 'install', 'install_req',
 			'check_installed', 'install_missing_libs')
 
 
@@ -19,17 +19,17 @@ from IO_sys import delete_last_line
 
 
 def check_internet(hostname='1.1.1.1'):
-  try:
-    # see if we can resolve the host name -- tells us if there is
-    # a DNS listening
-    host = socket.gethostbyname(hostname)
-    # connect to the host -- tells us if the host is actually reachable
-    s = socket.create_connection((host, 80), 2)
-    s.close()
-    return True
-  except Exception:
-     pass # we ignore any errors, returning False
-  return False
+	try:
+		# see if we can resolve the host name -- tells us if there is
+		# a DNS listening
+		host = socket.gethostbyname(hostname)
+		# connect to the host -- tells us if the host is actually reachable
+		s = socket.create_connection((host, 80), 2)
+		s.close()
+		return True
+	except Exception:
+		pass # we ignore any errors, returning False
+	return False
 
 def null(*args):
 	pass
@@ -56,7 +56,7 @@ def install(pack, alias=None):  # fc=0701 v
 	subprocess_call(comm, shell=True)
 
 
-	
+
 def install_req(pkg_name, alias=None):  # fc=0702 v
 	"""install requirement package if not installed
 
@@ -70,12 +70,12 @@ def install_req(pkg_name, alias=None):  # fc=0702 v
 		pkg_name = pkg_name[0]
 	if alias is None:
 		alias = pkg_name
-		
+
 	if not check_installed(pkg_name):
 		if not check_internet():
 			xprint("/rh/No internet! Failed to install requirements/=/\n/ruh/Closing in 5 seconds/=/")
 			return False
-			
+
 		xprint("/y/Installing missing libraries (%s)/=/"%pkg_name)
 		install(pkg_name, alias)
 		delete_last_line()
@@ -102,6 +102,6 @@ def install_missing_libs(req):  # fc=0706 v
 	""" installs missing libraries from the requirements variable"""
 
 	failed = False
-	
+
 	for i in req:
 		install_req(i)
