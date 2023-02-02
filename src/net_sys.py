@@ -10,9 +10,13 @@ import requests
 from re import compile as re_compile, sub as re_sub
 from os.path import isfile as os_isfile
 import os
+from hashlib import md5
+
+
 from headers_file import header_list
 
-from gen_uuid import random as gen_random_uuid
+#from gen_uuid import random as gen_random_uuid
+
 import F_sys as Fsys
 from REGEX_TOOLS import web_re
 from PRINT_TEXT3 import xprint
@@ -188,7 +192,7 @@ def gen_link_facts(link):  # fc=080C
 
 
 def get_page(link, referer=False, header=None, cache=False, failed=False, do_not_cache=True,
-			session=None, return_none=True, raise_error=False):  # fc=080D
+			session=None, return_none=True, raise_error=False, cache_priority=False):  # fc=080D
 	"""Gets a page from the internet and returns the page object
 
 	link: page link
@@ -199,18 +203,32 @@ def get_page(link, referer=False, header=None, cache=False, failed=False, do_not
 	do_not_cache: if True, don't cache the page object to file
 	session: if requests.session is avaialbe
 	return_none: if True, return None if page is not found, else return the page object
-	raise_error: if True, raise an error if an Error occured while getting the page"""
+	raise_error: if True, raise an error if an Error occured while getting the page
+	cache_priority: if True, tries to get the page from cache first if available
+	
+	"""
 
 	def retry():
-		return get_page(link=link, referer=False if referer == False else referer, cache=cache, failed=True,
-									do_not_cache=do_not_cache, session=session, return_none=return_none, raise_error=raise_error)
+		return get_page(link=link, 
+						referer=False if referer == False else referer, 
+						cache=cache, 
+						failed=True,
+						do_not_cache=do_not_cache,
+						session=session, 
+						return_none=return_none, 
+						raise_error=raise_error)
+	
+	def get_cache():
+		# if CachedData.has_cache(link): # this will be done anyways
+		__x = CachedData.get_webpage(link)
+		return __x
+			
+	if cache and cache_priority:
+		page = get_cache()
+		if page:
+			return page
 
-	if cache:
-		if link in CachedData.cached_webpages:
-			__x = CachedData.get_webpage(link)
-			# print(__x)
-			if __x is not None:
-				return __x
+
 
 	if session is None:
 		session = requests
@@ -232,14 +250,21 @@ def get_page(link, referer=False, header=None, cache=False, failed=False, do_not
 			if not failed:
 				page = retry()
 			else:
-				if return_none:
-					return None
-				else:
-					return page
+				if cache:
+					page = get_cache()
+					if page:
+						return page
+				
 	except NetErrors as e:
 		if not failed:
 			page = retry()
 		else:
+			if cache:
+				page = get_cache()
+				if page:
+					return page
+				
+				
 			if raise_error:
 				raise e
 			else:
@@ -324,8 +349,8 @@ class CachedData_ :  # fc=0C00
 
 		__x = Cached_Response(status_code=response.status_code, headers=response.headers, content=response.content,
 		                      encoding=response.encoding, url=response.url)
-		file_id = gen_random_uuid()
-		with open(appConfig.cached_webpages_dir + file_id, 'w') as f:
+		file_id = md5(url)
+		with open(appConfig.cached_webpages_dir + file_id + '.cache', 'w') as f:
 			f.write(repr(__x))
 		self.cached_webpages[url] = file_id
 
@@ -335,7 +360,7 @@ class CachedData_ :  # fc=0C00
 
 		if url in self.cached_webpages:
 			if os_isfile(appConfig.cached_webpages_dir + self.cached_webpages[url]):
-				with open(appConfig.cached_webpages_dir + self.cached_webpages[url], 'r') as f:
+				with open(appConfig.cached_webpages_dir + self.cached_webpages[url] + '.cache', 'r') as f:
 					__x = eval(f.read()) # TODO: remove it. use JSON
 				return __x
 
@@ -357,3 +382,79 @@ class CachedData_ :  # fc=0C00
 
 
 CachedData = CachedData_()
+
+import pickle
+class CachedData_2 :  # fc=0C00
+	def __init__(self):  # fc=0C01
+		self.data_vars = ("cached_webpages", "cached_link_facts")
+		self.cached_webpages = []
+		self.cached_link_facts = dict()
+		
+		os.makedirs(appConfig.cached_webpages_dir, exist_ok=True)
+		
+	def load_old_cache(self):
+		f_list = os.scandir(appConfig.cached_webpages_dir)
+		
+		for f in f_list:
+			name = f.name
+			if name.endswith(".cache") and f.is_file():
+				self.cached_webpages.append(os.path.splitext(name)[0])
+
+	def add_webpage(self, url, response):
+		""" Add a webpage to the cache
+		url: url of the webpage 
+		response: response object"""
+
+		# TODO: use JSON
+
+		__x = Cached_Response(status_code=response.status_code, headers=response.headers, content=response.content,
+		                      encoding=response.encoding, url=response.url)
+		file_id = md5(url.encode("utf-8")).hexdigest()
+		with open(appConfig.cached_webpages_dir + file_id + '.cache', 'wb') as f:
+			pickle.dump(__x, f)
+		self.cached_webpages.append(file_id)
+		
+	def has_cache(self, url):
+		url_hash = md5(url.encode("utf-8")).hexdigest()
+		if url_hash in self.cached_webpages:
+			return url_hash
+			
+		return False
+		
+
+	def get_webpage(self, url):
+		""" Get a webpage from the cache
+		url: url of the webpage """
+
+		
+		url_hash = self.has_cache(url)
+
+		if url_hash and  os_isfile(appConfig.cached_webpages_dir + url_hash + '.cache'):
+			with open(appConfig.cached_webpages_dir + url_hash + '.cache', 'rb') as f:
+				__x = pickle.load(f)
+					# __x = eval(f.read()) # TODO: remove it. use JSON
+			return __x
+
+		return None
+
+	def clean_cached_webpages(self):
+		""" Cleans the cached_webpages from storage"""
+		for i in os.listdir(appConfig.cached_webpages_dir):
+			try:
+				os.remove(appConfig.cached_webpages_dir + i)
+			except:
+					pass
+
+	def clear(self):
+		"""Cleans both from memory and storage""" 
+		self.clean_cached_webpages()
+		for i in self.data_vars:
+			self.__dict__[i].clear()
+
+
+CachedData = CachedData_2()
+
+CachedData.load_old_cache()
+
+
+

@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#pylint:disable=C0413
 
 __version__ = "0.2"
-enc = "utf-8"
-import os
 
+import os
+import sys
 import shutil
 import urllib.parse
 import urllib.request
@@ -14,7 +17,7 @@ import traceback
 
 
 from CONFIG import appConfig
-from user_handler import user_handler
+from user_handler import User, user_handler
 from OS_sys import check_internet
 from PRINT_TEXT3 import xprint
 
@@ -24,6 +27,11 @@ from pyroboxCore import run as run_server
 from pyroboxCore import config as pyrobox_config
 from pyroboxCore import DealPostData as DPD
 from pyroboxCore import PostError
+
+
+
+from Chat_raw2 import basic_output
+
 
 
 pyrobox_config.log_location = appConfig.log_location
@@ -56,7 +64,7 @@ class Tools:
 		tt = ""
 		for i in text.split('\n'):
 			tt += i.center(term_col) + '\n'
-		return (f"\n\n{s*term_col}\n{tt}{s*term_col}\n\n")
+		return f"\n\n{s*term_col}\n{tt}{s*term_col}\n\n"
 
 
 
@@ -64,6 +72,8 @@ tools = Tools()
 
 
 def join_path(*paths):
+	"""join multiple path parts, same as `os.path.join()`
+	"""
 	return os.path.join(*paths)
 
 #############################################
@@ -71,35 +81,6 @@ def join_path(*paths):
 #############################################
 
 
-from user_handler import User, user_handler
-from Chat_raw import basic_output
-def message_handler(username, uid, msg):
-	import json
-	out = {
-		"status": "success",
-		"message": '',
-		"mid": 1, # message id
-		"rid": 1, # reply id
-	}
-	# print("Message from %s: %s"%(username, msg))
-
-	user = user_handler.collection(username, uid)
-	if not user:
-		out["status"] = "error"
-		out["message"] = "User not found!\nPlease register first."
-		out["script"] = ["""(async () => {
-			tools.sleep(3000)
-			user.redirect_2_login()
-		})()"""]
-		return json.dumps(out)
-
-	reply = basic_output(msg, user)
-
-	if isinstance(reply, dict):
-		out.update(reply)
-	else:
-		out["message"] = reply
-	return json.dumps(out)
 
 
 #############################################
@@ -110,6 +91,9 @@ def message_handler(username, uid, msg):
 
 @SH.on_req('GET', '/favicon.ico')
 def send_favico(self: SH, *args, **kwargs):
+	"""
+	re-direct favicon.ico request to cloud to make server less file bloated
+	"""
 	self.send_response(301)
 	self.send_header('Location','https://cdn.jsdelivr.net/gh/RaSan147/py_httpserver_Ult@main/assets/favicon.ico')
 	self.end_headers()
@@ -119,20 +103,33 @@ def send_favico(self: SH, *args, **kwargs):
 
 @SH.on_req('GET', '/')
 def send_homepage(self: SH, *args, **kwargs):
+	"""
+	returns the main page as home
+	"""
 	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"))
 
 @SH.on_req('GET', '/login')
 def send_login(self: SH, *args, **kwargs):
+	"""
+	returns login.html on login request
+	js will redirect here or to home based on wheather user is logged in or not
+	"""
 	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_login.html"))
 
 @SH.on_req('GET', '/signup')
 def send_signup(self: SH, *args, **kwargs):
+	"""
+	returns signup.html on signup request
+	js will redirect here or to home based on wheather user is logged in or not
+	"""
 	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"))
 
 
 @SH.on_req('GET')
 def send_default(self: SH, *args, **kwargs):
-	"""Serve a GET request."""
+	"""
+	Serves as default GET request handler and returns files on file system under the hosted directory
+	"""
 	path = kwargs.get('path', '')
 	url_path = kwargs.get('url_path', '')
 	spathsplit = kwargs.get('spathsplit', '')
@@ -206,7 +203,12 @@ def send_default(self: SH, *args, **kwargs):
 def AUTHORIZE_POST(req: SH, post:DPD, post_type=''):
 	"""Check if the user is authorized to post
 
-	reads upto line 5"""
+	reads upto line 5
+	# args:
+		req: the request handler (self of server handler class
+		post: instance of DealPostData class
+		post_type: post type to check
+	"""
 
 	# START
 	try:
@@ -229,7 +231,14 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=''):
 
 
 def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password'):
-	"""Get username and password from post data"""
+	"""
+	Get username and password from post data
+	READS UPTO LINE 13
+	# args:
+		self: the request handler (self of server handler class
+		post: instance of DealPostData class
+		pass_or_uid: verify using password or uid
+		"""
 
 	if not post.match_type('username'): # line 6
 		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
@@ -246,17 +255,27 @@ def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password'):
 	return username, password
 
 def resp_json(success, message='', **kwargs):
+	"""
+	returns json.dumps string based on success of an post action
+	# args:
+		success: bool or string refering wheather the task was successful or not
+		message: any message or info the server wants to send to the front end
+	"""
 	out = {"status": success, "message": message}
 	out.update(kwargs)
 	return json.dumps(out)
 
 
 @SH.on_req('POST', hasQ='do_login')
-def do_login(self: SH, *args, **kwargs):
+def do_login(self: SH, *args, **kwargs):	
+	"""
+	handle log in post request.
+	1st validate post
+	2nd get user from request username and *password*
+	2.1 if username or password invalid, then Get_User_from_post(...) will send invalid request error and this will return None
+	3rd sends username pass to user_handler and the handler will return if the action was successful or not and a message
+	"""
 	post = DPD(self)
-
-	# while post.get():
-	# 	pass
 
 	valid = AUTHORIZE_POST(self, post, 'login')
 	if not valid:
@@ -273,10 +292,11 @@ def do_login(self: SH, *args, **kwargs):
 
 @SH.on_req('POST', hasQ='do_signup')
 def do_signup(self: SH, *args, **kwargs):
+	"""
+	signup user
+	same as `do_login(...)`
+	"""
 	post = DPD(self)
-
-	# while post.get():
-	# 	pass
 
 	valid = AUTHORIZE_POST(self, post, 'signup')
 	if not valid:
@@ -292,10 +312,11 @@ def do_signup(self: SH, *args, **kwargs):
 
 @SH.on_req('POST', hasQ='do_verify')
 def do_verify(self: SH, *args, **kwargs):
+	"""
+	verify user
+	same as `do_login`
+	"""
 	post = DPD(self)
-
-	# while post.get():
-	# 	pass
 
 	valid = AUTHORIZE_POST(self, post, 'verify')
 	if not valid:
@@ -314,6 +335,11 @@ def do_verify(self: SH, *args, **kwargs):
 
 @SH.on_req('POST', hasQ='bot_manager')
 def bot_manager(self: SH, *args, **kwargs):
+	"""
+	handles user based varius bot queries like bot background, skin texture url etc.
+	
+	
+	"""
 	post = DPD(self)
 
 	post_type = AUTHORIZE_POST(self, post)
@@ -341,6 +367,12 @@ def bot_manager(self: SH, *args, **kwargs):
 
 @SH.on_req('POST', url='/chat', hasQ='send_msg')
 def chat(self: SH, *args, **kwargs):
+	"""
+	handles messaging to bot.
+	
+	gets message and sent time from post
+	and send it to message handlerq
+	"""
 	post = DPD(self)
 
 	post_type = AUTHORIZE_POST(self, post)
@@ -396,7 +428,8 @@ def chat(self: SH, *args, **kwargs):
 
 
 if __name__ == '__main__':
-	if not check_internet():
+	if 0 and not check_internet():
+		pass # now works
 		xprint("/rh/No internet connection!\nPlease connect to the internet and try again.\n\n/=//hu/THIS APP IS HIGHLY DEPENDENT ON INTERNET CONNECTION!/=/")
-		exit(1)
+		sys.exit(1)
 	run_server(45454, './page', handler=SH)

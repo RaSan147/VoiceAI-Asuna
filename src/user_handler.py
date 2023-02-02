@@ -40,10 +40,16 @@ class User(GETdict):
 
 		# if the data asked for is already there
 		if os.path.exists(self.file_path):
-			with open(self.file_path, 'r') as f:
-				data = json.load(f)
-				for key in data:
-					self[key] = data[key]
+			with open(self.file_path, 'rb') as f:
+				try:
+					data = json.loads(f.read())
+					for key in data:
+						self[key] = data[key]
+				except Exception:
+					traceback.print_exc()
+					print(f.read())
+					raise Exception("User data corrupted")
+				
 
 
 		else:

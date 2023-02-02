@@ -11,6 +11,7 @@
 	bottom: 60px;
 	overflow-y: auto;
 	padding: 0 5px;
+	padding-top: 50px;
 	max-height: 100%;
 }
 
@@ -96,8 +97,9 @@
 	height: 100%;
 	padding: 0 3px;
 	/* margin-bottom: 60px; */
-
 	overflow-y: auto;
+	padding-top: 150px;
+	z-index: 0;
 
 }
 

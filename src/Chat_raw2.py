@@ -15,6 +15,7 @@ import requests
 from PRINT_TEXT3 import xprint, remove_style
 
 from basic_conv_pattern import *
+from basic_conv_re_pattern import ip, op, search, starts, check, is_in
 from OS_sys import os_name, check_internet
 
 import yt_plugin
@@ -62,7 +63,7 @@ def find_person(name):
 def tell_time():
 	"""tells the current time"""
 	nowits = datetime.datetime.now()
-	return (choice(li_tell_time2) + nowits.strftime("%I:%M %p."))
+	return (choice(op.tell_time) + nowits.strftime("%I:%M %p."))
 
 
 
@@ -224,13 +225,13 @@ def _basic_output(INPUT, user: User):
 
 	if user.flags.parrot:
 		log_type(1)
-		if ui in stop_parrot:
+		if is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
 			out = "Parrot mode disabled"
 		else:
 			out = ui
 
-	elif ui in li_hi:
+	elif is_in(ip.hi, ui):
 		log_type(2)
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
@@ -243,7 +244,7 @@ def _basic_output(INPUT, user: User):
 			user.flags.hi_bit = 0
 		case='basic1'
 
-	elif ui in li_hello:
+	elif is_in(ip.hello, ui):
 		log_type(3)
 		if not user.flags.hello_bit:
 			user.flags.hello_bit = 0
@@ -257,6 +258,7 @@ def _basic_output(INPUT, user: User):
 		case='basic2'
 
 	elif ui in ('change', "change cloth", "change skin", "change dress"):
+		# TODO: NEED TO ADD IN PATTERNS
 		log_type(4)
 		out = Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
 		case='change_cloth'
@@ -272,6 +274,7 @@ def _basic_output(INPUT, user: User):
 
 
 	elif ui in ('switch room', "change room", "change background"):
+		# TODO: NEED TO ADD IN PATTERNS
 		log_type(4)
 		out = Rchoice("Sure!", "Okay", "Okay, wait a sec!")
 		case='change_room_bg'
@@ -289,7 +292,7 @@ def _basic_output(INPUT, user: User):
 		log_type(4)
 		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.") + Rchoice("", "🥰", "😇")
 		case='yui3'
-	elif ui in li_how_r_u:
+	elif is_in(ip.how_are_you, ui):
 		log_type(5)
 		out = Rchoice("I'm fine!", "I'm doing great.")
 	elif ui in li_loveu:

@@ -199,6 +199,58 @@ def null(*args, **kwargs):
 
 
 
+from queue import Queue
+class Zfunc(object):
+	"""Thread safe sequncial printing/queue task handler class"""
+
+	__all__ = ["new", "update"]
+	def __init__(self, caller, store_return=False):
+		super().__init__()
+		
+		self.queue = Queue()
+		# stores [args, kwargs], ...
+		self.store_return = store_return
+		self.returner = Queue()
+		# queue to store return value if store_return enabled
+	
+		self.BUSY = False
+		
+		self.caller = caller
+
+	def next(self):
+		""" check if any item in queje and call, if already running or queue empty, returns """
+		if self.queue.empty() or self.BUSY:
+			return None
+
+		self.BUSY = True
+		args, kwargs = self.queue.get()
+
+		x = self.caller(*args, **kwargs)
+		if self.store_return:
+			self.returner.put(x)
+
+		self.BUSY = False
+
+		if not self.queue.empty():
+			# will make the loop continue running
+			return True
+
+		
+	def update(self, *args, **kwargs):
+		""" Uses xprint and parse string"""
+		
+		self.queue.put((args, kwargs))
+		while self.next() is True:
+			# use while instead of recursion to avoid recursion to avoid recursion to avoid recursion to avoid recursion to avoid recursion to avoid recursion to avoid recursion.... error
+			pass
+		
+
+
+	def new(self):
+		self.__init__()
+
+
+
 
 """HTTP server classes.
 
@@ -710,6 +762,10 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		"""Default log"""
 		self.log_message(args)
 
+	def _log_writer(self, message):
+		os.makedirs(config.log_location, exist_ok=True)
+		with open(config.log_location + 'log.txt','a+') as f:
+			f.write((f"#{self.req_hash} by [{self.address_string()}] at [{self.log_date_time_string()}]|=> {message}\n"))
 
 
 
@@ -740,19 +796,17 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			logger.info(message)
 
 
+		if not config.write_log:
+			return
+			
+		if not hasattr(self, "Zlog_writer"):
+			self.Zlog_writer = Zfunc(self._log_writer)
+		
 		try:
-			if not config.write_log:
-				return
-
-			# create config.log_location if it doesn't exist
-			os.makedirs(config.log_location, exist_ok=True)
-			with open(config.log_location + 'log.txt','a+') as f:
-				f.write(("\n\n# %s by [%s] at [%s] %s\n" %
-						 (self.req_hash, self.address_string(),
-						  self.log_date_time_string(),
-						  message)))
+			self.Zlog_writer.update(message)
 		except Exception:
 			traceback.print_exc()
+
 
 	def version_string(self):
 		"""Return the server software version string."""
@@ -1003,6 +1057,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 	def send_txt(self, code, msg, write_log=True):
 		'''sends the head and file to client'''
 		f = self.return_txt(code, msg, write_log=write_log)
+		if self.command == "HEAD": 
+			return # to avoid sending file on get request
 		self.copyfile(f, self.wfile)
 		f.close()
 
@@ -1012,6 +1068,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		if not isinstance(obj, str):
 			obj = json.dumps(obj, indent=1)
 		f = self.return_txt(200, obj, content_type="application/json")
+		if self.command == "HEAD": 
+			return # to avoid sending file on get request
 		self.copyfile(f, self.wfile)
 		f.close()
 
@@ -1445,7 +1503,8 @@ def test(HandlerClass=BaseHTTPRequestHandler,
 	print(tools.text_box(
 		f"Serving HTTP on {host} port {port} \n" #TODO: need to check since the output is "Serving HTTP on :: port 6969"
 		f"(http://{url_host}:{port}/) ...\n" #TODO: need to check since the output is "(http://[::]:6969/) ..."
-		f"Server is probably running on {config.address()}"
+		f"Server is probably running on {config.address()}\n"
+		f"and http://localhost:{config.port}"
 		, style="star"
 		)
 	)

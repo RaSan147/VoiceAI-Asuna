@@ -16,8 +16,8 @@ yeses = 'Yeah! ', 'Yeah. ', 'Yes! ', 'Yes. ', 'Sure! ', 'Sure. ', 'Yeah of cours
 
 li_QyuiName = "can i change your name", 'i want to change your name'
 li_QyuiNamePre = "can i call you ", 'may i call you'
-li_hello = "hello %(aiName)s", "halo %(aiName)s", 'hello', 'helo'
-li_hi = "hi %(aiName)s", "hey %(aiName)s", 'hi', 'hey'
+li_hello = "hello <:ai_name>", "helo <:ai_name>", 'hello', 'helo'
+li_hi = "hi <:ai_name>", "hey <:ai_name>", 'hi', 'hey', "hiii"
 
 li_redo = 'redo my last command', 'retry my last command', 'redo last command', 'redo last command', 'redo'
 li_QmyName = 'my name', 'my name is'
@@ -44,6 +44,16 @@ li_where += tuple(s + 'where' + x + t for x in _li_extra for s in li_do_u_know f
 
 
 li_what_is = tuple('what' + x + t for x in ('s', ' is') for t in (' the', ''))
+
+import json
+def js(x):
+	if isinstance(x, set):
+		return json.dumps(list(x))
+	return json.dumps(x)
+#print(js(set(li_whats)))
+#print(js(set(li_who)))
+#print(js(set(li_where)))
+#print(js(set(li_what_is)))
 
 
 li_whats2 = tuple('what'+x for x in _li_extra)
@@ -195,11 +205,11 @@ li_goto = ('open', 'go to', 'goto')
 li_play = ('play', 'lets play', 'hit', 'tune', 'sing')
 li_reload = ('re', 'reload', '11')
 li_fucku = ('fuck you', 'fuck u','fuck ya')
-li_loveu=('love u','i love you','love ya','love you','i love u')
+li_loveu=('love u','i love you','love ya','love you','i love u','i love you so much','i really love you','i really love you a lot','i wuv u')
 li_check_int = ["check " + i for i in ('net', 'internet',"connection", "wifi", "network")]
 
 li_refuck = ('Fuck yourself!', 'Go to hell!', 'Whatever! You can\'t do that!')
-li_relove='love ya too','love you too','I love you too'
+li_relove='love you too','love you so much','I love you too' 
 li_voice0 = ['silent', 'silence', 'shut up', 'turn off volume', 'stop speaking']
 li_can_do = li_goto + li_play
 works = ["talk", "calculate"]
@@ -289,5 +299,3 @@ links_li = tuple(v for k,v in links_dict.items())
 
 # print(*links, sep='\n')
 
-if __name__ == '__main__':
-	print(li_whats)

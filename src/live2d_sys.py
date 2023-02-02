@@ -1,5 +1,6 @@
 import requests
 import json
+import net_sys
 
 
 class OnLine:
@@ -9,12 +10,16 @@ class OnLine:
 		self.cached_characters = {}
 
 	def get_characters(self):
-		r = requests.get(self.latest_link + "/characters.json")
-		return json.loads(r.text)
+		r = net_sys.get_page(self.latest_link + "/characters.json", 
+							cache=True,
+							do_not_cache=False)
+		return json.loads(r.content)
 
 	def get_latest_commit(self):
-		r = requests.get("https://api.github.com/repos/RaSan147/voiceAI-skins/commits/main")
-		commits = json.loads(r.text)
+		r = net_sys.get_page("https://api.github.com/repos/RaSan147/voiceAI-skins/commits/main", 
+							cache=True,
+							do_not_cache=False)
+		commits = json.loads(r.content)
 		return commits['sha']
 
 	def get_character(self, name):
@@ -23,7 +28,9 @@ class OnLine:
 			return self.cached_characters[name]
 		folder = c['folder']
 		link = self.latest_link + "/" + folder + "/skins.json"
-		r = requests.get(link)
+		r = net_sys.get_page(link, 
+							cache=True,
+							do_not_cache=False)
 		# print(r.text)
 		c['skins'] = json.loads(r.text)
 		self.cached_characters[name] = c
