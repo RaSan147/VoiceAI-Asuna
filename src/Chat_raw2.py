@@ -127,7 +127,6 @@ def preprocess(in_dat):
 	in_dat = in_dat.replace("'", " ")
 	in_dat = in_dat.replace("?", " ")
 	in_dat = in_dat.replace("!", " ")
-	in_dat = in_dat.replace(".", " ")
 	in_dat = in_dat.replace(",", " ")
 	in_dat = in_dat.strip()
 	in_dat = re.sub(r'\s{2,}', ' ', in_dat)
@@ -213,7 +212,8 @@ def _basic_output(INPUT, user: User):
 	INPUT = parsed_names(INPUT, user)
 	INPUT = preprocess(INPUT)
 	ui_raw = pre_rem_bot_call(INPUT)
-	ui = ui_raw.lower()
+	ui = ui_raw.lower().replace(".", " ") # remove . from input
+	# keep . in raw to make sure its not removed it mathmatical expressions
 
 	if ui == "":
 		return

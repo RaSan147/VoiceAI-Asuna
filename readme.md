@@ -8,6 +8,17 @@ Welcome to project Asuna.
 
 * our additional plan is to create their animated avatar and make it available online (via Browsers)
 
+# Current status:
+- [x] Create server and web UI
+- [x] Add anime live2D
+- [x] Connect chat 
+- [ ] Server and UI improvements
+- [ ] Add more Commands
+- [ ] Add voice recognition
+- [ ] Add voice output
+- [ ] Add anime live2D animations
+- [ ] Improve sidebars
+- [ ] Add bot send pictures
 
 
 # How To:
