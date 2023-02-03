@@ -28,3 +28,7 @@ Welcome to project Asuna.
 # How To:
 * **First** install the [REQUIREMENTS](/REQUIREMENTS.md)
 * To Launch the server run the [App_server.py](/src/App_server.py) file
+
+# Requirement:
+* Python 3.7 or higher
+* Works on Pydroid 3 😄 (most develoment is done here)
