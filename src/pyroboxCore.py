@@ -246,8 +246,8 @@ class Zfunc(object):
 		
 
 
-	def new(self):
-		self.__init__()
+	def new(self, caller, store_return=False):
+		self.__init__(caller=caller, store_return=store_return)
 
 
 
@@ -1009,7 +1009,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		try:
 			for case, func in self.handlers['POST']:
 				if self.test_req(*case):
-					f = func(self, url_path=url_path, query=query, fragment=fragment, path=path, spathsplit=spathsplit)
+					try:
+						f = func(self, url_path=url_path, query=query, fragment=fragment, path=path, spathsplit=spathsplit)
+					except PostError:
+						traceback.print_exc()
+						break # break if error is raised and send BAD_REQUEST (at end of loop)
 
 					if f:
 						try:
@@ -1333,19 +1337,21 @@ class PostError(Exception):
 
 class DealPostData:
 	"""do_login
-1: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa\r\n'
-2: b'Content-Disposition: form-data; name="post-type"\r\n'
-3: b'\r\n'
-4: b'login\r\n'
-5: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa\r\n'
-6: b'Content-Disposition: form-data; name="username"\r\n'
-7: b'\r\n'
-8: b'xxx\r\n'
-9: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa\r\n'
-10: b'Content-Disposition: form-data; name="password"\r\n'
-11: b'\r\n'
-12: b'ccc\r\n'
-13: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa--\r\n'
+
+#get starting boundary
+0: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa\r\n'
+1: b'Content-Disposition: form-data; name="post-type"\r\n'
+2: b'\r\n'
+3: b'login\r\n'
+4: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa\r\n'
+5: b'Content-Disposition: form-data; name="username"\r\n'
+6: b'\r\n'
+7: b'xxx\r\n'
+8: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa\r\n'
+9: b'Content-Disposition: form-data; name="password"\r\n'
+10: b'\r\n'
+11: b'ccc\r\n'
+12: b'------WebKitFormBoundary7RGDIyjMpWhLXcZa--\r\n'
 """
 
 
@@ -1393,26 +1399,26 @@ class DealPostData:
 		if not self.boundary in line:
 			self.req.log_error("Content NOT begin with boundary\n", [line, self.boundary])
 
-	def get_type(self, line=None, ):
+	def get_name(self, line=None, ):
 		if not line:
 			line = self.get()
 		try:
 			return re.findall(r'Content-Disposition.*name="(.*?)"', line.decode())[0]
 		except: return None
 
-	def match_type(self, type):
+	def match_name(self, field_name=None):
 		line = self.get()
-		if self.get_type(line)==type:
-			return line
-		else:
-			raise PostError(f"Invalid {type} request")
+		if field_name and self.get_name(line)!=field_name:
+			raise PostError(f"Invalid request: Expected {field_name} but got {self.get_name(line)}")
+		
+		return line
 
 
 	def skip(self,):
 		self.get()
 
-	def start(self, post_type=''):
-		'''reads upto line 5'''
+	def start(self):
+		'''reads upto line 0'''
 		req = self.req
 		content_type = req.headers['content-type']
 
@@ -1423,24 +1429,32 @@ class DealPostData:
 		self.remainbytes = int(req.headers['content-length'])
 
 
-		self.pass_bound()# LINE 1
+		self.pass_bound()# LINE 0
+		
 
+	def get_part(self, verify_name=None, verify_msg=None, decode=F):
+		'''read a form field'''
+		field_name = self.match_name(verify_name) # LINE 1 (field name)
+		# if not verified, raise PostError
 
-		# get post type
-		if self.match_type("post-type"): # LINE 2 (post-type)
-			self.skip() # LINE 3 (blank line)
-		else:
-			raise PostError("Invalid post request")
+		self.skip() # LINE 2 (blank line)
 
-		line = self.get() # LINE 4 (post type value)
-		handle_type = line.decode().strip() # post type LINE 4
+		line = b''
+		while 1:
+			_line = self.get() # from LINE 4 till boundary (form field value)
+			if self.boundary in _line: # boundary
+				break
+			line += _line
 
-		if post_type and handle_type != post_type:
-			raise PostError("Invalid post request")
+		line = line.rpartition(b"\r\n")[0] # remove \r\n at end
+		if decode:
+			line = line.decode()
+		if verify_msg and line != verify_msg:
+			raise PostError(f"Invalid post request Expected: {[verify_msg]} Got: {[line]}")
 
-		self.pass_bound() # LINE 5 (boundary)
+		# self.pass_bound() # LINE 5 (boundary)
 
-		return handle_type
+		return field_name, line
 
 
 

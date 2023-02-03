@@ -200,7 +200,7 @@ def send_default(self: SH, *args, **kwargs):
 
 
 
-def AUTHORIZE_POST(req: SH, post:DPD, post_type=''):
+def AUTHORIZE_POST(req: SH, post:DPD, post_type=None):
 	"""Check if the user is authorized to post
 
 	reads upto line 5
@@ -210,15 +210,9 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=''):
 		post_type: post type to check
 	"""
 
-	# START
-	try:
-		post_verify = post.start(post_type)
-	except PostError as e:
-		req.send_txt(HTTPStatus.BAD_REQUEST, str(e))
-		return None
-	if not post_verify:
-		req.send_txt(HTTPStatus.BAD_REQUEST, post_verify)
-		return None
+	# START POST DATA READING
+	post.start()
+	post_verify = post.get_part("post-type", post_type, T)
 
 
 	##################################
@@ -227,7 +221,7 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=''):
 
 	##################################
 
-	return post_verify
+	return post_verify[1] # return 1st field value
 
 
 def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password'):
@@ -240,17 +234,12 @@ def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password'):
 		pass_or_uid: verify using password or uid
 		"""
 
-	if not post.match_type('username'): # line 6
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
-	post.skip() # line 7
-	username = post.get(strip=T).decode('utf-8') # line 8
-	post.pass_bound() # line 9
+	_, username = post.get_part('username', decode=T) # line 5-8
+	username = username
+	
 
-	if not post.match_type(pass_or_uid): # line 10
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
-	post.skip() # line 11
-	password = post.get(strip=T).decode('utf-8') # line 12
-	post.pass_bound() # line 13
+	_, password = post.get_part(pass_or_uid, decode=T) # line 9-12
+	password = password
 
 	return username, password
 
@@ -277,14 +266,10 @@ def do_login(self: SH, *args, **kwargs):
 	"""
 	post = DPD(self)
 
-	valid = AUTHORIZE_POST(self, post, 'login')
-	if not valid:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+	AUTHORIZE_POST(self, post, 'login')
 
-	data = Get_User_from_post(self, post)
-	if not data: return None
+	username, password = Get_User_from_post(self, post)
 
-	username, password = data
 
 	return self.send_json(user_handler.server_login(username, password))
 
@@ -298,14 +283,9 @@ def do_signup(self: SH, *args, **kwargs):
 	"""
 	post = DPD(self)
 
-	valid = AUTHORIZE_POST(self, post, 'signup')
-	if not valid:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+	AUTHORIZE_POST(self, post, 'signup')
 
-	data = Get_User_from_post(self, post)
-	if not data: return None
-
-	username, password = data
+	username, password = Get_User_from_post(self, post)
 
 	return self.send_json(user_handler.server_signup(username, password))
 
@@ -318,15 +298,10 @@ def do_verify(self: SH, *args, **kwargs):
 	"""
 	post = DPD(self)
 
-	valid = AUTHORIZE_POST(self, post, 'verify')
-	if not valid:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+	AUTHORIZE_POST(self, post, 'verify')
 
-	data = Get_User_from_post(self, post, 'uid')
-	if not data:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+	username, uid = Get_User_from_post(self, post, 'uid')
 
-	username, uid = data
 
 	x = resp_json(user_handler.server_verify(username, uid))
 	return self.send_json(x)
@@ -342,21 +317,17 @@ def bot_manager(self: SH, *args, **kwargs):
 	"""
 	post = DPD(self)
 
-	post_type = AUTHORIZE_POST(self, post)
-	if not post_type:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+	request  = AUTHORIZE_POST(self, post)
 
-	data = Get_User_from_post(self, post, 'uid')
-	if not data: return None
+	username, uid = Get_User_from_post(self, post, 'uid')
 
-	username, uid = data
 
-	if post_type == 'get_skin_link':
+	if request == 'get_skin_link':
 		skin = user_handler.get_skin_link(username, uid)
 		success = bool(skin)
 		return self.send_json(resp_json(success, skin))
 
-	elif post_type == 'room_bg':
+	elif request == 'room_bg':
 		skin = user_handler.room_bg(username, uid)
 		success = bool(skin)
 		return self.send_json(resp_json(success, skin))
@@ -375,27 +346,20 @@ def chat(self: SH, *args, **kwargs):
 	"""
 	post = DPD(self)
 
-	post_type = AUTHORIZE_POST(self, post)
-	if not post_type:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+	AUTHORIZE_POST(self, post)
 
-	data = Get_User_from_post(self, post, 'uid')
-	if not data: return None
+	username, uid = Get_User_from_post(self, post, 'uid')
 
-	username, uid = data
 
-	_m = post.match_type('message')
-	post.skip()
-	message = post.get(strip=T).decode('utf-8')
-	post.pass_bound()
+	_m, message = post.get_part('message', decode=T)
+	message = message.strip()
 
-	_t = post.match_type('time')
-	post.skip()
-	_time = post.get(strip=T).decode('utf-8')
-	post.pass_bound()
+	_t, _time = post.get_part('time', decode=T)
+	_time = _time.strip()
+
 
 	if not _m or not _t:
-		return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request")
+		raise PostError("Invalid post data")
 
 
 	out = {
