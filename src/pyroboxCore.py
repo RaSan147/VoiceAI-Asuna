@@ -150,11 +150,11 @@ class Tools:
 	def term_width(self):
 		return shutil.get_terminal_size()[0]
 
-	def text_box(self, *text, style = "equal"):
+	def text_box(self, *text, style = "equal", sep=" "):
 		"""
 		Returns a string of text with a border around it.
 		"""
-		text = " ".join(map(str, text))
+		text = sep.join(map(str, text))
 		term_col = shutil.get_terminal_size()[0]
 
 		s = self.styles[style] if style in self.styles else style
@@ -1499,13 +1499,17 @@ def test(HandlerClass=BaseHTTPRequestHandler,
 	hostname = socket.gethostname()
 	local_ip = config.IP if config.IP else get_ip()
 	config.IP= local_ip
+	
+	
+	on_network = local_ip!="127.0.0.1"
 
 	print(tools.text_box(
-		f"Serving HTTP on {host} port {port} \n" #TODO: need to check since the output is "Serving HTTP on :: port 6969"
-		f"(http://{url_host}:{port}/) ...\n" #TODO: need to check since the output is "(http://[::]:6969/) ..."
-		f"Server is probably running on {config.address()}\n"
-		f"and http://localhost:{config.port}"
-		, style="star"
+		f"Serving HTTP on {host} port {port} \n", #TODO: need to check since the output is "Serving HTTP on :: port 6969"
+		f"(http://{url_host}:{port}/) ...\n", #TODO: need to check since the output is "(http://[::]:6969/) ..."
+		f"Server is probably running on\n",
+		(f"[over NETWORK] {config.address()}\n" if on_network else ""),
+		f"[on DEVICE] http://localhost:{config.port} & http://127.0.0.1:{config.port}"
+		, style="star", sep=""
 		)
 	)
 	try:

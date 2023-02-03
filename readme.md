@@ -18,7 +18,11 @@ Welcome to project Asuna.
 - [ ] Add voice output
 - [ ] Add anime live2D animations
 - [ ] Improve sidebars
-- [ ] Add bot send pictures
+- [ ] Allow bot send pictures
+- [ ] Allow bot send audio
+- [ ] Allow bot send video
+
+
 
 
 # How To:
