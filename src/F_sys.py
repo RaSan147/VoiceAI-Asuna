@@ -3,6 +3,7 @@ import os.path
 from html import unescape as html_unescape
 import urllib.parse
 #from os_sys import os_name
+import time
 
 import DATA_sys as Datasys
 from PRINT_TEXT3 import xprint
@@ -145,6 +146,9 @@ def go_prev_dir(directory, preserve_sep=False):  # fc=0606 v
 		
 	#else:
 	return sep.join(directory.split(sep)[:-2]) + sep
+	
+	
+BUSY_FS = set()
 
 def reader(direc, read_mode='r', ignore_error=False, output=None,
 			encoding='utf-8', f_code='?????', on_missing=None,
@@ -172,19 +176,35 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 
 	else:
 		read_mode = 'r'
+		
+	location = loc(direc)
 
-	if not os.path.isfile(loc(direc)):
+	if not os.path.isfile(location):
 		if not ignore_missing_log:
-			print(loc(direc), 'NOT found to read. Error code: 0607x1')
+			print(location, 'NOT found to read. Error code: 0607x1')
 		return on_missing
+		
+	
+	waited = 0
+	while location in BUSY_FS and waited<3:
+		time.sleep(.1)
+		waited +=.1
+	if location in BUSY_FS:
+		raise TimeoutError
+		
+	BUSY_FS.add(location)
 
 	try:
-		with open(loc(direc), read_mode, encoding=None if 'b' in read_mode else encoding) as f:
+		with open(location, read_mode, encoding=None if 'b' in read_mode else encoding) as f:
 			out = f.read()
 	except PermissionError:
 		if not ignore_missing_log:
 			xprint(loc(direc), 'failed to read due to /hui/ PermissionError /=/. Error code: 0607x2')
 		return on_missing
+	finally:
+		BUSY_FS.remove(location)
+
+
 	if output is None:
 		if read_mode == 'r':
 			output = 'str'
@@ -212,6 +232,9 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 def writer(fname, mode, data, direc=None, f_code='????',
 			encoding='utf-8'):  # fc=0608 v
 	"""Writing on a file
+	
+	why this monster?
+	> to avoid race condition, folder not found etc
 
 	args:
 	-----
@@ -247,45 +270,55 @@ def writer(fname, mode, data, direc=None, f_code='????',
 
 	if direc is None or direc == '':
 		direc = './'
+	direc = loc(direc, 'Linux')
+	
 	# directory and file names are auto stripped by OS
 	# or else shitty problems occurs
 
 	direc = direc.strip()
+	if not direc.endswith("/"):
+		direc+="/"
 	fname = fname.strip()
+	
+
+	location = loc(direc + fname)
+	
+	if any(i in location for i in ('\\|:*"><?')):
+		location = Datasys.trans_str(location, {'\\|:*><?': '-', '"': "'"})
+		
+	waited = 0
+	while location in BUSY_FS and waited<3:
+		time.sleep(.1)
+		waited +=.1
+	if location in BUSY_FS:
+		raise TimeoutError
+
+		
+	BUSY_FS.add(location)
+	
+	# creates the directory, then write the file
+	try:
+		os_makedirs(direc, exist_ok=True)
+	except Exception as e:
+		if e.__class__.__name__ == "PermissionError":
+			_temp = ''
+			_temp2 = direc.split('/')
+			_temp3 = 0
+			for _temp3 in range(len(_temp2)):
+				_temp += _temp2[_temp3] + '/'
+				if not os.path.isdir(_temp): 
+					break
+			raise PermissionError(_temp) from e
+
 
 	try:
-		if direc is None:
-			locs = './'
-			write(fname)
-		else:
-			locs = loc(direc, 'Linux')
-			if any(i in locs for i in ('\\|:*"><?')):
-				locs = Datasys.trans_str(locs, {'\\|:*><?': '-', '"': "'"})
-
-			if not os.path.isdir(locs):
-				# creates the directory, then write the file
-				try:
-					os_makedirs(locs, exist_ok=True)
-				except Exception as e:
-					if e.__class__.__name__ == "PermissionError":
-						_temp = ''
-						_temp2 = locs.split('/')
-						_temp3 = 0
-						while True:
-							_temp += _temp2[_temp3] + '/'
-							if not os.path.isdir(_temp): break
-						del _temp, _temp2, _temp3
-					raise e
-			if locs.endswith('/'):
-				direc = loc(locs + fname)
-			else:
-				direc = loc(locs + '/' + fname)
-
-			write(direc)
+		write(location)
 
 	except Exception as e:
 		xprint('/r/', e.__class__.__name__, "occurred while writing", fname, 'in', 'current directory' if direc is None else direc, '/y/\nPlease inform the author. Error code: 00008x' + f_code, '/=/')
 		raise e
+	finally:
+		BUSY_FS.remove(location)
 	
 def get_dir_size(start_path = '.', limit=None, return_list= False, full_dir=True):
 	"""

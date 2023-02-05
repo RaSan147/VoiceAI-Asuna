@@ -3,6 +3,8 @@ import json
 import hashlib
 import time, datetime
 import traceback
+import inspect
+
 
 import F_sys
 import net_sys
@@ -37,23 +39,26 @@ class User(GETdict):
 
 		self.flags = Flag()
 		self.pointer = 0
+		
+		curframe = inspect.currentframe()
+		calframe = inspect.getouterframes(curframe, 3)
+		stack = inspect.stack()
+		#print('caller name:', calframe[1][3])
+		print("\n\n### caller ", *[i[1:4] for i in stack], "\n\n", sep="\n")
 
 		# if the data asked for is already there
-		if os.path.exists(self.file_path):
-			with open(self.file_path, 'rb') as f:
-				try:
-					data = json.loads(f.read())
-					for key in data:
-						self[key] = data[key]
-				except Exception:
-					traceback.print_exc()
-					print(f.read())
-					raise Exception("User data corrupted")
-				
-
-
-		else:
+		data = F_sys.reader(self.file_path, on_missing=None)
+		if not data:
 			raise Exception("User not found")
+
+		try:
+			json_data = json.loads(data)
+			for key in json_data:
+				self[key] = json_data[key]
+		except Exception:
+			traceback.print_exc()
+			raise Exception("User data corrupted")
+				
 
 	def __setitem__(self, key, value):
 		super().__setitem__(key, value)
@@ -72,9 +77,9 @@ class User(GETdict):
 		file_path = os.path.join(self.user_path, pointer+'.json')
 
 		# if the data asked for is already there
-		if os.path.exists(file_path):
-			with open(file_path, 'r') as f:
-				return json.load(f)
+		data = F_sys.reader(file_path, on_missing=None)
+		if data:
+			return json.loads(data)
 
 		return None
 
@@ -105,7 +110,7 @@ class User(GETdict):
 
 class UserHandler:
 	def __init__(self) -> None:
-		self.users = {}
+		self.users = {} #username: User()
 
 		self.online_avatar = live2d_sys.OnLine()
 
@@ -182,10 +187,10 @@ class UserHandler:
 				return False
 
 		# merge data
-		temp = self.default_user.copy()
-		temp.update(user)
+		temp = self.default_user
 		for key in temp:
-			user[key] = temp[key]
+			if key not in user:
+				user[key] = temp[key]
 
 	def server_signup(self, username, password):
 		# check if username is already taken
@@ -205,13 +210,13 @@ class UserHandler:
 		})
 
 	def server_login(self, username, password):
-		hash = hashlib.sha256((username+password).encode('utf-8'))
 		user = self.get_user(username)
 		if user is None:
 			return json.dumps({
 				"status": "error",
 				"message": "User not found"
 			})
+		hash = hashlib.sha256((username+password).encode('utf-8'))
 		if user["password"] != hash.hexdigest():
 			return json.dumps({
 				"status": "error",
@@ -220,7 +225,7 @@ class UserHandler:
 
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 		print("logged in", user)
-		user.flags.clear() # clear flags
+		# user.flags.clear() # clear flags
 
 		return {
 			"status": "success",
@@ -230,8 +235,11 @@ class UserHandler:
 		}
 
 	def get_user(self, username):
+		if username in self.users:
+			return self.users[username]
 		try:
 			user = User(username)
+			self.users[username] = user
 			return user
 		except:
 			return None
@@ -244,7 +252,7 @@ class UserHandler:
 			return False
 
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
-		user.flags.clear() # clear flags on refresh
+		# user.flags.clear() # clear flags on refresh
 		self.update_user(username)
 
 		if return_user:
@@ -252,14 +260,12 @@ class UserHandler:
 		return True
 
 
-	def collection(self, username, uid=None, temp=False):
-		if uid not in self.users: # if user is not in memory
-			verified_user = self.server_verify(username, uid, return_user=True)
-			if not verified_user:
-				return None
-			if not temp or uid is not None:
-				self.users[uid] = User(username)
-		return self.users[uid]
+	def collection(self, username, uid):
+		# verify uid from users collection
+		x = self.get_user(username)
+		if not x: return None
+		if x.get("id")!=uid: return None
+		return x
 
 	def get_skin_link(self, username, uid, retry=0):
 		user = self.collection(username, uid)
@@ -333,12 +339,12 @@ user_handler = UserHandler()
 
 if __name__ == "__main__":
 	user_handler.create_user("test", "test")
-	user = User("test")
-	print(user.username)
-	user.x = 1 # set temporary data (not saved in file)
-	user['y'] = 2 # set permanent data (saved in file)
-	print(user.x)
-	user.y = 3 # change permanently (saved)
-	user.x = 4 # changed, but not saved in file
-	print(user)
-	print(user_handler.get_skin_link("test", user["id"]))
+	__user = User("test")
+	print(__user.username)
+	__user.x = 1 # set temporary data (not saved in file)
+	__user['y'] = 2 # set permanent data (saved in file)
+	print(__user.x)
+	__user.y = 3 # change permanently (saved)
+	__user.x = 4 # changed, but not saved in file
+	print(__user)
+	print(user_handler.get_skin_link("test", __user["id"]))

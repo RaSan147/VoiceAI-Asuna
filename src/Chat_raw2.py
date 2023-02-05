@@ -16,12 +16,14 @@ from PRINT_TEXT3 import xprint, remove_style
 
 from basic_conv_pattern import *
 from basic_conv_re_pattern import ip, op, search, starts, check, is_in
+
 from OS_sys import os_name, check_internet
 
 import yt_plugin
 from bbc_news import bbc_news
 
 from TIME_sys import from_jstime
+from DS import str2
 
 from user_handler import User, user_handler
 from CONFIG import appConfig
@@ -108,6 +110,7 @@ def wikisearch(uix, raw='', user: User = None):
 				user.flags
 
 			return f"/y/I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?/=/"
+
 			
 			
 		return wolf
@@ -141,14 +144,22 @@ def pre_rem_bot_call(ui):
 	""" remove *hey Asuna* whats ...."""
 	nick = "<:ai_name>"
 	ui_parts = ui.split()
+	if len(ui_parts)<2:
+		# no job here
+		return ui
+
 	ui_LParts = ui.lower().split()
-	if len(ui_LParts)>2 and nick in ui_LParts[:2]:
-		if nick == ui_LParts[0]:
-			ui_parts.pop(0)
-		if ui_LParts[0] in ("hey", "miss", "dear", "yo"):
-			ui_parts.pop(0)
-			ui_parts.pop(1)
-			
+	
+
+	bkp = ui_parts.copy()
+	Lbkp = ui_LParts.copy()
+	
+	if ui_LParts[0] in ("hey", "miss", "dear", "yo"):
+		ui_parts.pop(0)
+		ui_LParts.pop(0)
+	if ui_LParts[0] in ("girl", "babe", nick):
+		ui_parts.pop(0)
+
 	return " ".join(ui_parts)
 			
 	
@@ -160,7 +171,7 @@ def Rchoice(*args):
 
 message_dict = {
 	"message": "",
-	"render": "innerHTML",
+	"render": "innerText",
 	"script": ""
 }
 
@@ -179,12 +190,16 @@ def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 		x["message"] = remove_style(x["message"])
 		msg.update(x)
 	else:
-		x = remove_style(x)
 		msg["message"] = x
+	
+	msg["message"] = msg["message"].strip()
+	if msg["render"] =="innerHTML":
+		msg["message"] = msg["message"].replace("\n", "<br>")
 
 	_time = int(time()*1000)
 	user.add_chat(msg["message"], _time, 0)
 	return msg
+	
 
 
 
@@ -214,11 +229,11 @@ def _basic_output(INPUT, user: User):
 	ui_raw = pre_rem_bot_call(INPUT)
 	ui = ui_raw.lower().replace(".", " ") # remove . from input
 	# keep . in raw to make sure its not removed it mathmatical expressions
-
+	print(ui, ui_raw)
 	if ui == "":
 		return
 
-	out = ""
+	out = str2()
 
 	print(user.flags)
 	print(ui)
@@ -227,40 +242,91 @@ def _basic_output(INPUT, user: User):
 		log_type(1)
 		if is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
-			out = "Parrot mode disabled"
+			out += "Parrot mode disabled"
 		else:
-			out = ui
+			out += ui
 
-	elif is_in(ip.hi, ui):
+	if starts(ip.hi, ui):
 		log_type(2)
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
 		if user.flags.hi_bit<2:
-			out = Rchoice('Hello', 'Hey', 'Hey','Hello') +Rchoice('', " there", '')+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
+			out += Rchoice('Hello', 'Hey', 'Hey','Hello') +Rchoice('', " there", '')+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
 		else:
-			out = Rchoice('Hello','Yeah!','Yes?','Yeah, need something?')
+			out += Rchoice('Hello','Yeah!','Yes?','Yeah, need something?')
 		user.flags.hi_bit+=1
 		if user.flags.hi_bit == 5:
 			user.flags.hi_bit = 0
 		case='basic1'
 
-	elif is_in(ip.hello, ui):
+	elif starts(ip.hello, ui):
 		log_type(3)
 		if not user.flags.hello_bit:
 			user.flags.hello_bit = 0
 		if user.flags.hello_bit<2:
-			out = Rchoice('Hi', 'Hey') +Rchoice('', '', " there")+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
+			out += Rchoice('Hi', 'Hey') +Rchoice('', '', " there")+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
 		else:
-			out = Rchoice('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?')
+			out += Rchoice('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?')
 		user.flags.hello_bit+=1
 		if user.flags.hello_bit == 5:
 			user.flags.hello_bit = 0
 		case='basic2'
+		
+	if check(ip.how_are_you, ui):
+		log_type(5)
+		out += Rchoice("I'm fine!", "I'm doing great.")
+		
+	elif check(ip.whats_your_name, ui):
+		log_type(8)
 
-	elif ui in ('change', "change cloth", "change skin", "change dress"):
+		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+		
+	elif check(ip.whats_, ui_raw):
+		
+		log_type("li_whats")
+		_what = search(ip.whats_, ui)
+		_what_raw = search(ip.whats_, ui_raw)
+		uiopen = _what.group("query")
+		uiopen_raw = _what_raw.group("query")
+		
+
+		if uiopen in ["you", "yourself"]:
+			log_type("what are you")
+			out += (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
+			return {"message": out,
+					"render": "innerHTML"
+					}
+
+		if uiopen in li_WmyName:
+			log_type("what is my name")
+			out += (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
+
+		elif uiopen in ["latest news", "news update", 'news']:
+			log_type(18)
+			if check_internet():
+				news = bbc_news.task(bbc_topic)
+				if news is None:
+					out += ("No news available")
+				else:
+					out += "".join(news[:5])
+					# asker("Do you want to hear the rest?", true_func=read_rest_news)
+
+
+			else:
+				out += 'No internet!'
+
+		else:
+			log_type(20)
+			out += wikisearch(uiopen_raw, raw=ui, user=user)
+			return {"message": out,
+					"render": "innerHTML"
+					}
+	
+
+	if ui in ('change', "change cloth", "change skin", "change dress"):
 		# TODO: NEED TO ADD IN PATTERNS
 		log_type(4)
-		out = Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
+		out += Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
 		case='change_cloth'
 		total_skins = len(user.skins)
 		user.bot_skin = (user.bot_skin + 1)%total_skins
@@ -292,9 +358,7 @@ def _basic_output(INPUT, user: User):
 		log_type(4)
 		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.") + Rchoice("", "🥰", "😇")
 		case='yui3'
-	elif is_in(ip.how_are_you, ui):
-		log_type(5)
-		out = Rchoice("I'm fine!", "I'm doing great.")
+
 	elif ui in li_loveu:
 		log_type(6)
 		out = choice(li_relove) + Rchoice(" dear", f" {user.nickname}", " babe", "", "") + Rchoice(" 🥰", " 😘💕❤️" " 😘", "😘😘😘", "", "")
@@ -304,10 +368,7 @@ def _basic_output(INPUT, user: User):
 		out = Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me")
 		case= 'yui5'
 
-	elif ui in li_what_ur_name:
-		log_type(8)
-
-		out = choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+	
 		# if user.flags.what_u_name_bit == 1:
 		# 	outtxt += "\nIf you want, you can change my name."
 		# 	out = (outtxt)
@@ -449,56 +510,7 @@ def _basic_output(INPUT, user: User):
 			out = ('No internet!')
 
 
-	elif ui.startswith(li_whats):
-		log_type("li_whats")
-		# what = [i for i in li_whats if ui.startswith(i) == True]
-		what = ''
-		for w in li_whats:
-			if ui.startswith(w):
-				what = w
-				break
-		if len(ui) == len(what):
-			return
-
-		reg_ex = re.search(what + ' (.+)', ui)
-		reg_ex_raw = re.search(what + ' (.+)', ui_raw, flags=re.IGNORECASE)
-
-
-		if not reg_ex:
-			return ("I don't know.")
-
-		uiopen = reg_ex.group(1)
-		uiopen_raw = reg_ex_raw.group(1)
-
-
-		if uiopen in ["you", "yourself"]:
-			log_type("what are you")
-			out = (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
-			return {"message": out,
-					"render": "innerHTML"
-					}
-
-		if uiopen in li_WmyName:
-			log_type("what is my name")
-			out = (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
-
-		elif uiopen in ["latest news", "news update", 'news']:
-			log_type(18)
-			if check_internet():
-				news = bbc_news.task(bbc_topic)
-				if news is None:
-					out = ("No news available")
-				else:
-					out = "".join(news[:5])
-					# asker("Do you want to hear the rest?", true_func=read_rest_news)
-
-
-			else:
-				out = ('No internet!')
-
-		else:
-			log_type(20)
-			out = wikisearch(uiopen_raw, raw=ui, user=user)
+	
 
 	elif ui.startswith(li_who):
 		log_type(21)
@@ -562,6 +574,8 @@ def _basic_output(INPUT, user: User):
 
 		return choice(li_bye)+Rchoice('', f" {user.nickname}")+ Rchoice('', '!', '.')+ Rchoice('👋😄', '')
 
+	#print([out], out=='')
+	
 	if out == '':
 		log_type(0)
 		log_unknown(ui)

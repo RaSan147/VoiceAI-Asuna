@@ -14,6 +14,7 @@ function request(url){
 class ChatHandler{
 
 	constructor(){
+		let that = this;
 		this.current_msg  = 0; // current chat id
 		this.cache_id = 0; // message not sent
 		this.chats = byId("chats");
@@ -22,11 +23,18 @@ class ChatHandler{
 		this.chat_input.onkeydown = e => {
 			if(e.key == "Enter"){
 				if(e.shiftKey){
-					// this.chat_input.value += "\n";
+					that.chat_input.value += "\n";
 					return;
 				}
 				e.preventDefault();
-				this.send_message();
+				that.send_message();
+			}
+		}
+		this.chat_input.onfocus = e => { that.go_to_bottom()
+		}
+		if('visualViewport' in window) {
+			window.visualViewport.onresize = e =>{
+				that.go_to_bottom()
 			}
 		}
 
@@ -36,6 +44,19 @@ class ChatHandler{
 			"script": ""
 		}
 		
+	}
+	
+	async go_to_bottom(){
+		//alert(this.chats.scrollHeight)
+		await tools.sleep(30)
+
+		if(this.chats.scrollHeight > 100){
+			this.page.scrollTo({
+			top: this.chats.scrollHeight,
+			left: 0,
+			behavior: 'smooth'
+			});
+		}
 	}
 
 	// add chat to chat list
@@ -56,13 +77,9 @@ class ChatHandler{
 		message.appendChild(chat);
 		this.chats.appendChild(message);
 		// this.chats.appendChild(line_break());
-		if(this.chats.scrollHeight > 100)
-			this.page.scrollTo({
-			top: this.chats.scrollHeight,
-			left: 0,
-			behavior: 'smooth'
-		});
+		
 		this.chat_input.focus();
+		this.go_to_bottom()
 		
 		return message
 	}

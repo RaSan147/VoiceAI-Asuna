@@ -220,6 +220,7 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=None):
 	# HANDLE USER PERMISSION BY CHECKING UID
 
 	##################################
+	print(req.req_hash, "|=>> Post type:", post_verify[1])
 
 	return post_verify[1] # return 1st field value
 
@@ -320,6 +321,7 @@ def bot_manager(self: SH, *args, **kwargs):
 	request  = AUTHORIZE_POST(self, post)
 
 	username, uid = Get_User_from_post(self, post, 'uid')
+	
 
 
 	if request == 'get_skin_link':

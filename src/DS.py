@@ -45,6 +45,24 @@ class Flag(GETdict):
 			return super().__getitem__(__name)
 		except Exception:
 			return None
+			
+class str2(str):
+	def __joiner__(self, joiner="\n"):
+		self.joiner = joiner
+	def __add__(self, other):
+		if not hasattr(self, "joiner"):
+			self.__joiner__()
+		self = str2(self.joiner.join([self, other]))
+		return self
+
+	def example(self):
+		x = str2("abc")
+		print(x + "123")
+		print(repr(x+"123"))
+		print(x=="")
+
+#x = str2("abc")
+#x.example()
 
 from string import Template as _Template
 
