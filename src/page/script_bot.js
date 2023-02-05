@@ -70,14 +70,18 @@ class Bot_{
 		
 		var ratio = vh/vw
 		
-		if (ratio<.7){
+		if (ratio<1.2){
+			this.model4.y = 50;
 			if(vh<500){
-			this.model4.y = -50;
+			this.model4.y = -100;
 			}
 		}
 
 		if (ratio>1.2){
 			this.model4.y = 30;
+			if(vh>700){
+				this.model4.y = 150;
+			}
 		if(vh>1500){
 			this.model4.y = 500;
 		}
