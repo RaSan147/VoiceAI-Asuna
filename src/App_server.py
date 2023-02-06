@@ -398,4 +398,4 @@ if __name__ == '__main__':
 		pass # now works
 		xprint("/rh/No internet connection!\nPlease connect to the internet and try again.\n\n/=//hu/THIS APP IS HIGHLY DEPENDENT ON INTERNET CONNECTION!/=/")
 		sys.exit(1)
-	run_server(45454, './page', handler=SH)
+	run_server(45454, appConfig.ftp_dir, handler=SH)

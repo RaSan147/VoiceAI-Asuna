@@ -69,6 +69,7 @@ class Bot_{
 		this.model4.y = 170;
 		
 		var ratio = vh/vw
+		this.model4["ratio"] = ratio
 		
 		if (ratio<1.2){
 			this.model4.y = 50;
