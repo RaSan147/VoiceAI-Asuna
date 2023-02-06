@@ -187,8 +187,8 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 	
 	waited = 0
 	while location in BUSY_FS and waited<3:
-		time.sleep(.1)
-		waited +=.1
+		time.sleep(.01)
+		waited +=.01
 	if location in BUSY_FS:
 		raise TimeoutError
 		
@@ -283,13 +283,15 @@ def writer(fname, mode, data, direc=None, f_code='????',
 
 	location = loc(direc + fname)
 	
+	"""
 	if any(i in location for i in ('\\|:*"><?')):
 		location = Datasys.trans_str(location, {'\\|:*><?': '-', '"': "'"})
+	"""
 		
 	waited = 0
 	while location in BUSY_FS and waited<3:
-		time.sleep(.1)
-		waited +=.1
+		time.sleep(.01)
+		waited +=.01
 	if location in BUSY_FS:
 		raise TimeoutError
 

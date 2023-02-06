@@ -39,12 +39,6 @@ class User(GETdict):
 
 		self.flags = Flag()
 		self.pointer = 0
-		
-		curframe = inspect.currentframe()
-		calframe = inspect.getouterframes(curframe, 3)
-		stack = inspect.stack()
-		#print('caller name:', calframe[1][3])
-		print("\n\n### caller ", *[i[1:4] for i in stack], "\n\n", sep="\n")
 
 		# if the data asked for is already there
 		data = F_sys.reader(self.file_path, on_missing=None)
@@ -68,7 +62,7 @@ class User(GETdict):
 	# 	return super().__getattribute__(__name)
 
 	def save(self):
-		J = json.dumps(self)
+		J = json.dumps(self, indent=2)
 		F_sys.writer("__init__.json", 'w', J, self.user_path)
 
 	def get_chat(self, pointer=-1):
@@ -104,7 +98,7 @@ class User(GETdict):
 
 		old.append({"id": self.msg_id, "msg": msg, "time": time, "user": user})
 
-		J = json.dumps(old, indent=0, separators=(',', ':'))
+		J = json.dumps(old, indent=2, separators=(',', ':'))
 		F_sys.writer(pointer+'.json', 'w', J, self.user_path)
 
 
@@ -174,7 +168,7 @@ class UserHandler:
 			"msg_id": 0,
 		}
 
-		J = json.dumps(u_data)
+		J = json.dumps(u_data, indent=2)
 		F_sys.writer("__init__.json", 'w', J, self.u_path(username))
 
 		return id
@@ -198,7 +192,7 @@ class UserHandler:
 			return json.dumps({
 				"status": "error",
 				"message": "Username already taken"
-			})
+			}, indent=0)
 
 		# create user
 		id = self.create_user(username, password)
@@ -207,7 +201,7 @@ class UserHandler:
 			"message": "User created",
 			"user_name": username,
 			"user_id": id
-		})
+		}, indent=0)
 
 	def server_login(self, username, password):
 		user = self.get_user(username)
@@ -215,13 +209,13 @@ class UserHandler:
 			return json.dumps({
 				"status": "error",
 				"message": "User not found"
-			})
+			}, indent=0)
 		hash = hashlib.sha256((username+password).encode('utf-8'))
 		if user["password"] != hash.hexdigest():
 			return json.dumps({
 				"status": "error",
 				"message": "Wrong password"
-			})
+			}, indent=0)
 
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 		print("logged in", user)

@@ -73,6 +73,9 @@ class Bot_{
 		
 		if (ratio<1.2){
 			this.model4.y = 50;
+			if(vh>800){
+				this.model4.y = 170;
+			}
 			if(vh<500){
 			this.model4.y = -100;
 			}

@@ -40,7 +40,7 @@ class ANIME{
 		form_.append("username", user.user_name);
 		form_.append("uid", user.user_id);
 		const request = new XMLHttpRequest()
-		request.open("POST", form.action, true)
+		request.open("POST", form.action, false)
 		request.onreadystatechange = () => {
 			if (request.readyState === XMLHttpRequest.DONE) {
 				if (request.status === 204 || request.status === 200){
