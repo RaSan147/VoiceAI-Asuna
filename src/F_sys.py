@@ -4,6 +4,8 @@ from html import unescape as html_unescape
 import urllib.parse
 #from os_sys import os_name
 import time
+from queue import Queue
+from random import random
 
 import DATA_sys as Datasys
 from PRINT_TEXT3 import xprint
@@ -147,12 +149,13 @@ def go_prev_dir(directory, preserve_sep=False):  # fc=0606 v
 	#else:
 	return sep.join(directory.split(sep)[:-2]) + sep
 	
-	
-BUSY_FS = set()
+from collections import deque
+from DS import Callable_dict
+BUSY_FS = Callable_dict()
 
 def reader(direc, read_mode='r', ignore_error=False, output=None,
 			encoding='utf-8', f_code='?????', on_missing=None,
-			ignore_missing_log=False):  # fc=0607 v
+			ignore_missing_log=False, timeout=3):  # fc=0607 v
 	"""reads file from given directory. If NOT found, returns `None`
 
 	args:
@@ -186,13 +189,25 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 		
 	
 	waited = 0
-	while location in BUSY_FS and waited<3:
+	token = (time.time(), random())
+	if not BUSY_FS(location):
+		BUSY_FS[location] = deque()
+	
+	BUSY_FS[location].append(token)
+	
+		
+	while 1:
+		if token==BUSY_FS[location][0]:
+			break
+		if waited==-1:
+			OSError(f"{location} File is busy")
+		if timeout and waited>timeout:
+			raise TimeoutError(f"Failed to writed {location}")
 		time.sleep(.01)
 		waited +=.01
-	if location in BUSY_FS:
-		raise TimeoutError
+
 		
-	BUSY_FS.add(location)
+	#BUSY_FS.add(location)
 
 	try:
 		with open(location, read_mode, encoding=None if 'b' in read_mode else encoding) as f:
@@ -202,7 +217,7 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 			xprint(loc(direc), 'failed to read due to /hui/ PermissionError /=/. Error code: 0607x2')
 		return on_missing
 	finally:
-		BUSY_FS.remove(location)
+		BUSY_FS[location].popleft()
 
 
 	if output is None:
@@ -290,10 +305,17 @@ def writer(fname, mode, data, direc="", f_code='????',
 	if any(i in location for i in ('\\|:*"><?')):
 		location = Datasys.trans_str(location, {'\\|:*><?': '-', '"': "'"})
 	"""
-		
+	
 	waited = 0
+	token = (time.time(), random())
+	if not BUSY_FS(location):
+		BUSY_FS[location] = deque()
+	
+	BUSY_FS[location].append(token)
+	
+		
 	while 1:
-		if location not in BUSY_FS:
+		if token==BUSY_FS[location][0]:
 			break
 		if waited==-1:
 			OSError(f"{location} File is busy")
@@ -302,8 +324,8 @@ def writer(fname, mode, data, direc="", f_code='????',
 		time.sleep(.01)
 		waited +=.01
 
-		
-	BUSY_FS.add(location)
+	
+	
 	
 	# creates the directory, then write the file
 	try:
@@ -327,7 +349,7 @@ def writer(fname, mode, data, direc="", f_code='????',
 		xprint('/r/', e.__class__.__name__, "occurred while writing", fname, 'in', 'current directory' if direc is None else direc, '/y/\nPlease inform the author. Error code: 00008x' + f_code, '/=/')
 		raise e
 	finally:
-		BUSY_FS.remove(location)
+		BUSY_FS[location].popleft()
 	
 def get_dir_size(start_path = '.', limit=None, return_list= False, full_dir=True):
 	"""

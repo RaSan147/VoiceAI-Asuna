@@ -277,10 +277,10 @@ def _basic_output(INPUT, user: User):
 		log_type(5)
 		out += Rchoice("I'm fine!", "I'm doing great.")
 		
-		"""elif check(ip.whats_your_name, ui):
+	elif check(ip.whats_your_name, ui):
 		log_type(8)
 
-		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name"""
+		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
 		
 	elif check(ip.whats_, ui_raw):
 		
@@ -298,10 +298,6 @@ def _basic_output(INPUT, user: User):
 			return {"message": out,
 					"render": "innerHTML"
 					}
-			
-		elif re.match("((yo)?u|y(a|o))(r|re)? name", uiopen):
-			out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
-			
 
 		elif uiopen in li_WmyName:
 			log_type("what is my name")

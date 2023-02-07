@@ -118,7 +118,7 @@ class Tools {
 		config.Debugging = true;
 		var script = createElement('script');
 		script.src = "//cdn.jsdelivr.net/npm/eruda";
-		document.body.appendChild(script);
+		document.head.appendChild(script);
 		script.onload = function() {
 			eruda.init()
 		};
