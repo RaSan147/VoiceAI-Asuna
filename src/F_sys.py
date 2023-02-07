@@ -229,8 +229,8 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 
 	return out
 
-def writer(fname, mode, data, direc=None, f_code='????',
-			encoding='utf-8'):  # fc=0608 v
+def writer(fname, mode, data, direc="", f_code='????',
+			encoding='utf-8', timeout=3):  # fc=0608 v
 	"""Writing on a file
 	
 	why this monster?
@@ -243,7 +243,8 @@ def writer(fname, mode, data, direc=None, f_code='????',
 		data: data to write
 		direc: directory of the file, empty for current dir *None
 		func_code: (str) code of the running func *empty string
-		encoding: if encoding needs to be specified (only str, not binary data) *utf-8"""
+		encoding: if encoding needs to be specified (only str, not binary data) *utf-8
+		timeout: how long to wait until free, 0 for unlimited, -1 for immidiate or crash"""
 
 	def write(location):
 		if 'b' not in mode:
@@ -263,13 +264,14 @@ def writer(fname, mode, data, direc=None, f_code='????',
 		xprint("/rh/Invalid data type./yh/ Data must be a string or binary data/=/")
 		raise TypeError
 	mode = mode.replace('+', '').replace('r', 'w')
+	
+	_direc, fname = os.path.split(fname)
+	direc = os.path.join(direc, _direc)
 
 	if any(i in fname for i in ('/\\|:*"><?')):
 		# these characters are forbidden to use in file or folder Names
 		fname = Datasys.trans_str(fname, {'/\\|:*><?': '-', '"': "'"})
 
-	if direc is None or direc == '':
-		direc = './'
 	direc = loc(direc, 'Linux')
 	
 	# directory and file names are auto stripped by OS
@@ -278,6 +280,7 @@ def writer(fname, mode, data, direc=None, f_code='????',
 	direc = direc.strip()
 	if not direc.endswith("/"):
 		direc+="/"
+
 	fname = fname.strip()
 	
 
@@ -289,11 +292,15 @@ def writer(fname, mode, data, direc=None, f_code='????',
 	"""
 		
 	waited = 0
-	while location in BUSY_FS and waited<3:
+	while 1:
+		if location not in BUSY_FS:
+			break
+		if waited==-1:
+			OSError(f"{location} File is busy")
+		if timeout and waited>timeout:
+			raise TimeoutError(f"Failed to writed {location}")
 		time.sleep(.01)
 		waited +=.01
-	if location in BUSY_FS:
-		raise TimeoutError
 
 		
 	BUSY_FS.add(location)

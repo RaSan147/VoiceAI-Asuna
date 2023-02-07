@@ -12,15 +12,15 @@ def merge(*args):
 	txt = re.sub(r'\s+', ' ', txt)
 	return txt.strip()
 	
-	
-to_bot_suffix = "( (<:ai_name>|girl|dear|babe|honey|sweet ?heart|darling|ma.?am))?"
+
 def C(pattern):
 	""" return re.compile of the pattern with ignore case flag
 	also add to to_bot_suffix so that it can capture calling by bot name or other nouns
 	"""
 	
-	return compile(rf"{pattern}{to_bot_suffix}", flags=re.IGNORECASE)
+	return compile(rf"{pattern}", flags=re.IGNORECASE)
 
+to_bot_suffix = C(r"(( please)? (<:ai_name>|girl|dear|babe|honey|sweet ?heart|darling|ma.?am))$")
 
 def starts(patterns:list[str,re.Pattern], string:str):
 	"""checks and returns string if it **starts with** any of the patterns in the given patterns list
@@ -78,7 +78,8 @@ def search(patterns:list[str,re.Pattern], string:str):
 				return m
 
 	
-
+def remove_suffix(string):
+	return to_bot_suffix.sub("", string)
 
 """yes = "y", "yes", "yeah", "sure", "ok", "lets go", "let's go", "start", "yep", "yeap"
 yes2 = yes1 = yes
@@ -279,13 +280,19 @@ ip.who_are_you = [C("who ?a?re? ((yo)?u|y(a|o))"), # who are u
 ip.whats_ = [C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),]
 
 ip.whats_your_name = [
-						C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name( please)?"),
+						C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
 						C("((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
 										]
+										
+ip.what_time = [
+						C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?")
+
+							]
 									
 									
 									
 										
+#print(search(ip.what_time, "do you even know what time it is"))
 
 #print(check(ip.whats_your_name, "can you tell me what should i call you"))
 #print(check(ip.whats_your_name, "can you tell me whats your name"))

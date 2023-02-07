@@ -15,9 +15,10 @@ import requests
 from PRINT_TEXT3 import xprint, remove_style
 
 from basic_conv_pattern import *
-from basic_conv_re_pattern import ip, op, search, starts, check, is_in
+from basic_conv_re_pattern import ip, op, search, starts, check, is_in, remove_suffix
 
 from OS_sys import os_name, check_internet
+import F_sys
 
 import yt_plugin
 from bbc_news import bbc_news
@@ -31,8 +32,8 @@ from CONFIG import appConfig
 bbc_topic = 'Asia_url'
 
 def log_unknown(*args, **kwargs):
-	with open(appConfig.log_unknown, 'a') as f:
-		f.write(str(args) + "\n")
+	F_sys.writer(appConfig.log_unknown, "a", str(args) + "\n", timeout=0)
+
 
 def log_type(*args, **kwargs):
 	xprint("USER INPUT", *args, **kwargs, end="\n\n")
@@ -276,18 +277,19 @@ def _basic_output(INPUT, user: User):
 		log_type(5)
 		out += Rchoice("I'm fine!", "I'm doing great.")
 		
-	elif check(ip.whats_your_name, ui):
+		"""elif check(ip.whats_your_name, ui):
 		log_type(8)
 
-		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name"""
 		
 	elif check(ip.whats_, ui_raw):
 		
 		log_type("li_whats")
 		_what = search(ip.whats_, ui)
 		_what_raw = search(ip.whats_, ui_raw)
-		uiopen = _what.group("query")
-		uiopen_raw = _what_raw.group("query")
+		uiopen = remove_suffix(_what.group("query"))
+		uiopen_raw = remove_suffix(_what_raw.group("query"))
+		print("query:", uiopen_raw)
 		
 
 		if uiopen in ["you", "yourself"]:
@@ -296,10 +298,17 @@ def _basic_output(INPUT, user: User):
 			return {"message": out,
 					"render": "innerHTML"
 					}
+			
+		elif re.match("((yo)?u|y(a|o))(r|re)? name", uiopen):
+			out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+			
 
-		if uiopen in li_WmyName:
+		elif uiopen in li_WmyName:
 			log_type("what is my name")
 			out += (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
+			out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+		elif re.match("(current )?time( is| it)*( now)?", uiopen):
+			out = tell_time()
 
 		elif uiopen in ["latest news", "news update", 'news']:
 			log_type(18)
