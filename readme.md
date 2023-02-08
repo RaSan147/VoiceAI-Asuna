@@ -1,6 +1,3 @@
-# Owner note: If I don't push any commit or remove this by 9-Feb-2023, I might not be able to do so in a year as well 😓
-
-
 PROJECT Asuna
 -------------
 <p align="center"><img src="https://user-images.githubusercontent.com/34002411/214065966-6fcbd90f-0948-42dd-b846-5e6130a78421.jpg" alt="ASUNA SAO"/></p>
