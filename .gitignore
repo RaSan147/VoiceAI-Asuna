@@ -1,5 +1,5 @@
 src/Asuna_data/*
-*.bak
+*.bak*
 **/test**
 .vscode
 

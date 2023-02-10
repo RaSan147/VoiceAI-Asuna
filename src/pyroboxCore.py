@@ -9,6 +9,7 @@ __all__ = [
 import os
 import atexit
 import logging
+from queue import Queue
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
@@ -131,7 +132,9 @@ from http import HTTPStatus
 import re
 import base64
 
-import random, string, json
+import random
+import string
+import json
 import traceback
 
 
@@ -199,7 +202,6 @@ def null(*args, **kwargs):
 
 
 
-from queue import Queue
 class Zfunc(object):
 	"""Thread safe sequncial printing/queue task handler class"""
 
@@ -296,7 +298,7 @@ def parse_byte_range(byte_range):
 	The last number or both numbers may be None.
 	'''
 	if byte_range.strip() == '':
-		return None
+		return None, None
 
 	m = BYTE_RANGE_RE.match(byte_range)
 	if not m:
@@ -930,13 +932,14 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 	@staticmethod
-	def on_req(type='', url='.*', hasQ=(), QV={}, fragent='', func=null, escape=None):
+	def on_req(type='', url='', hasQ=(), QV={}, fragent='', url_regex = '', func=null):
 		'''called when request is received
 		type: GET, POST, HEAD, ...
-		url: url regex, * for all, must escape special char and start with /
+		url: url (must start with /)
 		hasQ: if url has query
 		QV: match query value
 		fragent: fragent of request
+		url_regex: url regex (must start with /) url regex, the url must start and end with this regex
 
 		if query is tuple, it will only check existence of key
 		if query is dict, it will check value of key
@@ -951,26 +954,44 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		if type not in self.handlers:
 			self.handlers[type] = []
 
+		# FIXING TYPE ISSUE
 		if isinstance(hasQ, str):
 			hasQ = (hasQ,)
 
-		if escape or (escape is None and '*' not in url):
-			url = re.escape(url)
+		if url=='' and url_regex=='': 
+			url_regex = '.*'
 
-		to_check = (url, hasQ, QV, fragent)
+
+		to_check = (url, hasQ, QV, fragent, url_regex)
 
 		def decorator(func):
 			self.handlers[type].append((to_check, func))
 			return func
 		return decorator
 
-	def test_req(self, url, hasQ, QV, fragent):
-		'''test if request is matched'''
+	def test_req(self, url='', hasQ=(), QV={}, fragent='', url_regex=''):
+		'''test if request is matched'
+		
+		args:
+			url: url relative path (must start with /)
+			hasQ: if url has query
+			QV: match query value
+			fragent: fragent of request
+			url_regex: url regex, the url must start and end with this regex
+
+		
+		'''
 		# print("^"+url, hasQ, QV, fragent)
 		# print(self.url_path, self.query, self.fragment)
 		# print(self.url_path != url, self.query(*hasQ), self.query, self.fragment != fragent)
 
-		if not re.search("^"+url+'$', self.url_path): return False
+		if url_regex:
+			if not re.search("^"+url_regex+'$', self.url_path): return False
+		elif url and url!=self.url_path: return False
+
+		if isinstance(hasQ, str):
+			hasQ = (hasQ,)
+
 		if hasQ and self.query(*hasQ)==False: return False
 		if QV:
 			for k, v in QV.items():
@@ -995,7 +1016,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 		"""Serve a POST request."""
-		self.range = None # bug patch
+		self.range = None, None
 
 
 		path = self.translate_path(self.path)
@@ -1039,7 +1060,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 
-	def return_txt(self, code, msg, content_type="text/html; charset=utf-8", write_log=True):
+	def return_txt(self, code, msg, content_type="text/html; charset=utf-8", write_log=False):
 		'''returns only the head to client
 		and returns a file object to be used by copyfile'''
 		self.log_debug(f'[RETURNED] {code} {msg} to client', write=write_log)
@@ -1187,11 +1208,13 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 		if 'Range' not in self.headers:
-			self.range = None
+			self.range = None, None
+			first, last = 0, 0
 
 		else:
 			try:
 				self.range = parse_byte_range(self.headers['Range'])
+				first, last = self.range
 			except ValueError as e:
 				self.send_error(400, 'Invalid byte range')
 				return None
@@ -1199,12 +1222,14 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		path = self.translate_path(self.path)
 		# DIRECTORY DONT CONTAIN SLASH / AT END
 
+
 		url_path, query, fragment = self.url_path, self.query, self.fragment
+
 		spathsplit = self.url_path.split("/")
 
 
 
-		for case, func in self.handlers['HEAD']:
+		for case, func in self.handlers['HEAD']: # GET WILL Also BE HANDLED BY HEAD
 			if self.test_req(*case):
 				return func(self, url_path=url_path, query=query, fragment=fragment, path=path, spathsplit=spathsplit)
 
@@ -1333,6 +1358,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 class PostError(Exception):
 	pass
+
+
 
 
 class DealPostData:
