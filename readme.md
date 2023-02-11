@@ -28,6 +28,9 @@ Welcome to project Asuna.
 # How To Run:
 * **First** install the [REQUIREMENTS](/REQUIREMENTS.md), click it to see details
 * To Launch the server run the [RUN_ME.py](/RUN_ME.py) file
+  ```
+  python RUN_ME.py
+  ```
 * Demo video coming soon...
 
 
