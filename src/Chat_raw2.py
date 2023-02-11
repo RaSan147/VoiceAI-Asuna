@@ -335,8 +335,9 @@ def _basic_output(INPUT, user: User):
 		case='change_cloth'
 		total_skins = len(user.skins)
 		user.bot_skin = (user.bot_skin + 1)%total_skins
+		_skin = user_handler.use_next_skin(user.username, user.id)
 
-		_skin = str(user.bot_skin)
+		#_skin = str(user.bot_skin)
 
 		out = {
 			"message": out,
@@ -502,7 +503,7 @@ def _basic_output(INPUT, user: User):
 		log_type("li_tell_time1")
 		out = tell_time()
 
-	elif re.search('read (the )?(latest )?news', ui):
+	elif re.search('((tell|speak|read )(out)?)?(the )?(latest )?news', ui):
 		log_type("read news")
 		if check_internet():
 			news = bbc_news.task(bbc_topic)

@@ -278,6 +278,7 @@ class UserHandler:
 			try:
 				_skin = self.online_avatar.get_skin_link(charecter, skin)
 				user.skins = self.online_avatar.get_skins(charecter)
+				print("SKINS LOADED")
 				user.c_skin_mode = mode
 				return _skin
 			except net_sys.NetErrors:
@@ -293,6 +294,20 @@ class UserHandler:
 
 				self.get_skin_link(username, uid, 1)
 		return 0
+		
+	def use_next_skin(self, username, uid):
+		user = self.collection(username, uid)
+		if not user:
+			print("USER NOT FOUND")
+			return None
+		
+		self.get_skin_link(username, uid) # init
+		total_skins = len(user.skins)
+		user.bot_skin = (user.bot_skin + 1)%total_skins
+		
+		_skin = str(user.bot_skin)
+		
+		return _skin
 
 	def room_bg(self, username="", uid="", command=None, custom=None, user=None):
 		if not user:
