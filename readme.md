@@ -28,7 +28,10 @@ Welcome to project Asuna.
 # How To Run:
 * **First** install the [REQUIREMENTS](/REQUIREMENTS.md), click it to see details
 * To Launch the server run the [RUN_ME.py](/RUN_ME.py) file
+* Demo video coming soon...
+
 
 # Requirement:
 * Python 3.7 or higher
 * Works on Pydroid 3 😄 too (most develoment is done using this)
+
