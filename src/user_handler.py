@@ -38,6 +38,7 @@ class User(GETdict):
 
 
 		self.flags = Flag()
+		self.chat = Flag()
 		self.pointer = 0
 
 		# if the data asked for is already there
@@ -77,7 +78,7 @@ class User(GETdict):
 
 		return None
 
-	def add_chat(self, msg, time, user=1):
+	def add_chat(self, msg, time, user=1, parsed_msg=None):
 		"""
 		msg: message sent
 		time: time of message
@@ -94,9 +95,14 @@ class User(GETdict):
 		
 		pointer = str(self.pointer)
 
-		self.msg_id += 1
+		user = "USER" if user else "BOT"
 
-		old.append({"id": self.msg_id, "msg": msg, "time": time, "user": user})
+		self.msg_id += 1
+		data = {"id": self.msg_id, "msg": msg, "time": time, "user": user}
+		if parsed_msg:
+			data["parsed_msg"] = parsed_msg
+
+		old.append(data)
 
 		J = json.dumps(old, indent=2, separators=(',', ':'))
 		F_sys.writer(pointer+'.json', 'w', J, self.user_path)

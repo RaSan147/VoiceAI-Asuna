@@ -275,17 +275,17 @@ stop_parrot = "stop", "stop it", "stop mimicing", "stop mimic", "stop parrot", "
 
 
 links_dict = {
-"url_google" : ('https://www.google.com', 'google', 'gogle', 'gooogle'),
-"url_fb" : ('https://www.facebook.com', 'facebook', 'facebok', 'fb'),
-"url_yahoo" : ['https://www.yahoo.com', 'yahoo', 'yaho'],
-"url_youtube" : ['https://www.youtube.com', 'youtube', 'tubemate', 'utube'],
-"url_wiki" : ['https://www.wikipedia.com', 'wikipedia', 'wikipidia', 'wikipidea', 'wikipedea'],
-'url_reddit' : ['https://www.reddit.com', 'reddit', 'redit'],
-'url_bing' : ['https://www.bing.com', 'bing', 'microsoft search'],
-'url_insta' : ['https://www.instagram.com', 'instagram', 'insta'],
-'url_apple' : ['http://apple.com/', 'apple website', 'apple.com'],
+"url_google" : ('https://www.google.com', 'google', 'gogle', 'gooogle', 'google.com'),
+"url_fb" : ('https://www.facebook.com', 'facebook', 'facebok', 'fb', 'facebook.com'),
+"url_yahoo" : ['https://www.yahoo.com', 'yahoo', 'yaho', 'yahho', 'yahoo.com'],
+"url_youtube" : ['https://www.youtube.com', 'youtube', 'tubemate', 'utube', 'youtub', 'youtub.com', 'youtube.com'],
+"url_wiki" : ['https://www.wikipedia.com', 'wikipedia', 'wikipidia', 'wikipidea', 'wikipedea', 'wiki', 'wikipidia.com', 'wikipidea.com', 'wikipedea.com', 'wikipedia.com'],
+'url_reddit' : ['https://www.reddit.com', 'reddit', 'redit', 'reddit.com', 'redit.com'],
+'url_bing' : ['https://www.bing.com', 'bing', 'microsoft search', 'bing.com'],
+'url_insta' : ['https://www.instagram.com', 'instagram', 'insta', 'insta.com', 'instagram.com'],
+'url_apple' : ['http://apple.com/', 'apple website', 'apple.com', 'apple site', 'apple page'],
 'url_microsoft' : ['http://microsoft.com/', 'microsoft website', 'microsoft.com', 'microsoft site', 'microsoft page'],
-'url_pornhub' : ['https://www.pornhub.com/', 'pornhub website', 'pornhub'],
+'url_pornhub' : ['https://www.pornhub.com/', 'pornhub website', 'pornhub', 'pornhub.com', 'pornhub site'],
 
 'goog_supp' : ['http://support.google.com/', 'support', 'supports'],
 'goog_docs' : ['http://docs.google.com/', 'doc', 'docs'],

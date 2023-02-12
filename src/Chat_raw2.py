@@ -142,26 +142,50 @@ def preprocess(in_dat):
 	return in_dat
 	
 def pre_rem_bot_call(ui):
-	""" remove *hey Asuna* whats ...."""
+	""" remove *hey Asuna* whats ....
+		remove *can you* ....
+		remove *will you* ....
+		remove *do you know* ....
+		"""
 	nick = "<:ai_name>"
-	ui_parts = ui.split()
-	if len(ui_parts)<2:
-		# no job here
-		return ui
+	# ui_parts = ui.split()
+	# if len(ui_parts)<2:
+	# 	# no job here
+	# 	return ui
 
-	ui_LParts = ui.lower().split()
+	# ui_LParts = ui.lower().split()
 	
 
-	bkp = ui_parts.copy()
-	Lbkp = ui_LParts.copy()
+	# bkp = ui_parts.copy()
+	# Lbkp = ui_LParts.copy()
 	
-	if ui_LParts[0] in ("hey", "miss", "dear", "yo"):
-		ui_parts.pop(0)
-		ui_LParts.pop(0)
-	if ui_LParts[0] in ("girl", "babe", nick):
-		ui_parts.pop(0)
+	# if ui_LParts[0] in ("hey", "miss", "dear", "yo"):
+	# 	ui_parts.pop(0)
+	# 	ui_LParts.pop(0)
+	# if ui_LParts[0] in ("girl", "babe", nick):
+	# 	ui_parts.pop(0)
 
-	return " ".join(ui_parts)
+	ui = re.sub(rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})\s', '', ui, flags=re.IGNORECASE)
+
+
+	# if ui_LParts[0] in ("can", "will", "do"):
+	# 	ui_parts.pop(0)
+	# 	ui_LParts.pop(0)
+	# 	if ui_LParts[0] in ("you", "u"):
+	# 		ui_parts.pop(0)
+	# 		ui_LParts.pop(0)
+	# 		if ui_LParts[0] in ("know", "tell", "remember", "think"):
+	# 			ui_parts.pop(0)
+	# 			ui_LParts.pop(0)
+	# 			if ui_LParts[0] in ("of", "regarding"):
+	# 				ui_parts[0] = "about"
+	# 				ui_LParts[0] = "about"
+
+	ui = re.sub(r'^((can|will|do|did) ((yo)?u|y(a|o)) )?(please )?(even )?(know|tell|remember|speak|say)? ?(me )?', '', ui, flags=re.IGNORECASE)
+	ui = re.sub(r'^please ', '', ui, flags=re.IGNORECASE)
+	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
+
+	return ui
 			
 	
 	
@@ -181,12 +205,27 @@ def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 	if user is None and username is not None:
 		user = User(username)
 
-	user.add_chat(INPUT, _time, 1)
+	_INPUT = parsed_names(INPUT, user)
+	_INPUT = preprocess(_INPUT)
+	_ui_raw = pre_rem_bot_call(_INPUT)
+	_ui = _ui_raw.lower().replace(".", " ") # remove . from input
+	# keep . in raw to make sure its not removed it mathmatical expressions
+	print(_ui, _ui_raw)
+	if _ui == "":
+		return
+	
+
+
+
+	user.add_chat(INPUT, _time, 1, _ui_raw) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
 	msg = message_dict.copy()
-	x = _basic_output(INPUT, user)
+	x = _basic_output(INPUT, user, _ui, _ui_raw)
 	if not x:
 		log_unknown(INPUT)
 		x = "I don't know what to say..."
+
+	print("Intent: ", user.chat)
+
 	if isinstance(x, dict):
 		x["message"] = remove_style(x["message"])
 		msg.update(x)
@@ -204,7 +243,7 @@ def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 
 
 
-def _basic_output(INPUT, user: User):
+def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 	"""Input: user input
 		user: user object
 	{
@@ -225,22 +264,12 @@ def _basic_output(INPUT, user: User):
 
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
-	INPUT = parsed_names(INPUT, user)
-	INPUT = preprocess(INPUT)
-	ui_raw = pre_rem_bot_call(INPUT)
-	ui = ui_raw.lower().replace(".", " ") # remove . from input
-	# keep . in raw to make sure its not removed it mathmatical expressions
-	print(ui, ui_raw)
-	if ui == "":
-		return
-
+	
 	out = str2()
 
-	print(user.flags)
-	print(ui)
+	print("Flags: ", user.flags)
 
 	if user.flags.parrot:
-		log_type(1)
 		if is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
 			out += "Parrot mode disabled"
@@ -248,7 +277,6 @@ def _basic_output(INPUT, user: User):
 			out += ui
 
 	if starts(ip.hi, ui):
-		log_type(2)
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
 		if user.flags.hi_bit<2:
@@ -258,10 +286,10 @@ def _basic_output(INPUT, user: User):
 		user.flags.hi_bit+=1
 		if user.flags.hi_bit == 5:
 			user.flags.hi_bit = 0
-		case='basic1'
+
+		user.chat.intent ='say_hi'
 
 	elif starts(ip.hello, ui):
-		log_type(3)
 		if not user.flags.hello_bit:
 			user.flags.hello_bit = 0
 		if user.flags.hello_bit<2:
@@ -271,20 +299,25 @@ def _basic_output(INPUT, user: User):
 		user.flags.hello_bit+=1
 		if user.flags.hello_bit == 5:
 			user.flags.hello_bit = 0
-		case='basic2'
+
+		user.chat.intent ='say_hello'
 		
 	if check(ip.how_are_you, ui):
-		log_type(5)
 		out += Rchoice("I'm fine!", "I'm doing great.")
+
+		user.chat.intent ='how_are_you'
 		
 	elif check(ip.whats_your_name, ui):
-		log_type(8)
-
 		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+
+		user.chat.intent ='whats_your_name'
+
+	elif check(ip.what_time, ui):
+		out = tell_time()
+
+		user.chat.intent ='whats_the_time'
 		
 	elif check(ip.whats_, ui_raw):
-		
-		log_type("li_whats")
 		_what = search(ip.whats_, ui)
 		_what_raw = search(ip.whats_, ui_raw)
 		uiopen = remove_suffix(_what.group("query"))
@@ -293,21 +326,27 @@ def _basic_output(INPUT, user: User):
 		
 
 		if uiopen in ["you", "yourself"]:
-			log_type("what are you")
 			out += (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
+			
+			user.chat.intent = 'what are you'
+
 			return {"message": out,
 					"render": "innerHTML"
 					}
+		
 
 		elif uiopen in li_WmyName:
-			log_type("what is my name")
 			out += (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
 			out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+
+			user.chat.intent = "(whats)_your_name"
+
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
 			out = tell_time()
 
+			user.chat.intent = "(whats)_the_time"
+
 		elif uiopen in ["latest news", "news update", 'news']:
-			log_type(18)
 			if check_internet():
 				news = bbc_news.task(bbc_topic)
 				if news is None:
@@ -320,9 +359,13 @@ def _basic_output(INPUT, user: User):
 			else:
 				out += 'No internet!'
 
+			user.chat.intent = "(whats)_the_news"
+
 		else:
-			log_type(20)
 			out += wikisearch(uiopen_raw, raw=ui, user=user)
+
+			user.chat.intent = "(whats)_something"
+
 			return {"message": out,
 					"render": "innerHTML"
 					}
@@ -330,7 +373,6 @@ def _basic_output(INPUT, user: User):
 
 	if ui in ('change', "change cloth", "change skin", "change dress"):
 		# TODO: NEED TO ADD IN PATTERNS
-		log_type(4)
 		out += Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
 		case='change_cloth'
 		total_skins = len(user.skins)
@@ -344,10 +386,11 @@ def _basic_output(INPUT, user: User):
 			"script": "(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})()"
 		}
 
+		user.chat.intent = 'change_cloth'
+
 
 	elif ui in ('switch room', "change room", "change background"):
 		# TODO: NEED TO ADD IN PATTERNS
-		log_type(4)
 		out = Rchoice("Sure!", "Okay", "Okay, wait a sec!")
 		case='change_room_bg'
 
@@ -358,21 +401,24 @@ def _basic_output(INPUT, user: User):
 			"script": f"anime.set_bg('{bg}')"
 		}
 
+		user.chat.intent = 'change_room_bg'
+
 
 
 	elif ui in li_r_u_fine:
-		log_type(4)
 		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.") + Rchoice("", "🥰", "😇")
-		case='yui3'
+		
+		user.chat.intent = "are_you_fine"
 
 	elif ui in li_loveu:
-		log_type(6)
 		out = choice(li_relove) + Rchoice(" dear", f" {user.nickname}", " babe", "", "") + Rchoice(" 🥰", " 😘💕❤️" " 😘", "😘😘😘", "", "")
-		case='yui4'
+		
+		user.chat.intent = "love_you"
+
 	elif ui in ('i hate u', 'i hate you'):
-		log_type(7)
 		out = Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me")
-		case= 'yui5'
+		
+		user.chat.intent = "hate_you"
 
 	
 		# if user.flags.what_u_name_bit == 1:
@@ -420,23 +466,23 @@ def _basic_output(INPUT, user: User):
 	# 			out = ('No music is playing right now.')
 	# 	else:
 	# 		out = ("You can't control music play in your Operating system")
-	elif ui in li_QyuiName:
-		log_type(9)
-		outtxt = "Yes, you can."
-		out = (outtxt)
-		# FCyuiName()
-	elif ui.startswith(li_play):
-		log_type(10)
-		what = [i for i in li_play if ui.startswith(i) == True]
-		reg_ex = re.search(what[0] + ' *(.+)', ui)
-		if len(ui) != what[0] and reg_ex:
-			uiopen = reg_ex.group(1)
-			try:
-				yt_plugin.music.stop()
-			except: pass
-			yt_plugin.play_youtube(uiopen)
-			played_music=True
-			m_paused= False
+	# elif ui in li_QyuiName:
+	# 	log_type(9)
+	# 	outtxt = "Yes, you can."
+	# 	out = (outtxt)
+	# 	# FCyuiName()
+	# elif ui.startswith(li_play):
+	# 	log_type(10)
+	# 	what = [i for i in li_play if ui.startswith(i) == True]
+	# 	reg_ex = re.search(what[0] + ' *(.+)', ui)
+	# 	if len(ui) != what[0] and reg_ex:
+	# 		uiopen = reg_ex.group(1)
+	# 		try:
+	# 			yt_plugin.music.stop()
+	# 		except: pass
+	# 		yt_plugin.play_youtube(uiopen)
+	# 		played_music=True
+	# 		m_paused= False
 			#music_patch.start()
 
 
@@ -463,26 +509,42 @@ def _basic_output(INPUT, user: User):
 	# 			out = ('/g/Upgrade complete./=/')
 	# 		else:
 	# 			out = ('/r/Could not upgrade!/=/')
-	elif ui.startswith(li_can_do):
-		log_type(11)
-		if ui.startswith(li_goto):
-			what = ''
-			for i in li_goto:
-				if ui.startswith(i):
-					what = i
-					break
-			log_type(what)
-			# what = [i for i in li_goto if ui.startswith(i) == True]
-			reg_ex = re.search(re.escape(what) + ' (.+)', ui)
-			if reg_ex:
-				uiopen = reg_ex.group(1)
-				# log_type(uiopen)
-				if uiopen in links:
-					log_type('link')
-					if linker(uiopen):
-						out = ('Opening ' + uiopen)
-				else:
-					searcher(uiopen)
+
+	elif starts(ip.goto, ui):
+		link = search(ip.goto, ui)['query']
+		if linker(link):
+			out = ('Opening ' + link)
+		else:
+			out = ('/r/No such link found/=/')
+
+		print(link)
+		user.chat.intent = "goto"
+
+	elif starts(ip.search, ui):
+		query = check(ip.search, ui)
+		searcher(query)
+
+		user.chat.intent = "search"
+	# elif ui.startswith(li_can_do):
+	# 	log_type(11)
+	# 	if ui.startswith(li_goto):
+	# 		what = ''
+	# 		for i in li_goto:
+	# 			if ui.startswith(i):
+	# 				what = i
+	# 				break
+	# 		log_type(what)
+	# 		# what = [i for i in li_goto if ui.startswith(i) == True]
+	# 		reg_ex = re.search(re.escape(what) + ' (.+)', ui)
+	# 		if reg_ex:
+	# 			uiopen = reg_ex.group(1)
+	# 			# log_type(uiopen)
+	# 			if uiopen in links:
+	# 				log_type('link')
+	# 				if linker(uiopen):
+	# 					out = ('Opening ' + uiopen)
+	# 			else:
+	# 				searcher(uiopen)
 
 	elif ui in li_AmyName:
 		log_type("li_AmyName")
