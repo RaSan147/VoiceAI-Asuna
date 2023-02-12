@@ -21,6 +21,7 @@ Welcome to project Asuna.
 - [ ] Allow bot send pictures
 - [ ] Allow bot send audio
 - [ ] Allow bot send video
+- [ ] Understand and reply according to context
 
 
 
