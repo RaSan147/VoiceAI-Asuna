@@ -392,10 +392,13 @@ def chat(self: SH, *args, **kwargs):
 	return self.send_json(out)
 
 
-
-if __name__ == '__main__':
+def main():
 	if 0 and not check_internet():
 		pass # now works
 		xprint("/rh/No internet connection!\nPlease connect to the internet and try again.\n\n/=//hu/THIS APP IS HIGHLY DEPENDENT ON INTERNET CONNECTION!/=/")
 		sys.exit(1)
 	run_server(45454, appConfig.ftp_dir, handler=SH)
+
+if __name__ == '__main__':
+	main()
+	
