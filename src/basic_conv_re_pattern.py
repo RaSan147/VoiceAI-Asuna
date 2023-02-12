@@ -96,15 +96,37 @@ no+=tuple('actually ' + i for i in no1)"""
 
 
 
-output_PATTERNS = GETdict()
-op = output_PATTERNS
+output_TEXTS = GETdict()
+ot = output_TEXTS
 
-op.yes = ("Yeah!", "Sure...", "Sure!!" "Okkay~", "Okie~", "Okay!")
-op.no = ("No", "Sorry but nope")
-op.tell_time = ('The time is ', "It's ")
+ot.yes = ("Yeah!", "Sure...", "Sure!!" "Okkay~", "Okie~", "Okay!")
+ot.no = ("No", "Sorry but nope")
+ot.tell_time = ('The time is ', "It's ")
+
+ot.happy_emj = ("(◕‿◕)💞", " 😄", " 😇", " 😊", " ~", "...","", "")
+ot.sad_emj = ("(◕︵◕)", " 😢", " 😭", " 😞", " ~", "...","", "")
+
+ot.my_name_is = ["My name is ", "I am ", "Its ", "Call me ", "You can call me "]
+ot.call_me = ["You can call me ", "Call me ", "Its "]
+ot.about_self = ('I am your virtual partner. My name is <:ai_name> and I was made by <a href="https://github.com/RaSan147">RaSan147</a>', 
+'I am an AI. My name is <:ai_name> & I am your voice assistant.', 'My name is <:ai_name>. I am an AI voice assistant.')
+
+ot.on_whats_up = (
+	"Just the usual.",
+	"Nothing much.",
+	"Nothing much, just chilling.",
+	"Nothing much, just hanging around.",
+	"All good here!",
+	"I’m doing well.",
+	"Nothing much, just doing my thing.",
+)
+
 
 input_PATTERNS = GETdict({})
 ip = input_PATTERNS
+
+input_text = GETdict()
+it = input_text
 
 
 ip.yeses = [C('(well )?(actually )?y(e|a)(ah|s|p)( of ?course)?( sure)'), 
@@ -187,6 +209,9 @@ li_your = tuple(i+'r' for i in li_you)
 li_r = 'are','re','re', 'r', 'r'
 li_r_u = tuple(merge(a, i) for i in li_you for a in li_r)
 
+ip.r_u_ok = [
+	C("a?re? ((yo)?u|y(a|o)) (fine|ok((a|e)y)?|well|alright)"),
+]
 
 ####################################################
 # li_how_r_u = tuple(merge('how', i) for i in li_r_u)
@@ -279,16 +304,20 @@ ip.who_are_you = [C("who ?a?re? ((yo)?u|y(a|o))"), # who are u
 
 ip.whats_ = [
 	# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C("what ?(s|re|is|are|was|were)? (the )?(?P<query>.*)"),
+	C("what ?(s|re|is|are|r|was|were)? (the )?(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [
 						# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
 						C("(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
 						# C("((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
-						C("what should i call ((yo)?u|y(a|o))( by)?")
-										]
-										
+						
+]
+
+ip.what_to_call_you = [
+	C("what should i call ((yo)?u|y(a|o))( by)?"),
+]
+
 ip.what_time = [
 	# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
 	C("(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
@@ -311,8 +340,20 @@ li_how_old_r_u= 'old are you', 'your age'
 li_where_r_u = 'you',
 li_where_r_u_frm = 'you from',
 
-li_AamI = 'I am an AI. My name is %s & I am your voice assistant.', 'My name is %s. I am an AI voice assistant.'
 li_WmyName = 'my name',
+
+it.my_name = ['my name', 'my nickanme']
+ip.you_self = [
+	C("((yo)?u|y(a|o)) ?(r|re)?( ?self)?( really)?"),
+]
+
+it.latest_news = ['latest news', 'news', 'latest news headlines', 'news headlines', "news update"]
+
+
+it.change_cloth = ('change', "change cloth", "change skin", "change dress")
+it.change_room = ('change room', 'change place', 'change location', 'switch room', "change background")
+
+
 li_AmyName = 'Your name is ',
 			
 # print(li_whats)
@@ -367,7 +408,14 @@ li_goto = ('open', 'go to', 'goto')
 li_play = ('play', 'lets play', 'hit', 'tune', 'sing')
 li_reload = ('re', 'reload', '11')
 li_fucku = ('fuck you', 'fuck u','fuck ya')
-li_loveu=('love u','i love you','love ya','love you','i love u','i love you so much','i really love you','i really love you a lot','i wuv u')
+
+
+
+ip.love_you = [
+	C('(i )?(really )?(love|wuv) ((yo)?u|y(a|o))( so much| a lot)?'),
+]
+
+
 li_check_int = ["check " + i for i in ('net', 'internet',"connection", "wifi", "network")]
 
 li_refuck = ('Fuck yourself!', 'Go to hell!', 'Whatever! You can\'t do that!')

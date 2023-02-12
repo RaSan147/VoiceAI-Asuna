@@ -39,6 +39,7 @@ class User(GETdict):
 
 		self.flags = Flag()
 		self.chat = Flag()
+		self.chat.intent = {}
 		self.pointer = 0
 
 		# if the data asked for is already there
@@ -77,12 +78,26 @@ class User(GETdict):
 			return json.loads(data)
 
 		return None
+	
+	demo_chat = {
+		"id": 0,
+		"msg": "hello Asuna",
+		"time": 123456789,
+		"user": "USER",
+		"parsed_msg": "hello <:ai_name>",
+		"rTo": -1,
+		"intent": "", 
+		# intent of user message can't be determined immediately
+		# so it will be determined later, on bot's reply
+	}
 
-	def add_chat(self, msg, time, user=1, parsed_msg=None):
+	def add_chat(self, msg, time, user=1, parsed_msg="", rTo=-1, intent=""):
 		"""
 		msg: message sent
 		time: time of message
 		user: 1 if user, 0 if bot
+		parsed_msg: parsed message by basic_output
+		rTo: reply to message id (-1 if not reply)
 		"""
 		pointer = self.pointer
 		old = self.get_chat(pointer)
@@ -92,20 +107,27 @@ class User(GETdict):
 		if len(old) >= 100:
 			self.pointer += 1
 			old = []
-		
 		pointer = str(self.pointer)
+
+		chat = self.demo_chat.copy()
 
 		user = "USER" if user else "BOT"
 
 		self.msg_id += 1
-		data = {"id": self.msg_id, "msg": msg, "time": time, "user": user}
-		if parsed_msg:
-			data["parsed_msg"] = parsed_msg
+		id = self.msg_id
+		chat['id'] = id
+		chat['msg'] = msg # dict, contains msg, script and render mode
+		chat['time'] = time
+		chat["parsed_msg"] = parsed_msg
+		chat['rTo'] = rTo
+		chat['intent'] = intent
 
-		old.append(data)
+		old.append(chat)
 
 		J = json.dumps(old, indent=2, separators=(',', ':'))
 		F_sys.writer(pointer+'.json', 'w', J, self.user_path)
+
+		return id
 
 
 class UserHandler:

@@ -158,6 +158,7 @@ li_where_r_u_frm = 'you from',
 li_AamI = 'I am an AI. My name is %s & I am your voice assistant.', 'My name is %s. I am an AI voice assistant.'
 li_WmyName = 'my name',
 li_AmyName = 'Your name is ',
+
 			
 # print(li_whats)
 

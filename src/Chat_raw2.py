@@ -15,7 +15,7 @@ import requests
 from PRINT_TEXT3 import xprint, remove_style
 
 from basic_conv_pattern import *
-from basic_conv_re_pattern import ip, op, search, starts, check, is_in, remove_suffix
+from basic_conv_re_pattern import ip, ot, it, search, starts, check, is_in, remove_suffix
 
 from OS_sys import os_name, check_internet
 import F_sys
@@ -66,7 +66,7 @@ def find_person(name):
 def tell_time():
 	"""tells the current time"""
 	nowits = datetime.datetime.now()
-	return (choice(op.tell_time) + nowits.strftime("%I:%M %p."))
+	return (choice(ot.tell_time) + nowits.strftime("%I:%M %p."))
 
 
 
@@ -124,6 +124,13 @@ def parsed_names(ui, user:User):
 	"""Replace variable nicknames with constant strings"""
 	ui = re.sub(re.escape(user.ai_name), "<:ai_name>", ui, flags=re.IGNORECASE)
 	ui = re.sub(re.escape(user.nickname), "<:u_name>", ui, re.IGNORECASE)
+	return ui
+
+def parsed_names_back(ui, user:User):
+	"""Replace constant strings with variable nicknames"""
+	ui = ui.replace("<:ai_name>", user.ai_name)
+	ui = ui.replace("<:u_name>", user.nickname)
+	
 	return ui
 
 def preprocess(in_dat):
@@ -217,33 +224,39 @@ def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 
 
 
-	user.add_chat(INPUT, _time, 1, _ui_raw) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
+	id = user.add_chat(INPUT, _time, 1, _ui_raw) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
 	msg = message_dict.copy()
-	x = _basic_output(INPUT, user, _ui, _ui_raw)
+	x = _basic_output(INPUT, user, _ui, _ui_raw, id)
+	intent = user.chat.intent[id]
+
+	msg["rTo"] = id # reply to id # can be used in HTML to scroll to the message
+
 	if not x:
 		log_unknown(INPUT)
 		x = "I don't know what to say..."
 
-	print("Intent: ", user.chat)
-
 	if isinstance(x, dict):
-		x["message"] = remove_style(x["message"])
+		message = x["message"]
 		msg.update(x)
+		
 	else:
-		msg["message"] = x
-	
-	msg["message"] = msg["message"].strip()
+		message = x
+		
+	message = parsed_names_back(message, user)
+	message = remove_style(message)
+	msg["message"] = message.strip()
+
 	if msg["render"] =="innerHTML":
 		msg["message"] = msg["message"].replace("\n", "<br>")
 
 	_time = int(time()*1000)
-	user.add_chat(msg["message"], _time, 0)
+	user.add_chat(msg, _time, 0, rTo=id, intent=intent)
 	return msg
 	
 
 
 
-def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
+def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	"""Input: user input
 		user: user object
 	{
@@ -261,6 +274,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 	"""
 
 
+	def intent(i):
+		user.chat.intent[id] = i
 
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
@@ -287,7 +302,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 		if user.flags.hi_bit == 5:
 			user.flags.hi_bit = 0
 
-		user.chat.intent ='say_hi'
+		intent('say_hi')
 
 	elif starts(ip.hello, ui):
 		if not user.flags.hello_bit:
@@ -300,22 +315,27 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 		if user.flags.hello_bit == 5:
 			user.flags.hello_bit = 0
 
-		user.chat.intent ='say_hello'
+		intent('say_hello')
 		
 	if check(ip.how_are_you, ui):
 		out += Rchoice("I'm fine!", "I'm doing great.")
 
-		user.chat.intent ='how_are_you'
+		intent('how_are_you')
 		
 	elif check(ip.whats_your_name, ui):
-		out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+		out += choice(ot.my_name_is) + user.ai_name
 
-		user.chat.intent ='whats_your_name'
+		intent('whats_your_name')
+
+	elif check(ip.what_to_call_you, ui):
+		out += choice(ot.call_me) + user.ai_name + choice(ot.happy_emj)
+
+		intent('what_to_call_you')
 
 	elif check(ip.what_time, ui):
-		out = tell_time()
+		out += tell_time()
 
-		user.chat.intent ='whats_the_time'
+		intent('whats_the_time')
 		
 	elif check(ip.whats_, ui_raw):
 		_what = search(ip.whats_, ui)
@@ -323,30 +343,35 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 		uiopen = remove_suffix(_what.group("query"))
 		uiopen_raw = remove_suffix(_what_raw.group("query"))
 		print("query:", uiopen_raw)
+
+
+		if uiopen == "up":
+			out+= choice(ot.on_whats_up)
+
+			intent("whats_up")
 		
 
-		if uiopen in ["you", "yourself"]:
-			out += (f'I am your virtual partner. My name is {user.ai_name} and I was made by <a href="https://github.com/RaSan147">RaSan147</a>')
+		elif is_in(ip.you_self, uiopen):
+			out += choice(ot.about_self)
 			
-			user.chat.intent = 'what are you'
+			intent('what are you')
 
 			return {"message": out,
 					"render": "innerHTML"
 					}
 		
 
-		elif uiopen in li_WmyName:
-			out += (choice(yeses) + Rchoice(li_AmyName) + user.nickname + '.')
-			out += choice(["My name is ", "I am ", "Its ", "Call me ", "You can call me "]) + user.ai_name
+		elif uiopen in it.my_name:
+			out = choice(["Your name is ", "You are ", "You're "]) + user.nickname + Rchoice(" 😄", " 😇", " 😊", " ~", "...","", "")
 
-			user.chat.intent = "(whats)_your_name"
+			intent("(whats)_my_name")
 
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
 			out = tell_time()
 
-			user.chat.intent = "(whats)_the_time"
+			intent("(whats)_the_time")
 
-		elif uiopen in ["latest news", "news update", 'news']:
+		elif uiopen in it.latest_news:
 			if check_internet():
 				news = bbc_news.task(bbc_topic)
 				if news is None:
@@ -359,19 +384,19 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 			else:
 				out += 'No internet!'
 
-			user.chat.intent = "(whats)_the_news"
+			intent("(whats)_the_news")
 
 		else:
 			out += wikisearch(uiopen_raw, raw=ui, user=user)
 
-			user.chat.intent = "(whats)_something"
+			intent("(whats)_something")
 
 			return {"message": out,
 					"render": "innerHTML"
 					}
 	
 
-	if ui in ('change', "change cloth", "change skin", "change dress"):
+	if ui in it.change_cloth:
 		# TODO: NEED TO ADD IN PATTERNS
 		out += Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
 		case='change_cloth'
@@ -386,10 +411,10 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 			"script": "(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})()"
 		}
 
-		user.chat.intent = 'change_cloth'
+		intent('change_cloth')
 
 
-	elif ui in ('switch room', "change room", "change background"):
+	elif ui in it.change_room:
 		# TODO: NEED TO ADD IN PATTERNS
 		out = Rchoice("Sure!", "Okay", "Okay, wait a sec!")
 		case='change_room_bg'
@@ -401,24 +426,24 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 			"script": f"anime.set_bg('{bg}')"
 		}
 
-		user.chat.intent = 'change_room_bg'
+		intent('change_room_bg')
 
 
 
-	elif ui in li_r_u_fine:
-		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.") + Rchoice("", "🥰", "😇")
+	elif check(ip.r_u_ok, ui):
+		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") + Rchoice(" Thanks", '')  + Rchoice("", "🥰", "😇")
 		
-		user.chat.intent = "are_you_fine"
+		intent("are_you_ok")
 
-	elif ui in li_loveu:
+	elif check(ip.love_you, ui):
 		out = choice(li_relove) + Rchoice(" dear", f" {user.nickname}", " babe", "", "") + Rchoice(" 🥰", " 😘💕❤️" " 😘", "😘😘😘", "", "")
 		
-		user.chat.intent = "love_you"
+		intent("love_you")
 
 	elif ui in ('i hate u', 'i hate you'):
 		out = Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me")
 		
-		user.chat.intent = "hate_you"
+		intent("hate_you")
 
 	
 		# if user.flags.what_u_name_bit == 1:
@@ -518,13 +543,13 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 			out = ('/r/No such link found/=/')
 
 		print(link)
-		user.chat.intent = "goto"
+		intent("goto")
 
 	elif starts(ip.search, ui):
 		query = check(ip.search, ui)
 		searcher(query)
 
-		user.chat.intent = "search"
+		intent("search")
 	# elif ui.startswith(li_can_do):
 	# 	log_type(11)
 	# 	if ui.startswith(li_goto):
@@ -546,49 +571,55 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 	# 			else:
 	# 				searcher(uiopen)
 
-	elif ui in li_AmyName:
-		log_type("li_AmyName")
-		out = (choice(li_AmyName) + user.nickname + '.')
+	# elif ui in li_AmyName:
+	# 	log_type("li_AmyName")
+	# 	out = (choice(li_AmyName) + user.nickname + '.')
 
 	elif ui in start_parrot:
-		log_type("parrot mode")
-		out = ('Parrot mode activated.')
+		out += ('Parrot mode activated.')
 		parrot_mode = True
 
+		intent("parrot_on")
 
-	elif ui in ('whats up', 'sup', 'what is up'):
-		log_type("What's up")
+
+	elif ui in ('sup',):
 		out = ('Just doing my things.')
+
+		intent("whats_up")
 
 
 	elif ui in li_tell_time1:
-		log_type("li_tell_time1")
 		out = tell_time()
 
+		intent("whats_the_time")
+
 	elif re.search('((tell|speak|read )(out)?)?(the )?(latest )?news', ui):
-		log_type("read news")
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
 			if news is None:
-				out = ('No news available')
+				out += ('No news available')
 			else:
-				out = "".join(news[:5])
+				out += "".join(news[:5])
 				# asker("Do you want to read more?", true_func=lambda: out = (*news[5:15]))
 		else:
-			out = ('No internet!')
+			out += ('No internet!')
+
+		intent("whats_the_news")
 
 
 	
 
 	elif ui.startswith(li_who):
-		log_type(21)
-
+		
 		if ui in li_who_r_u:
-			log_type(22)
-			out = (choice(li_AamI) % user.ai_name)
+			out += (choice(li_AamI) % user.ai_name)
+
+			intent("(who)_are_you")
+
 		elif ui == "who am i":
-			log_type(23)
-			out = ("You are " + user.nickname + ", a human being. Far more intelligent than me.")
+			out += ("You are " + user.nickname + ", a human being. Far more intelligent than me.")
+
+			intent("(who)_am_i")
 		else:
 			who = [i for i in li_who if ui.startswith(i)]
 			if len(ui) == len(who[0]):
@@ -615,23 +646,28 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 				else:
 					out = find_person(uiopen_raw)
 
+			intent("(who)_something")
+
 
 	elif ui in li_check_int:
-		log_type(27)
 		if check_internet() == False:
 			out = ("No internet available.")
 		else:
 			out = ("Internet connection available.")
 
+		intent("check_internet")
+
 	elif ui in li_fucku:
-		log_type(28)
 		out = choice(li_refuck)
 
+		intent('fuck_you')
+
 	elif re.search(set_timer_pattern, ui):
-		log_type(29)
 		x = re.match(set_timer_pattern, ui).group(1)
 		out = "Timer not supported yet."
 		# set_timer(x)
+
+		intent("set_timer")
 
 
 	elif ui in escape:
@@ -640,17 +676,17 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str):
 		reloader = False
 		BREAK_POINT =True
 
+		intent("exit")
+
 		return choice(li_bye)+Rchoice('', f" {user.nickname}")+ Rchoice('', '!', '.')+ Rchoice('👋😄', '')
 
-	#print([out], out=='')
 	
 	if out == '':
-		log_type(0)
 		log_unknown(ui)
-		outtxt = "Sorry, I don't understand.\n"
-		out = (outtxt)
-		#ui = inputer()
-		#ui = i_slim(ui)
+		out = "Sorry, I don't understand..." + choice(ot.sad_emj)
+		
+		intent("unknown")
+
 		uibit1 = 1
 	ui1 = ui
 	if ui not in li_redo:
@@ -664,6 +700,9 @@ if __name__=="__main__":
 	user = user_handler.collection(user.username, user.id)
 	user_handler.get_skin_link(user.username, user.id)
 	while 1:
-		msg = basic_output(input(" >> "), user)["message"]
+		msg = basic_output(input(" >> "), user)
+		if not msg:
+			break
+		msg = msg["message"]
 		if msg == "exit": break
 		print(remove_style(msg))
