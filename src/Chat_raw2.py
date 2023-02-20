@@ -294,10 +294,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 				_out["render"] = msg["render"]
 				
 			out = _out
-		 	
 		else:
-		 	out += str(msg)
-		 	
+			out += str(msg)
 		return out
 
 
