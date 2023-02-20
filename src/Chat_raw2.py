@@ -110,9 +110,10 @@ def wikisearch(uix, raw='', user: User = None):
 				# TODO: add to user flags for later use "yes/no" message
 				user.flags
 
-			return f"/y/I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?/=/"
+			return {"message": f"I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?",
+		"render": "innerHTML"
+		}
 
-			
 			
 		return wolf
 		sleep(2)
@@ -272,32 +273,54 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		"ai_name": "Asuna", # user preferred ai name
 	}
 	"""
-
+	out = str2()
 
 	def intent(i):
 		user.chat.intent[id] = i
+		
+	def rep(msg):
+		nonlocal out
+		
+		if isinstance(msg, dict):
+			if isinstance(out, dict):
+				_out = out
+
+			else:
+				_out = {"message": out}
+				
+			_out["message"]  += "\n" +  msg["message"]
+				
+			if msg.get("render"):
+				_out["render"] = msg["render"]
+				
+			out = _out
+		 	
+		else:
+		 	out += str(msg)
+		 	
+		return out
 
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
 	
-	out = str2()
+	
 
 	print("Flags: ", user.flags)
 
 	if user.flags.parrot:
 		if is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
-			out += "Parrot mode disabled"
+			rep("Parrot mode disabled")
 		else:
-			out += ui
+			rep(ui)
 
 	if starts(ip.hi, ui):
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
 		if user.flags.hi_bit<2:
-			out += Rchoice('Hello', 'Hey', 'Hey','Hello') +Rchoice('', " there", '')+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
+			rep(Rchoice('Hello', 'Hey', 'Hey','Hello') +Rchoice('', " there", '')+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", ""))
 		else:
-			out += Rchoice('Hello','Yeah!','Yes?','Yeah, need something?')
+			rep(Rchoice('Hello','Yeah!','Yes?','Yeah, need something?'))
 		user.flags.hi_bit+=1
 		if user.flags.hi_bit == 5:
 			user.flags.hi_bit = 0
@@ -308,9 +331,9 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		if not user.flags.hello_bit:
 			user.flags.hello_bit = 0
 		if user.flags.hello_bit<2:
-			out += Rchoice('Hi', 'Hey') +Rchoice('', '', " there")+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", "")
+			rep( Rchoice('Hi', 'Hey') +Rchoice('', '', " there")+Rchoice("", f' {user.nickname}')+ Rchoice('.', '...', '!', '', '~')+ Rchoice('', "👋", ""))
 		else:
-			out += Rchoice('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?')
+			rep(Rchoice('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'))
 		user.flags.hello_bit+=1
 		if user.flags.hello_bit == 5:
 			user.flags.hello_bit = 0
@@ -318,17 +341,17 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		intent('say_hello')
 		
 	if check(ip.how_are_you, ui):
-		out += Rchoice("I'm fine!", "I'm doing great.")
+		rep( Rchoice("I'm fine!", "I'm doing great."))
 
 		intent('how_are_you')
 		
 	elif check(ip.whats_your_name, ui):
-		out += choice(ot.my_name_is) + user.ai_name
+		rep( choice(ot.my_name_is) + user.ai_name)
 
 		intent('whats_your_name')
 
 	elif check(ip.what_to_call_you, ui):
-		out += choice(ot.call_me) + user.ai_name + choice(ot.happy_emj)
+		rep( choice(ot.call_me) + user.ai_name + choice(ot.happy_emj))
 
 		intent('what_to_call_you')
 
@@ -346,13 +369,13 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 
 		if uiopen == "up":
-			out+= choice(ot.on_whats_up)
+			rep( choice(ot.on_whats_up))
 
 			intent("whats_up")
 		
 
 		elif is_in(ip.you_self, uiopen):
-			out += choice(ot.about_self)
+			rep( choice(ot.about_self))
 			
 			intent('what are you')
 
@@ -362,12 +385,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		
 
 		elif uiopen in it.my_name:
-			out = choice(["Your name is ", "You are ", "You're "]) + user.nickname + Rchoice(" 😄", " 😇", " 😊", " ~", "...","", "")
+			rep( choice(["Your name is ", "You are ", "You're "]) + user.nickname + Rchoice(" 😄", " 😇", " 😊", " ~", "...","", ""))
 
 			intent("(whats)_my_name")
 
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
-			out = tell_time()
+			rep(tell_time())
 
 			intent("(whats)_the_time")
 
@@ -375,30 +398,28 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 			if check_internet():
 				news = bbc_news.task(bbc_topic)
 				if news is None:
-					out += ("No news available")
+					rep("No news available")
 				else:
-					out += "".join(news[:5])
+					rep("".join(news[:5]))
 					# asker("Do you want to hear the rest?", true_func=read_rest_news)
 
 
 			else:
-				out += 'No internet!'
+				rep('Sorry, No internet!')
 
 			intent("(whats)_the_news")
 
 		else:
-			out += wikisearch(uiopen_raw, raw=ui, user=user)
+			rep(wikisearch(uiopen_raw, raw=ui, user=user))
 
 			intent("(whats)_something")
 
-			return {"message": out,
-					"render": "innerHTML"
-					}
+			return out
 	
 
 	if ui in it.change_cloth:
 		# TODO: NEED TO ADD IN PATTERNS
-		out += Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look...")
+		rep(Rchoice("Sure!", "Okay", "Okay, let me change my clothes", "Hey, don't peek!", "Okk tell me how I look..."))
 		case='change_cloth'
 		total_skins = len(user.skins)
 		user.bot_skin = (user.bot_skin + 1)%total_skins
@@ -416,9 +437,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 	elif ui in it.change_room:
 		# TODO: NEED TO ADD IN PATTERNS
-		out = Rchoice("Sure!", "Okay", "Okay, wait a sec!")
-		case='change_room_bg'
-
+		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"))
+		
 		bg = user_handler.room_bg(user=user, command="change")
 
 		out = {
@@ -431,17 +451,17 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 
 	elif check(ip.r_u_ok, ui):
-		out = Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") + Rchoice(" Thanks", '')  + Rchoice("", "🥰", "😇")
+		rep(Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") + Rchoice(" Thanks", '')  + Rchoice("", "🥰", "😇"))
 		
 		intent("are_you_ok")
 
 	elif check(ip.love_you, ui):
-		out = choice(li_relove) + Rchoice(" dear", f" {user.nickname}", " babe", "", "") + Rchoice(" 🥰", " 😘💕❤️" " 😘", "😘😘😘", "", "")
+		rep(choice(li_relove) + Rchoice(" dear", f" {user.nickname}", " babe", "", "") + Rchoice(" 🥰", " 😘💕❤️" " 😘", "😘😘😘", "", ""))
 		
 		intent("love_you")
 
 	elif ui in ('i hate u', 'i hate you'):
-		out = Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me")
+		rep(Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me"))
 		
 		intent("hate_you")
 
@@ -538,9 +558,13 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	elif starts(ip.goto, ui):
 		link = search(ip.goto, ui)['query']
 		if linker(link):
-			out = ('Opening ' + link)
+			rep(Rchoice('Opening ' + link, 
+							"Opening " + link + " for you", 
+							"Here you go",
+							"There you go"
+							))
 		else:
-			out = ('/r/No such link found/=/')
+			rep('No such link found')
 
 		print(link)
 		intent("goto")
@@ -576,20 +600,20 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	# 	out = (choice(li_AmyName) + user.nickname + '.')
 
 	elif ui in start_parrot:
-		out += ('Parrot mode activated.')
+		rep('Parrot mode activated.')
 		parrot_mode = True
 
 		intent("parrot_on")
 
 
 	elif ui in ('sup',):
-		out = ('Just doing my things.')
+		rep('Just doing my things.')
 
 		intent("whats_up")
 
 
 	elif ui in li_tell_time1:
-		out = tell_time()
+		rep(tell_time())
 
 		intent("whats_the_time")
 
@@ -597,12 +621,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
 			if news is None:
-				out += ('No news available')
+				rep('No news available')
 			else:
-				out += "".join(news[:5])
+				rep("".join(news[:5]))
 				# asker("Do you want to read more?", true_func=lambda: out = (*news[5:15]))
 		else:
-			out += ('No internet!')
+			rep('No internet!')
 
 		intent("whats_the_news")
 
@@ -612,12 +636,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	elif ui.startswith(li_who):
 		
 		if ui in li_who_r_u:
-			out += (choice(li_AamI) % user.ai_name)
+			rep(choice(li_AamI) % user.ai_name)
 
 			intent("(who)_are_you")
 
 		elif ui == "who am i":
-			out += ("You are " + user.nickname + ", a human being. Far more intelligent than me.")
+			rep("You are " + user.nickname + ", a human being. Far more intelligent than me.")
 
 			intent("(who)_am_i")
 		else:
@@ -634,44 +658,43 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 			uiopen_raw = reg_ex_raw.group(1)
 			if uiopen in li_r_u:
 				log_type(24)
-				out = (choice(li_AamI) % user.ai_name)
+				rep(choice(li_AamI) % user.ai_name)
 			elif uiopen in li_Qcreator:
 				log_type(25)
-				out = (choice(li_Acreator) % Rchoice(li_syn_created))
+				rep(choice(li_Acreator) % Rchoice(li_syn_created))
 			else:
 				log_type(26)
 				x = wikisearch(uiopen_raw, user)
 				if x:
-					out = x
+					rep(x)
 				else:
-					out = find_person(uiopen_raw)
+					rep(find_person(uiopen_raw))
 
 			intent("(who)_something")
 
 
 	elif ui in li_check_int:
 		if check_internet() == False:
-			out = ("No internet available.")
+			rep("No internet available.")
 		else:
-			out = ("Internet connection available.")
+			rep("Internet connection available.")
 
 		intent("check_internet")
 
 	elif ui in li_fucku:
-		out = choice(li_refuck)
+		rep(choice(li_refuck))
 
 		intent('fuck_you')
 
 	elif re.search(set_timer_pattern, ui):
 		x = re.match(set_timer_pattern, ui).group(1)
-		out = "Timer not supported yet."
+		rep("Timer not supported yet.")
 		# set_timer(x)
 
 		intent("set_timer")
 
 
 	elif ui in escape:
-		log_type(30)
 		reloaded = False
 		reloader = False
 		BREAK_POINT =True
