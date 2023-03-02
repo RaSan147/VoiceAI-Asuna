@@ -1,5 +1,6 @@
 __all__ = ['web_re']
 
+import re
 from re import compile as re_compile
 from DS import Callable_dict
 
@@ -75,3 +76,71 @@ class WEB_RE:
 		return facts
 
 web_re = WEB_RE()
+
+
+class Tool_belt:
+	def __init__(self):
+		pass
+	def starts(self, patterns:list[str,re.Pattern], string:str):
+		"""checks and returns string if it **starts with** any of the patterns in the given patterns list
+		"""
+		for i in patterns:
+			if isinstance(i, re.Pattern):
+				m = i.match(string)
+			
+				if m:
+					return m.group(0)
+				
+			else:
+				if string.startswith(i):
+					return i
+				
+	
+	def check(self, patterns:list[str,re.Pattern], string:str):
+		"""checks and returns string if it **has** any of the patterns in the given patterns list
+		"""
+		for i in patterns:
+			if isinstance(i, re.Pattern):
+				m = i.search(string)
+				if m:
+					return m.group(0)
+				
+			else:
+				if string in i:
+					return i
+					
+	def is_in(self, patterns:list[str,re.Pattern], string:str):
+		"""checks and returns string if it **full match** with any of the patterns in the given patterns list
+		"""
+		for i in patterns:
+			if isinstance(i, re.Pattern):
+				
+				m = i.fullmatch(string)
+				if m:
+					return m.group(0)
+				
+			else:
+				if string == i:
+					return i
+				
+	
+	def search(self, patterns:list[str,re.Pattern], string:str):
+		"""checks and returns `re.match object` if it has any of the patterns in the given patterns list
+		"""
+		for i in patterns:
+			if isinstance(i, re.Pattern):
+				m = i.search(string)
+				if m:
+					return m
+				
+			else:
+				m = re.search(re.escape(i), string)
+				if m:
+					return m
+	
+re_tools = Tool_belt()
+
+re_starts = re_tools.starts
+re_check = re_tools.check
+re_is_in = re_tools.is_in
+re_search = re_tools.search

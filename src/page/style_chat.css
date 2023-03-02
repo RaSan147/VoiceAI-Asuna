@@ -24,7 +24,7 @@
     height: max-content;
     bottom: 0;
     padding: 0 3px;
-    /* margin-bottom: 60px; */
+    /*margin-bottom: 60px;*/
     overflow-y: auto;
     padding-top: 100px;
     z-index: 0;
@@ -126,29 +126,25 @@
 }
 
 .message-text {
-	/* position: absolute; */
+	position: relative;
 	margin: 10px 0;
 	max-width: 70%;
-	width: max-content;
+	width: fit-content;
 	padding: 7px;
 	border-radius: 10px;
-	margin: 10px 3px;
+	margin: 10px 0;
 	margin-left: auto; 
 	margin-right: 0;
 	color: #fff;
-    overflow-wrap: break-word;
+	/*overflow-wrap: break-word;*/
 }
 
 .message-text.user {
 	background-color: rgba(10, 63, 115, 0.508);
-	left: auto;
-	right: 0;
-
 }
 
 .message-text.bot {
 	background-color: rgba(77, 5, 99, 0.508);
-	float: left;
 	margin-left: 0;
 }
 

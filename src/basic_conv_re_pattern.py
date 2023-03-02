@@ -1,5 +1,6 @@
 import re
 from re import compile
+from REGEX_TOOLS import re_starts, re_check, re_is_in, re_search
 from DS import GETdict
 def generate_list(prefix):
 	#l = [globals()[name] for name in globals().keys() if name.startswith(prefix)]
@@ -22,60 +23,9 @@ def C(pattern):
 
 to_bot_suffix = C(r"(( please)? (<:ai_name>|girl|dear|babe|honey|sweet ?heart|darling|ma.?am))$")
 
-def starts(patterns:list[str,re.Pattern], string:str):
-	"""checks and returns string if it **starts with** any of the patterns in the given patterns list
-	"""
-	for i in patterns:
-		if isinstance(i, re.Pattern):
-			m = i.match(string)
-			if m:
-				return m.group(0)
-			
-		else:
-			if string.startswith(i):
-				return i
-			
 
-def check(patterns:list[str,re.Pattern], string:str):
-	"""checks and returns string if it **has** any of the patterns in the given patterns list
-	"""
-	for i in patterns:
-		if isinstance(i, re.Pattern):
-			m = i.search(string)
-			if m:
-				return m.group(0)
-			
-		else:
-			if string in i:
-				return i
-				
-def is_in(patterns:list[str,re.Pattern], string:str):
-	"""checks and returns string if it **full match** with any of the patterns in the given patterns list
-	"""
-	for i in patterns:
-		if isinstance(i, re.Pattern):
-			m = i.fullmatch(string)
-			if m:
-				return m.group(0)
-			
-		else:
-			if string == i:
-				return i
-			
 
-def search(patterns:list[str,re.Pattern], string:str):
-	"""checks and returns `re.match object` if it starts with any of the patterns in the given patterns list
-	"""
-	for i in patterns:
-		if isinstance(i, re.Pattern):
-			m = i.search(string)
-			if m:
-				return m
-			
-		else:
-			m = re.search(re.escape(i), string)
-			if m:
-				return m
+
 
 	
 def remove_suffix(string):
@@ -171,6 +121,10 @@ li_Qcreator = tuple(i + " you" for i in li_syn_created)
 
 li_Acreator = 'I was %s by Ratul Hasan.', 'A boy named Ratul Hasan %s me.', 'Ratul Hasan %s me.'
 
+ip.created_program = [
+	C('(?P<action>created|programmed|invented|designed|made)  ((yo)?u|y(a|o))'),
+
+]
 
 
 
@@ -304,12 +258,17 @@ ip.who_are_you = [C("who ?a?re? ((yo)?u|y(a|o))"), # who are u
 
 ip.whats_ = [
 	# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C("what ?(s|re|is|are|r|was|were)? (the )?(?P<query>.*)"),
+	C("what('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
+]
+
+ip.whos_ = [
+	# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
+	C("who('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [
 						# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
-						C("(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
+						C("(what('| )?(s|re|is|are|r|was|were|am|will|will be)? )?((yo)?u|y(a|o))(r|re)? name"),
 						# C("((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
 						
 ]
@@ -320,7 +279,7 @@ ip.what_to_call_you = [
 
 ip.what_time = [
 	# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C("(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
+	C("(what('| )?(s|re|is|are|r|was|were|am|will|will be)?)?( the )?( current)? time( is| it)*( now)?( please)?"),
 	'clock',
 ]
 									
@@ -342,15 +301,31 @@ li_where_r_u_frm = 'you from',
 
 li_WmyName = 'my name',
 
-it.my_name = ['my name', 'my nickanme']
+
+"whats my name"
+it.my_name = ['my name', 'my nickname']
+
+
+"what/who am i to you?"
+ip.my_self = ["me( to ((yo)?u|y(a|o)))?", 
+	C("my ?self( to ((yo)?u|y(a|o)))?"),
+	C("i( to ((yo)?u|y(a|o)))?")
+]
+
+
+"what are you?"
 ip.you_self = [
 	C("((yo)?u|y(a|o)) ?(r|re)?( ?self)?( really)?"),
 ]
 
+
+"whats the latest news" "tell me the latest news"
 it.latest_news = ['latest news', 'news', 'latest news headlines', 'news headlines', "news update"]
 
-
+"change Anime dress"
 it.change_cloth = ('change', "change cloth", "change skin", "change dress")
+
+"change Anime room"
 it.change_room = ('change room', 'change place', 'change location', 'switch room', "change background")
 
 
