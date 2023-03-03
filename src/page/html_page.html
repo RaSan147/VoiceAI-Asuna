@@ -11,8 +11,16 @@
 <link rel="stylesheet" href="./style_anime.css">
 <link rel="stylesheet" href="./style_chat.css">
 
+
+<link rel="icon" href="https://cdn.jsdelivr.net/gh/RaSan147/py_httpserver_Ult@main/assets/favicon.png?raw=true" type="image/png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+
+
+
 </head>
 
+<body>
 
 <noscript>
 	<style>
@@ -22,16 +30,14 @@
 		</style>
 </noscript>
 
-<link rel="icon" href="https://cdn.jsdelivr.net/gh/RaSan147/py_httpserver_Ult@main/assets/favicon.png?raw=true" type="image/png">
-
-
-<body>
 <script src="./script_global.js"></script>
 <script src="./script_user.js"></script>
+
 <script>
 	user.get_local_data(); // redirect to login if not logged in
 	user.verify_login(true, true);
 </script>
+
 
 
 
@@ -64,11 +70,13 @@
 
 		<canvas id="canvas" class="charecter" style="height: 75%;width: auto;"></canvas>
 	</div>
-	<buttom id="to-chat" class="disable_selection" onclick="pages.to_chat()"><span class="fa fa-light fa-paper-plane">&gt;</span> Chat</buttom>
+	<buttom id="to-chat" class="disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-light fa-paper-plane">&#9010;</span> Chat</buttom>
+	
+	
+		<buttom id="to-install" class="disable_selection home-btns"><span class="fa fa-light fa-disc-drive">&#9019;</span> Install</buttom>
+		
+		<buttom id="to-open-pwa" class="disable_selection home-btns">&#9004; Open App</buttom>
 </div>
-
-
-
 
 <div id="chat-page" class="inactive">
 
@@ -91,7 +99,7 @@
 
 </div>
 
-
+<script src="./script_installer.js"></script>
 
 <!-- <script src="./script_global.js"></script> -->
 <script src="./script_app.js"></script>
@@ -99,6 +107,7 @@
 <script src="./script_chat.js"></script>
 <script src="./script_anime.js"></script>
 <script src="./script_page_handler.js"></script>
+<script src="./script_pwa.js"></script>
 
 
 <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>

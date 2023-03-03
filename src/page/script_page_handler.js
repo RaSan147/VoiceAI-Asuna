@@ -6,20 +6,33 @@ class PAGES{
 		this.anime_page_handler = anime
 		this.anime_page = anime.page
 	}
-
-	async to_chat(){
+	
+	async _to_chat(){
 		this.current_page = "chat"
 		await this.anime_page_handler.hide_page()
 		this.chat_page_handler.show_page()
 		this.chat_page_handler.chat_input.focus()
 	}
-
-	async to_anime(){
-		
-		this.current_page = "anime"
+	
+	to_chat(){
+		history.pushState({page: "chat"}, "Chat AI", "#chat")
+		log(history)
+		this._to_chat()
+	}
+	
+	async _to_anime(){
 		await this.chat_page_handler.hide_page()
 		// location.reload(); // following code makes the charecter to invisible. so simply just reloading
 		this.anime_page_handler.show_page()
+		
+	}
+
+	to_anime(){
+		// this.current_page = "home"
+		history.back()
+		log(history)
+		
+		this._to_anime()
 	}
 }
 

@@ -128,13 +128,14 @@ class ChatHandler{
 	}
 
 	success_msg(msg_ele){
-		const tick = createElement("span")
+		let tick = createElement("span")
 		tick.className = "fa fa-regular fa-check sent-tick"
 		tick.innerText = "✔"
 		tick.style.color = "green"
 		tick.style.fontSize = "5px"
-		msg_ele.appendChild(tick)
-		theme_controller.del_fa_alt(msg_ele)
+
+		this.chats.appendChild(tick)
+		theme_controller.del_fa_alt(tick)
 	}
 
 	replied_msg(json){

@@ -183,11 +183,40 @@ class Tools {
 	fetch_json(url){
 		return fetch(url).then(r => r.json()).catch(e => {console.log(e); return null;})
 	}
+	
+	is_standalone(){
+		const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+		if (document.referrer.startsWith('android-app://')) {
+			return true; // twa-pwa
+		} else if (navigator.standalone || isStandalone) {
+			return true;
+		}
+		return false;
+	}
+	
+	is_touch_device(){
+		return 'ontouchstart' in document.documentElement;
+	}
+	
+	async is_installed(){
+		const listOfInstalledApps = await navigator.getInstalledRelatedApps();
+		console.log(listOfInstalledApps)
+		for (const app of listOfInstalledApps) {
+		// These fields are specified by the Web App Manifest spec.
+		console.log('platform:', app.platform);
+		console.log('url:', app.url);
+		console.log('id:', app.id);
+		
+		// This field is provided by the UA.
+		console.log('version:', app.version);
+		}
+		
+		return listOfInstalledApps
+	}
 }
 var tools = new Tools();
 
-
-
+tools.is_installed()
 
 '#########################################'
 tools.enable_debug() // TODO: Disable this in production

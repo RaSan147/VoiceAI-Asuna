@@ -44,7 +44,7 @@
 	/* margin-left: -100px; */
 }
 
-#to-chat {
+#to-chat, #to-install, #to-open-pwa {
 	position: absolute;
 	/* justify-content: center; */
 	bottom: 0;
@@ -60,3 +60,13 @@
 	border-radius: 10px;
 	z-index: 10;
 }
+
+#to-install, #to-open-pwa {
+	display: none;
+	
+	top: 0;
+	padding-bottom: 10px;
+	height: 30px;
+	
+}
+

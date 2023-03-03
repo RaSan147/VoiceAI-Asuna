@@ -1,13 +1,10 @@
 
-
 class AppConfig {
 
 	constructor() {
-		this.page_type = "chat"; // Chat / Home / Face
+		this.location = window.location;
 	}
 }
-
-
 
 var appConfig = new AppConfig();
 
@@ -400,4 +397,9 @@ const resizer = () => {
 window.addEventListener("resize", (_e) => resizer());
 
 document.addEventListener("DOMContentLoaded", (_e) => resizer());
+
+
+
+
+
 
