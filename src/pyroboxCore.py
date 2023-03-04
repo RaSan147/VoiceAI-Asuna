@@ -1,4 +1,4 @@
-__version__ = "0.6.4"
+__version__ = "0.7.0"
 enc = "utf-8"
 __all__ = [
 	"HTTPServer", "ThreadingHTTPServer", "BaseHTTPRequestHandler",
@@ -10,8 +10,12 @@ import os
 import atexit
 import logging
 from queue import Queue
+from typing import Union
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+import argparse
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: \n%(message)s')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -33,10 +37,11 @@ class Config:
 		self.IP = None # will be assigned by checking
 
 		# DEFAULT PORT TO LAUNCH SERVER
-		self.port= 45454  # DEFAULT PORT TO LAUNCH SERVER
+		self.port= 6969  # DEFAULT PORT TO LAUNCH SERVER
 
 		# UPLOAD PASSWORD SO THAT ANYONE RANDOM CAN'T UPLOAD
-		self.PASSWORD= "SECret".encode('utf-8')
+		# CAN BE CHANGED BY USING --password NEW_PASSWORD
+		self.PASSWORD= "SECret"
 
 		# LOGGING
 		self.log_location = "./"  # fallback log_location = "./"
@@ -80,6 +85,10 @@ class Config:
 		# ASSET MAPPING
 		self.file_list = {}
 
+		# COMMANDLINE ARGUMENTS PARSER
+		self.parser = argparse.ArgumentParser(add_help=False)
+		
+
 	def clear_temp(self):
 		for i in self.temp_file:
 			try:
@@ -106,6 +115,42 @@ class Config:
 
 	def address(self):
 		return "http://%s:%i"%(self.IP, self.port)
+	
+	def parse_default_args(self, port = None, directory = None, bind = None, ):
+		if port is None:
+			port = self.port
+		if directory is None:
+			directory = self.ftp_dir
+		if bind is None:
+			bind = None
+
+		parser = self.parser
+
+		parser.add_argument('--bind', '-b', 
+							metavar='ADDRESS', default=bind,
+							help='Specify alternate bind address '
+								'[default: all interfaces]')
+		parser.add_argument('--directory', '-d', default=directory,
+							help='Specify alternative directory '
+							'[default: current directory]')
+		parser.add_argument('port', action='store',
+							default=port, type=int,
+							nargs='?',
+							help='Specify alternate port [default: 8000]')
+		parser.add_argument('--version', '-v', action='version',
+							version=__version__)
+		
+		self.parser.add_argument('-h', '--help', action='help',
+								default='==SUPPRESS==', 
+								help=('show this help message and exit'))
+		
+		args = parser.parse_known_args()[0]
+
+		return args
+	
+		
+
+
 
 
 
@@ -187,9 +232,11 @@ class Callable_dict(dict):
 
 def reload_server():
 	"""reload the server process from file"""
-	file = '"' + config.MAIN_FILE + '"'
-	print("Reloading...")
-	# print(sys.executable, config.MAIN_FILE, *sys.argv[1:])
+	file = config.MAIN_FILE
+	logger.info("Reloading...\n"+
+				" ".join(
+					["RE-RUNNING: ", sys.executable, sys.executable, file, *sys.argv[1:]]
+				))
 	try:
 		os.execl(sys.executable, sys.executable, file, *sys.argv[1:])
 	except:
@@ -593,13 +640,16 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			_w = tools.term_width()
 			w = _w - len(str(self.req_hash)) -2
 			w = w//2
-			print('='*w + f' {self.req_hash} ' + '='*w)
-			print(  f'{self.req_hash}|=>\t request\t: {self.command}',
-					f'{self.req_hash}|=>\t url     \t: {url_path}',
-					f'{self.req_hash}|=>\t query   \t: {query}',
-					f'{self.req_hash}|=>\t fragment\t: {fragment}'
-					, sep=f'\n')
-			print('+'*w + f' {self.req_hash} ' + '+'*w)
+			logger.info('='*w + f' {self.req_hash} ' + '='*w + '\n'+ 
+					'\n'.join(
+						[f'{self.req_hash}|=>\t request\t: {self.command}',
+						f'{self.req_hash}|=>\t url     \t: {url_path}',
+						f'{self.req_hash}|=>\t query   \t: {query}',
+						f'{self.req_hash}|=>\t fragment\t: {fragment}',
+						f'{self.req_hash}|=>\t full url \t: {self.path}',
+						]) + '\n'+
+					'+'*w + f' {self.req_hash} ' + '+'*w
+				)
 
 
 
@@ -609,8 +659,9 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			except Exception:
 				traceback.print_exc()
 
-			print('-'*w + f' {self.req_hash} ' + '-'*w)
-			print('#'*_w)
+			logger.info('-'*w + f' {self.req_hash} ' + '-'*w + '\n'+
+						'#'*_w
+						)
 			self.wfile.flush() #actually send the response if not already done.
 		except (TimeoutError, socket.timeout) as e:
 			#a read or a write timed out.  Discard this connection
@@ -742,7 +793,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		self.log_message(f'"{self.requestline}"', code, size)
 
 	def log_error(self, *args):
-		"""Log an error.
+		"""Log an error. [ERROR PRIORITY]
 
 		This is called when a request cannot be fulfilled.  By
 		default it passes the message on to log_message().
@@ -755,16 +806,16 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		self.log_message(args, error = True)
 
 	def log_warning(self, *args):
-		"""Log a warning"""
+		"""Log a warning message [HIGH PRIORITY]"""
 		self.log_message(args, warning = True)
 
 	def log_debug(self, *args, write = True):
-		"""Log a debug message"""
+		"""Log a debug message [LOWEST PRIORITY]"""
 		self.log_message(args, debug = True, write = write)
 
-	def log_info(self, *args):
-		"""Default log"""
-		self.log_message(args)
+	def log_info(self, *args, write = False):
+		"""Default log message [MEDIUM PRIORITY]"""
+		self.log_message(args, write = write)
 
 	def _log_writer(self, message):
 		os.makedirs(config.log_location, exist_ok=True)
@@ -881,7 +932,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		'.c': 'text/plain',
 		'.h': 'text/plain',
 		'.css': 'text/css',
-		'html': "text/html",
 
 		'.gz': 'application/gzip',
 		'.Z': 'application/octet-stream',
@@ -925,7 +975,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			try:
 				self.copyfile(f, self.wfile)
 			except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-				print(tools.text_box(e.__class__.__name__, e,"\nby ", self.address_string()))
+				self.log_info(tools.text_box(e.__class__.__name__, e,"\nby ", self.address_string()))
 			finally:
 				f.close()
 
@@ -984,10 +1034,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 		'''
-		# print("^"+url, hasQ, QV, fragent)
-		# print(self.url_path, self.query, self.fragment)
-		# print(self.url_path != url, self.query(*hasQ), self.query, self.fragment != fragent)
-
 		if url_regex:
 			if not re.search("^"+url_regex+'$', self.url_path): return False
 		elif url and url!=self.url_path: return False
@@ -1028,7 +1074,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		url_path, query, fragment = self.url_path, self.query, self.fragment
 		spathsplit = self.url_path.split("/")
 
-		# print(f'url: {url_path}\nquery: {query}\nfragment: {fragment}')
 
 		try:
 			for case, func in self.handlers['POST']:
@@ -1043,7 +1088,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 						try:
 							self.copyfile(f, self.wfile)
 						except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-							print(tools.text_box(e.__class__.__name__, e,"\nby ", self.address_string()))
+							logger.info(tools.text_box(e.__class__.__name__, e,"\nby ", [self.address_string()]))
 						finally:
 							f.close()
 					return
@@ -1053,7 +1098,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request.")
 
 		except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-			print(tools.text_box(e.__class__.__name__, e,"\nby ", [self.address_string()]))
+			logger.info(tools.text_box(e.__class__.__name__, e,"\nby ", [self.address_string()]))
 			return
 		except Exception as e:
 			traceback.print_exc()
@@ -1061,12 +1106,16 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			return
 
 
+	def redirect(self, location):
+		'''redirect to location'''
+		self.send_response(HTTPStatus.FOUND)
+		self.send_header("Location", location)
+		self.end_headers()
 
-
-	def return_txt(self, code, msg, content_type="text/html; charset=utf-8", write_log=False):
+	def return_txt(self, code, msg, content_type="text/html; charset=utf-8"):
 		'''returns only the head to client
 		and returns a file object to be used by copyfile'''
-		self.log_debug(f'[RETURNED] {code} {msg} to client', write=write_log)
+		self.log_debug(f'[RETURNED] {code} to client')
 		if not isinstance(msg, bytes):
 			encoded = msg.encode('utf-8', 'surrogateescape')
 		else:
@@ -1082,9 +1131,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		self.end_headers()
 		return f
 
-	def send_txt(self, code, msg, write_log=True):
+	def send_txt(self, code, msg, content_type="text/html; charset=utf-8"):
 		'''sends the head and file to client'''
-		f = self.return_txt(code, msg, write_log=write_log)
+		f = self.return_txt(code, msg, content_type)
 		if self.command == "HEAD":
 			return # to avoid sending file on get request
 		self.copyfile(f, self.wfile)
@@ -1194,6 +1243,16 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			# if f and not f.closed(): f.close()
 			raise
+			
+	def send_file(self, path, filename=None, download=False):
+		'''sends the head and file to client'''
+		f = self.return_file(path, filename, download)
+		if self.command == "HEAD":
+			return # to avoid sending file on get request
+		try:
+			self.copyfile(f, self.wfile)
+		finally:
+			f.close()
 
 
 
@@ -1319,7 +1378,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 				source.read(1)
 			except:
 				traceback.print_exc()
-				print(source)
 			source.seek(0)
 			shutil.copyfileobj(source, outputfile)
 
@@ -1436,9 +1494,15 @@ class DealPostData:
 			return re.findall(r'Content-Disposition.*name="(.*?)"', line.decode())[0]
 		except: return None
 
-	def match_name(self, field_name=None):
+	def match_name(self, field_name:Union[None, str]=None):
+		"""
+		field_name: name of the field (str)
+		* if None, skip checking field name
+		* if `empty string`, field name must be empty too
+		"""
 		line = self.get()
-		if field_name and self.get_name(line)!=field_name:
+
+		if field_name is not None and self.get_name(line)!=field_name:
 			raise PostError(f"Invalid request: Expected {field_name} but got {self.get_name(line)}")
 
 		return line
@@ -1462,8 +1526,19 @@ class DealPostData:
 		self.pass_bound()# LINE 0
 
 
-	def get_part(self, verify_name=None, verify_msg=None, decode=F):
-		'''read a form field'''
+	def get_part(self, verify_name:Union[None, bytes, str] =None, verify_msg:Union[None, bytes, str] =None, decode=F):
+		'''read a form field
+		ends at boundary
+		verify_name: name of the field (str|bytes|None)
+		verify_msg: message to verify (str|bytes)
+		decode: decode the message
+		* if None, skip checking field name
+		* if `empty string`, field name must be empty too'''
+		decoded = False
+		
+		if isinstance(verify_name, bytes):
+			verify_name = verify_name.decode()
+
 		field_name = self.match_name(verify_name) # LINE 1 (field name)
 		# if not verified, raise PostError
 
@@ -1479,8 +1554,14 @@ class DealPostData:
 		line = line.rpartition(b"\r\n")[0] # remove \r\n at end
 		if decode:
 			line = line.decode()
-		if verify_msg and line != verify_msg:
-			raise PostError(f"Invalid post request Expected: {[verify_msg]} Got: {[line]}")
+			decoded = True
+		if verify_msg is not None:
+			if not decoded:
+				if isinstance(verify_msg, str):
+					verify_msg = verify_msg.encode()
+					
+			if line != verify_msg:
+				raise PostError(f"Invalid post request.\n Expected: {[verify_msg]}\n Got: {[line]}")
 
 		# self.pass_bound() # LINE 5 (boundary)
 
@@ -1500,8 +1581,8 @@ def _get_best_family(*address):
 	family, type, proto, canonname, sockaddr = next(iter(infos))
 	return family, sockaddr
 
-def get_ip():
-	IP = '127.0.0.1'
+def get_ip(bind=None):
+	IP = bind # or "127.0.0.1"
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.settimeout(0)
 	try:
@@ -1531,23 +1612,26 @@ def test(HandlerClass=BaseHTTPRequestHandler,
 	"""
 
 	global httpd
-	if sys.version_info>(3,7,2): # BACKWARD COMPATIBILITY
+	if sys.version_info>=(3,8): # BACKWARD COMPATIBILITY
 		ServerClass.address_family, addr = _get_best_family(bind, port)
 	else:
 		addr =(bind if bind!=None else '', port)
+
+	device_ip = bind or "127.0.0.1"
+	# bind can be None (=> 127.0.0.1) or a string (=> 127.0.0.DDD)
 
 	HandlerClass.protocol_version = protocol
 	httpd = ServerClass(addr, HandlerClass)
 	host, port = httpd.socket.getsockname()[:2]
 	url_host = f'[{host}]' if ':' in host else host
 	hostname = socket.gethostname()
-	local_ip = config.IP if config.IP else get_ip()
+	local_ip = config.IP if config.IP else get_ip(device_ip)
 	config.IP= local_ip
 
 
-	on_network = local_ip!="127.0.0.1"
+	on_network = local_ip!=(device_ip)
 
-	print(tools.text_box(
+	logger.info(tools.text_box(
 		f"Serving HTTP on {host} port {port} \n", #TODO: need to check since the output is "Serving HTTP on :: port 6969"
 		f"(http://{url_host}:{port}/) ...\n", #TODO: need to check since the output is "(http://[::]:6969/) ..."
 		f"Server is probably running on\n",
@@ -1557,12 +1641,12 @@ def test(HandlerClass=BaseHTTPRequestHandler,
 		)
 	)
 	try:
-		httpd.serve_forever()
+		httpd.serve_forever(poll_interval=0.1)
 	except KeyboardInterrupt:
-		print("\nKeyboard interrupt received, exiting.")
+		logger.info("\nKeyboard interrupt received, exiting.")
 
 	except OSError:
-		print("\nOSError received, exiting.")
+		logger.info("\nOSError received, exiting.")
 	finally:
 		if not config.reload:
 			sys.exit(0)
@@ -1588,32 +1672,9 @@ class DualStackServer(ThreadingHTTPServer): # UNSUPPORTED IN PYTHON 3.7
 
 
 def run(port = None, directory = None, bind = None, arg_parse= True, handler = SimpleHTTPRequestHandler):
-	if port is None:
-		port = config.port
-	if directory is None:
-		directory = config.ftp_dir
 
 	if arg_parse:
-		import argparse
-
-
-
-		parser = argparse.ArgumentParser()
-
-		parser.add_argument('--bind', '-b', metavar='ADDRESS',
-							help='Specify alternate bind address '
-								'[default: all interfaces]')
-		parser.add_argument('--directory', '-d', default=directory,
-							help='Specify alternative directory '
-							'[default:current directory]')
-		parser.add_argument('port', action='store',
-							default=port, type=int,
-							nargs='?',
-							help='Specify alternate port [default: 8000]')
-		parser.add_argument('--version', '-v', action='version',
-							version=__version__)
-
-		args = parser.parse_args()
+		args = config.parse_default_args(port=port, directory=directory, bind=bind)
 
 		port = args.port
 		directory = args.directory
@@ -1621,11 +1682,11 @@ def run(port = None, directory = None, bind = None, arg_parse= True, handler = S
 
 
 
-	print(tools.text_box("Running pyroboxCore: ", config.MAIN_FILE, "Version: ", __version__))
+	logger.info(tools.text_box("Running pyroboxCore: ", config.MAIN_FILE, "Version: ", __version__))
 
 
 	if directory == config.ftp_dir and not os.path.isdir(config.ftp_dir):
-		print(config.ftp_dir, "not found!\nReseting directory to current directory")
+		logger.warning(config.ftp_dir, "not found!\nReseting directory to current directory")
 		directory = "."
 
 	handler_class = partial(handler,
@@ -1635,7 +1696,7 @@ def run(port = None, directory = None, bind = None, arg_parse= True, handler = S
 	config.ftp_dir = directory
 
 	if not config.reload:
-		if sys.version_info>(3,7,2):
+		if sys.version_info>(3,8):
 			test(
 			HandlerClass=handler_class,
 			ServerClass=DualStackServer,

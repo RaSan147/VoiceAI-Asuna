@@ -63,18 +63,14 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
   // Clear the deferredPrompt so it can be garbage collected
   deferredPrompt = null;
-  open_pwa_btn.style.display = "block"
-  alert("Installed")
+  open_pwa_btn.style.display = "block
 });
 
 var installedApps;;
 async function getInstalledApps() {
   installedApps = await navigator.getInstalledRelatedApps();
-  alert(notify_install)
-  alert(installedApps)
   
   if(notify_install && installedApps.length){
-    alert(69)
   	open_pwa_btn.style.display = "block"
   }
   
