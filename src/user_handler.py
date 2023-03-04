@@ -121,6 +121,7 @@ class User(GETdict):
 		chat["parsed_msg"] = parsed_msg
 		chat['rTo'] = rTo
 		chat['intent'] = intent
+		chat['user'] = user
 
 		old.append(chat)
 

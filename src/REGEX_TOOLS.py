@@ -3,7 +3,7 @@ __all__ = ['web_re']
 import re
 from re import compile as re_compile
 from DS import Callable_dict
-
+from typing import Union
 
 class WEB_RE:
 	link_extractor = re_compile( r'^(?P<noQuery>(?P<homepage>(?P<schema>((?P<scheme>[^:/?#]+):(?=//))?(//)?)(((?P<login>[^:/]+)(?::(?P<password>[^@]+)?)?@)?(?P<host>[^@/?#:]*)(?::(?P<port>\d+)?)?)?)?(?P<path>[^?#]*))(\?(?P<query>[^#]*))?(#(?P<fragment>.*))?')  # compiled regex tool for getting homepage
@@ -81,7 +81,7 @@ web_re = WEB_RE()
 class Tool_belt:
 	def __init__(self):
 		pass
-	def starts(self, patterns:list[str,re.Pattern], string:str):
+	def starts(self, patterns:Union[str,re.Pattern], string:str):
 		"""checks and returns string if it **starts with** any of the patterns in the given patterns list
 		"""
 		for i in patterns:
@@ -96,7 +96,7 @@ class Tool_belt:
 					return i
 				
 	
-	def check(self, patterns:list[str,re.Pattern], string:str):
+	def check(self, patterns:Union[str,re.Pattern], string:str):
 		"""checks and returns string if it **has** any of the patterns in the given patterns list
 		"""
 		for i in patterns:
@@ -109,7 +109,7 @@ class Tool_belt:
 				if string in i:
 					return i
 					
-	def is_in(self, patterns:list[str,re.Pattern], string:str):
+	def is_in(self, patterns:Union[str,re.Pattern], string:str):
 		"""checks and returns string if it **full match** with any of the patterns in the given patterns list
 		"""
 		for i in patterns:
@@ -124,7 +124,7 @@ class Tool_belt:
 					return i
 				
 	
-	def search(self, patterns:list[str,re.Pattern], string:str):
+	def search(self, patterns:Union[str,re.Pattern], string:str):
 		"""checks and returns `re.match object` if it has any of the patterns in the given patterns list
 		"""
 		for i in patterns:
@@ -137,6 +137,8 @@ class Tool_belt:
 				m = re.search(re.escape(i), string)
 				if m:
 					return m
+				
+		return re.Match(None)
 	
 re_tools = Tool_belt()
 

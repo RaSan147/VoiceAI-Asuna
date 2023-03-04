@@ -314,8 +314,11 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		if re_is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
 			rep("Parrot mode disabled")
+			intent('stop_parrot')
 		else:
 			rep(ui)
+			intent('parrot_say')
+		return out
 
 	if re_starts(ip.hi, ui):
 		if not user.flags.hi_bit:
@@ -625,7 +628,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 	elif ui in start_parrot:
 		rep('Parrot mode activated.')
-		parrot_mode = True
+		user.flags.parrot = True
 
 		intent("parrot_on")
 

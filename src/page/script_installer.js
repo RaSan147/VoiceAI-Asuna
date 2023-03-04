@@ -11,10 +11,15 @@ var install_btn = byId("to-install")
 var open_pwa_btn = byId("to-open-pwa")
 
 open_pwa_btn.onclick = (e) => {
+  if(tools.is_standalone()){
+    e.target.style.display = "none"
+    return
+  }
 	window.open('.', '_blank');
+
 }
 
-if(!tools.is_standalone() && tools.is_touch_device()){
+if(!tools.is_standalone()){
 	notify_install = true
 }
 
@@ -59,12 +64,17 @@ window.addEventListener('appinstalled', () => {
   // Clear the deferredPrompt so it can be garbage collected
   deferredPrompt = null;
   open_pwa_btn.style.display = "block"
+  alert("Installed")
 });
 
+var installedApps;;
 async function getInstalledApps() {
-  const installedApps = await navigator.getInstalledRelatedApps();
-
-  if(notify_install && installedApps){
+  installedApps = await navigator.getInstalledRelatedApps();
+  alert(notify_install)
+  alert(installedApps)
+  
+  if(notify_install && installedApps.length){
+    alert(69)
   	open_pwa_btn.style.display = "block"
   }
   
@@ -152,7 +162,7 @@ function to_install_if_not_chrome(){
 		)
 }
 
-if(notify_install && !isChrome()){
+if(notify_install && !isChrome() && config.is_touch_device){
 	to_install_if_not_chrome()
 }
 
