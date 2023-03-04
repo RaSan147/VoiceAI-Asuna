@@ -8,6 +8,8 @@ Welcome to project Asuna.
 
 * our additional plan is to create their animated avatar and make it available online (via Browsers)
 
+## Live Demo: https://aigirl.repl.co
+
 # Current status:
 - [x] Create server and web UI
 - [x] Add anime live2D
@@ -39,3 +41,8 @@ Welcome to project Asuna.
 * Python 3.7 or higher
 * Works on Pydroid 3 😄 too (most develoment is done using this)
 
+Thanks to:
+0. Reki Kawahara and abec (for creating Asuna)
+1. Sony group (for Wake me up Asuna App idea and illustrations)
+2. Replit for continuously hosting Demo link for free
+3. Anyone who's willing to share chat data and ideas
