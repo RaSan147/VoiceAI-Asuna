@@ -49,7 +49,7 @@ class Flag(GETdict):
 			return None
 			
 class str2(str):
-	def __joiner__(self, joiner="\n"):
+	def __joiner__(self, joiner="\n\n"):
 		self.joiner = joiner
 	def __add__(self, other):
 		if not hasattr(self, "joiner"):

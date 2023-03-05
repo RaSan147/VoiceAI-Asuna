@@ -13,6 +13,12 @@ def merge(*args):
 	txt = re.sub(r'\s+', ' ', txt)
 	return txt.strip()
 	
+def check_context(context=[], contextsss=[]):
+	for i in context:
+		if i in contextsss:
+			return True 
+	
+
 
 def C(pattern):
 	""" return re.compile of the pattern with ignore case flag
@@ -279,7 +285,7 @@ ip.what_to_call_you = [
 
 ip.what_time = [
 	# C("((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C("(what('| )?(s|re|is|are|r|was|were|am|will|will be)?)?( the )?( current)? time( is| it)*( now)?( please)?"),
+	C("(what('| )?(s|re|is|are|r|was|were|am|will|will be)? )?(the )?(current )?time( is| it)*( now)?( please)?"),
 	'clock',
 ]
 									
@@ -384,16 +390,30 @@ li_play = ('play', 'lets play', 'hit', 'tune', 'sing')
 li_reload = ('re', 'reload', '11')
 li_fucku = ('fuck you', 'fuck u','fuck ya')
 
+ip.fuck_you = [
+	C(r"(i('| | wi)ll )?(fuckh?|rape|torture) ((yo)?u|y(a|o))(('| )?r ((mo(m|ther|mmy))|sis(ter)?))?"),
+]
+# this is terrible, i wish no one use this ever
+ot.fuck_you = ("I don't like you.", 'How rude!', "You're mean!", "You're rude", "Please refrain from using such terms", "You're horrible", "I don't want to talk to you", "You're disgusting")
 
 
 ip.love_you = [
 	C('(i )?(really )?(love|wuv) ((yo)?u|y(a|o))( so much| a lot)?'),
 ]
 
+ip.hate_you = [
+	C("(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),
+]
+
+ip.whats_up = [
+	C("wh?(u|a)t?s+ *up+"),
+	'sup',
+]
+
 
 li_check_int = ["check " + i for i in ('net', 'internet',"connection", "wifi", "network")]
 
-li_refuck = ('Fuck yourself!', 'Go to hell!', 'Whatever! You can\'t do that!')
+
 li_relove='love you too','love you so much','I love you too' 
 li_voice0 = ['silent', 'silence', 'shut up', 'turn off volume', 'stop speaking']
 li_can_do = li_goto + li_play

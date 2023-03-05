@@ -138,7 +138,8 @@ class Tool_belt:
 				if m:
 					return m
 				
-		return re.Match(None)
+		# all m are None re.Match
+		return m
 	
 re_tools = Tool_belt()
 
@@ -146,3 +147,4 @@ re_starts = re_tools.starts
 re_check = re_tools.check
 re_is_in = re_tools.is_in
 re_search = re_tools.search
+
