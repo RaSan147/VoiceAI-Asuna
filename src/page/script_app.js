@@ -342,7 +342,10 @@ var top_bar = new Top_Bar();
 top_bar.hide();
 
 window.onscroll = function () {
-	if(appConfig.page_type=="chat") return false;
+	// theres no need for this now
+	return false;
+
+	if(pages.current_page=="chat") return false;
 	var currentScrollPos = window.pageYOffset;
 
 	if (top_bar.dont_move) {
@@ -366,6 +369,9 @@ window.addEventListener('touchstart', (e) => {
   }, false);
   
 window.addEventListener('touchend', (e) => {
+	return false;
+	// there is no need for this now
+
 	let deltaX;
 	let deltaY;
 

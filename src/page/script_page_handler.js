@@ -28,7 +28,8 @@ class PAGES{
 	}
 
 	to_anime(){
-		// this.current_page = "home"
+		if (this.current_page == "home") return;
+		// history.pushState({page: "anime"}, "Anime AI", "#anime")
 		history.back()
 		log(history)
 		

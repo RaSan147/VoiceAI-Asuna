@@ -1,5 +1,7 @@
 var app_installed = false
-var notify_install = false
+var notify_install = false // is INSTALL button visible
+var is_standalone = false
+
 
 if (0 && 'serviceWorker' in navigator) {
   navigator.serviceWorker
@@ -11,25 +13,22 @@ var install_btn = byId("to-install")
 var open_pwa_btn = byId("to-open-pwa")
 
 open_pwa_btn.onclick = (e) => {
-  if(tools.is_standalone()){
+  if(is_standalone){
     e.target.style.display = "none"
     return
   }
 	window.open('.', '_blank');
-
 }
 
-if(!tools.is_standalone()){
-	notify_install = true
-}
 
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
+  alert("beforeinstallprompt")
   app_installed = false; 
 
 	
-	if(!notify_install){
+	if(is_standalone){
 		return
 	}
   e.preventDefault();
@@ -37,6 +36,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   deferredPrompt = e;
   // Update UI to notify the user they can add to home screen
   install_btn.style.display = 'block';
+  notify_install = true // is INSTALL button visible
 
   install_btn.onclick = () => {
     // hide our user interface that shows our A2HS button
@@ -63,10 +63,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
   // Clear the deferredPrompt so it can be garbage collected
   deferredPrompt = null;
-  open_pwa_btn.style.display = "block
+  open_pwa_btn.style.display = "block"
 });
 
-var installedApps;;
+var installedApps;
 async function getInstalledApps() {
   installedApps = await navigator.getInstalledRelatedApps();
   
@@ -85,7 +85,6 @@ if ('getInstalledRelatedApps' in navigator) {
 
 
 
-const GOOGLE_VENDOR_NAME = 'Google Inc.';
 
 function isOpera(){
   return Boolean(window.opr);
@@ -101,6 +100,7 @@ const _userAgent = window.navigator.userAgent;
 const _vendor = window.navigator.vendor;
 var _browserName = null;
 function getBrowserName() {
+  const GOOGLE_VENDOR_NAME = 'Google Inc.';
 	let userAgent = _userAgent
 	let vendor = _vendor
 	if (_browserName){
@@ -137,12 +137,12 @@ function isChrome() {
 }
 
 function to_install_if_not_chrome(){
-	install_btn.style.display="block"
+	install_btn.style.display="block";
 	install_btn.onclick= () => {
-		popup_msg.show()
-	}
-	var body = createElement("div")
-	var msg = createElement("p")
+		popup_msg.show();
+	};
+	var body = createElement("div");
+	var msg = createElement("p");
 	
 	msg.innerHTML = `To install, please click <b>&#8962; Add to Home Screen</b>
 	<br>
@@ -151,14 +151,14 @@ function to_install_if_not_chrome(){
 	<br>
 	<h2>Why?</h2>
 	This app works & looks better on fullscreen, without any outlines and other things. And if you are seeing this, you're probably not using chrome, no problem... Just follow above steps to manually install (Chrome does that in better ways)
-	`
+	`;
 	
 	
 	popup_msg.createPopup("Install as PWA for the best Experience", msg
-		)
+		);
 }
 
-if(notify_install && !isChrome() && config.is_touch_device){
-	to_install_if_not_chrome()
+if(!is_standalone && !isChrome() && config.is_touch_device){
+	alert(69)
+	to_install_if_not_chrome();
 }
-
