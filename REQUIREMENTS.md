@@ -2,7 +2,7 @@
 
 ```
 pip install --upgrade pip wheel
-pip install pafy mutagen comtypes six yt-dlp requests
+pip install -U pafy mutagen comtypes six yt-dlp requests pytz
 pip install https://github.com/goldsmith/Wikipedia/archive/refs/heads/master.zip
 ```
 
