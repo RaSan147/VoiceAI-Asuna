@@ -8,13 +8,16 @@ Welcome to project Asuna.
 
 # Description:
 * **This is not a ChatGPT or full blown all knowing AI**
-* This is an English only pattern based chat bot (for now)
+* This is an English only, pattern based chat bot (for now)
 * Currently using regular expressions to catch and reply specific patterns of messaged and collecting inputs and unknown inputs to train in future
 * Once, With sufficient data and resources, we will perform AI training
 * If you have any idea or want to provide IO datas, please file an Issue or Pull Request
 * Documentation will be created soon for ease of group development.
 * Currently this is an one man project and my 1st language is not English, Using 1000 years of knowledge from animes and movies to enreach the chat input response.
 * So please don't expect much but I hope I'll be able to provide great performance with it.
+
+* **Please have patience** Maintaining completely new (self made) server, UI and back end is not easy task (for me). Then again adding IO based patterns, sequencing them takes time.
+
 
 * My/Our main goal is to create a Multi platform accessable voice assistant.
 
