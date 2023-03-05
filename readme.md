@@ -51,6 +51,19 @@ Welcome to project Asuna.
 * Python 3.7 or higher
 * Works on Pydroid 3 😄 too (most develoment is done using this)
 
+
+# Common IO: (similar inputs may/will work too)
+* Basic `hiiii`, `hello`
+* `What's your/my name` / `how're u`
+* `Whats the time` / `tell time`
+* <ins>**Static Q/A**</ins>, like `whats newtons 3rd law` / `whos the president of canada` / `whats root(69+420)`
+* `Whats the latest news` / `news highlights`
+* `Tell me about yourself` / `... your hobby/favorite game/anime`
+* `Love ya`
+* `Repeat after me` -> will reply whatever you say next. Say `stop/stop repeating` to stop
+* **Many more (forgot mostly) and many more coming soon**
+
+
 Thanks to:
 0. Reki Kawahara and abec (for creating Asuna)
 1. Sony group (for Wake me up Asuna App idea and illustrations)
