@@ -63,6 +63,7 @@ Welcome to project Asuna.
 * `Tell me about yourself` / `... your hobby/favorite game/anime`
 * `Love ya`
 * `Repeat after me` -> will reply whatever you say next. Say `stop/stop repeating` to stop
+* `change dress` to change costumes and `change room` to switch background 
 * **Many more (forgot mostly) and many more coming soon**
 
 
