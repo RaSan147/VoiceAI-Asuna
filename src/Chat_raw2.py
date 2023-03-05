@@ -31,6 +31,14 @@ from DS import str2
 from user_handler import User, user_handler
 from CONFIG import appConfig
 
+
+
+
+from chat_about_bot import patterns as about_bot_patterns
+
+
+
+
 bbc_topic = 'Asia_url'
 
 def log_unknown(*args, **kwargs):
@@ -39,6 +47,10 @@ def log_unknown(*args, **kwargs):
 
 def log_type(*args, **kwargs):
 	xprint("USER INPUT", *args, **kwargs, end="\n\n")
+	
+	
+	
+
 
 
 def web_go(link):
@@ -191,8 +203,9 @@ def pre_rem_bot_call(ui):
 	# 				ui_parts[0] = "about"
 	# 				ui_LParts[0] = "about"
 
-	ui = re.sub(r'^((can|will|do|did) ((yo)?u|y(a|o)) )?(please )?(even )?(know|tell|remember|speak|say)? ?(me )?', '', ui, flags=re.IGNORECASE)
+
 	ui = re.sub(r'^please ', '', ui, flags=re.IGNORECASE)
+	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please )?(even )?(know|tell|remember|speak|say)( me)? )(?P<msg>.+)', r'\g<msg>', ui, flags=re.IGNORECASE)
 	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 
 	return ui
@@ -204,8 +217,6 @@ def pre_rem_bot_call(ui):
 def Rchoice(*args, blank=0):
 	b = ['']*blank
 	return choice([*args, *b])
-	
-print(Rchoice(blank=4))
 
 message_dict = {
 	"message": "",
@@ -214,7 +225,7 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = None, _time=0):
+def basic_output(INPUT, user: User = None, username: str = None, user_time=0):
 	if user is None and username is not None:
 		user = User(username)
 
@@ -229,8 +240,8 @@ def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 	
 
 
-
-	id = user.add_chat(INPUT, _time, 1, _ui_raw) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
+	_time = time()
+	id = user.add_chat(INPUT, _time, 1, _ui_raw, user_time=user_time) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
 	msg = message_dict.copy()
 	x = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	intent = user.chat.intent[id]
@@ -255,7 +266,7 @@ def basic_output(INPUT, user: User = None, username: str = None, _time=0):
 	if msg["render"] =="innerHTML":
 		msg["message"] = msg["message"].replace("\n", "<br>")
 
-	_time = int(time()*1000)
+	_time = time()
 	user.add_chat(msg, _time, 0, rTo=id, intent=intent)
 	return msg
 	
@@ -279,9 +290,13 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	}
 	"""
 	out = str2()
+	
+	_intent = []
 
 	def intent(i):
-		user.chat.intent[id] = i
+		nonlocal _intent
+		_intent.append(i)
+		user.chat.intent[id] = _intent
 		
 	def rep(msg):
 		nonlocal out
@@ -293,7 +308,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 			else:
 				_out = {"message": out}
 				
-			_out["message"]  += "\n" +  msg["message"]
+			_out["message"]  += "\n\n" +  msg["message"]
 				
 			if msg.get("render"):
 				_out["render"] = msg["render"]
@@ -302,6 +317,25 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		else:
 			out += str(msg)
 		return out
+		
+	def rand_out(outputs):
+		if isinstance(outputs, str):
+			return outputs
+		return choice(outputs)
+		
+	def check_patterns(patterns, ui):
+		found = False
+		uiParts = ui.split(" and ")
+		for i in uiParts:
+			for ptrn, otpt, intnt in patterns:
+				if re_check(ptrn, i):
+					rep(rand_out(otpt))
+					intent(intnt)
+						
+					found = True
+					# tell me about yourself *and* your favourite hobby
+		return found
+	
 
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
@@ -318,6 +352,9 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		else:
 			rep(ui)
 			intent('parrot_say')
+		return out
+		
+	if check_patterns(about_bot_patterns(), ui):
 		return out
 
 	if re_starts(ip.hi, ui):
@@ -358,10 +395,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 		intent('how_are_you')
 		
-	elif re_check(ip.whats_your_name, ui):
+	if re_check(ip.whats_your_name, ui):
 		rep( choice(ot.my_name_is) + user.ai_name)
 
 		intent('whats_your_name')
+		
+	
 
 	elif re_check(ip.what_to_call_you, ui):
 		rep( choice(ot.call_me) + user.ai_name + choice(ot.happy_emj))
@@ -384,7 +423,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		if uiopen == "up":
 			rep( choice(ot.on_whats_up))
 
-			intent("whats_up")
+			intent("(whats)_up")
 		
 
 		elif re_is_in(ip.you_self, uiopen):
@@ -487,8 +526,15 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		
 		intent("love_you")
 
-	elif ui in ('i hate u', 'i hate you'):
-		rep(Rchoice("I'm sorry.", 'Sorry to dissapoint you.',"Please forgive me"))
+	elif re_check(ip.hate_you, ui):
+		rep(Rchoice("I'm sorry. ", 'Sorry to dissapoint you. ',"Please forgive me. ")+
+		 	Rchoice("I'm still learning",
+		 		"I'll try my best to help you",
+		 		"I don't know much yet, I'll try my best to learn quickly and be by your side forever ",
+		 		blank=1)+
+		 	Rchoice("🥺", "😞", "😭", "\n(⁠っ⁠˘̩⁠╭⁠╮⁠˘̩⁠)⁠っ","\n(⁠｡⁠ŏ⁠﹏⁠ŏ⁠)","...",
+		 	blank=2)
+		 	)
 		
 		intent("hate_you")
 
@@ -633,16 +679,11 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		intent("parrot_on")
 
 
-	elif ui in ('sup',):
-		rep('Just doing my things.')
-
+	elif re_check (ip.whats_up, ui):
+		rep( choice(ot.on_whats_up))
+		
 		intent("whats_up")
 
-
-	elif ui in li_tell_time1:
-		rep(tell_time())
-
-		intent("whats_the_time")
 
 	elif re.search('((tell|speak|read )(out)?)?(the )?(latest )?news', ui):
 		if check_internet():
@@ -706,8 +747,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 		intent("check_internet")
 
-	elif ui in li_fucku:
-		rep(choice(li_refuck))
+	elif re_check(ip.fuck_you, ui):
+		rep(choice(ot.fuck_you))
 
 		intent('fuck_you')
 
@@ -748,9 +789,9 @@ if __name__=="__main__":
 	user = user_handler.collection(user.username, user.id)
 	user_handler.get_skin_link(user.username, user.id)
 	while 1:
-		msg = basic_output(input(" >> "), user)
+		msg = basic_output(input(" >> "), user, user_time=time())
 		if not msg:
-			break
+			continue #break
 		msg = msg["message"]
 		if msg == "exit": break
 		print(remove_style(msg))

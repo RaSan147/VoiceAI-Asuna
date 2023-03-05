@@ -8,6 +8,7 @@ import inspect
 
 import F_sys
 import net_sys
+from TIME_sys import utc_to_bd_time
 
 from CONFIG import appConfig
 from DS import GETdict, Flag
@@ -40,7 +41,7 @@ class User(GETdict):
 		self.flags = Flag()
 		self.chat = Flag()
 		self.chat.intent = {}
-		self.pointer = 0
+		#self.pointer = 0
 
 		# if the data asked for is already there
 		data = F_sys.reader(self.file_path, on_missing=None)
@@ -59,12 +60,20 @@ class User(GETdict):
 	def __setitem__(self, key, value):
 		super().__setitem__(key, value)
 		self.save()
+		
+	
+	def __setattr__(self, key, value):
+		if self(key):
+			self.__setitem__(key, value)
+		else:
+			super().__setattr__(key, value)
+
 
 	# def __getattribute__(self, __name: str):
 	# 	return super().__getattribute__(__name)
 
 	def save(self):
-		J = json.dumps(self, indent=2)
+		J = json.dumps(self, indent="\t", sort_keys=True)
 		F_sys.writer("__init__.json", 'w', J, self.user_path)
 
 	def get_chat(self, pointer=-1):
@@ -91,7 +100,7 @@ class User(GETdict):
 		# so it will be determined later, on bot's reply
 	}
 
-	def add_chat(self, msg, time, user=1, parsed_msg="", rTo=-1, intent=""):
+	def add_chat(self, msg, time, user=1, parsed_msg="", rTo=-1, intent=[], context=[], user_time=0):
 		"""
 		msg: message sent
 		time: time of message
@@ -103,29 +112,35 @@ class User(GETdict):
 		old = self.get_chat(pointer)
 		if old is None:
 			old = []
-		
+
 		if len(old) >= 100:
 			self.pointer += 1
 			old = []
 		pointer = str(self.pointer)
 
-		chat = self.demo_chat.copy()
 
-		user = "USER" if user else "BOT"
+		chat = self.demo_chat.copy()
+		
+		if user:
+			user= "USER"
+			# actual time on user side
+			chat["uTime"] = str(datetime.datetime.fromtimestamp(user_time))
+		else:
+			user= "BOT"
 
 		self.msg_id += 1
 		id = self.msg_id
 		chat['id'] = id
 		chat['msg'] = msg # dict, contains msg, script and render mode
-		chat['time'] = time
+		chat['time'] = str(utc_to_bd_time(time))
 		chat["parsed_msg"] = parsed_msg
 		chat['rTo'] = rTo
-		chat['intent'] = intent
+		chat['intent'] = "+".join(intent)
 		chat['user'] = user
 
 		old.append(chat)
 
-		J = json.dumps(old, indent=2, separators=(',', ':'))
+		J = json.dumps(old, indent="\t", separators=(',', ':'))
 		F_sys.writer(pointer+'.json', 'w', J, self.user_path)
 
 		return id
@@ -153,6 +168,7 @@ class UserHandler:
 			"room": 0,
 			"custom_room": None,
 			"msg_id": 0,
+			"pointer": 0,
 		}
 
 
@@ -195,6 +211,7 @@ class UserHandler:
 			"room": 0,
 			"custom_room": None,
 			"msg_id": 0,
+			"pointer": 0,
 		}
 
 		J = json.dumps(u_data, indent=2)

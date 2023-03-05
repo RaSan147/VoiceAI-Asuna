@@ -383,7 +383,7 @@ def chat(self: SH, *args, **kwargs):
 		return self.send_json(out)
 
 
-	reply = basic_output(message, user, _time=int(_time))
+	reply = basic_output(message, user, user_time=int(_time)/1000)
 
 	if isinstance(reply, dict):
 		out.update(reply)
