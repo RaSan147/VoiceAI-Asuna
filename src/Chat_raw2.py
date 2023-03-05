@@ -77,9 +77,9 @@ def searcher(search_txt):
 def find_person(name):
 	return searcher(name)
 
-def tell_time():
+def tell_time(user_time= 0):
 	"""tells the current time"""
-	nowits = datetime.datetime.now()
+	nowits = datetime.datetime.fromtimestamp(user_time)
 	return (choice(ot.tell_time) + nowits.strftime("%I:%M %p."))
 
 
@@ -243,7 +243,7 @@ def basic_output(INPUT, user: User = None, username: str = None, user_time=0):
 	_time = time()
 	id = user.add_chat(INPUT, _time, 1, _ui_raw, user_time=user_time) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
 	msg = message_dict.copy()
-	x = _basic_output(INPUT, user, _ui, _ui_raw, id)
+	x = _basic_output(INPUT, user, _ui, _ui_raw, id, user_time)
 	intent = user.chat.intent[id]
 
 	msg["rTo"] = id # reply to id # can be used in HTML to scroll to the message
@@ -273,7 +273,7 @@ def basic_output(INPUT, user: User = None, username: str = None, user_time=0):
 
 
 
-def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
+def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 	"""Input: user input
 		user: user object
 	{
@@ -408,7 +408,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		intent('what_to_call_you')
 
 	elif re_check(ip.what_time, ui):
-		out += tell_time()
+		out += tell_time(user_time)
 
 		intent('whats_the_time')
 		
