@@ -36,3 +36,5 @@ def utc_to_bd_time(utc_dt=None):
 
 if __name__=="__main__":
 	print(utc_to_bd_time(1677963222428/1000))
+
+	print(datetime.fromtimestamp(1678025767196/1000))

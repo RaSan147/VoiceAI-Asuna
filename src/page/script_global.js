@@ -80,6 +80,14 @@ class Tools {
 		// returns current time in milliseconds
 		return new Date().getTime();
 	}
+	datetime() {
+		// returns current date and time
+		return new Date(Date.now());
+	}
+	time_offset() {
+		// returns the time offset in milliseconds
+		return new Date().getTimezoneOffset() * 60 * 1000;
+	}
 	del_child(elm) {
 		if (typeof(elm) == "string") {
 			elm = byId(elm);

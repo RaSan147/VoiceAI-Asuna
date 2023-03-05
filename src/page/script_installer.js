@@ -159,6 +159,5 @@ function to_install_if_not_chrome(){
 }
 
 if(!is_standalone && !isChrome() && config.is_touch_device){
-	alert(69)
 	to_install_if_not_chrome();
 }
