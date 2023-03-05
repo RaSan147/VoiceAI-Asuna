@@ -3,6 +3,15 @@ PROJECT Asuna
 <p align="center"><img src="https://user-images.githubusercontent.com/34002411/214065966-6fcbd90f-0948-42dd-b846-5e6130a78421.jpg" alt="ASUNA SAO"/></p>
 
 Welcome to project Asuna.
+# Description:
+* **This is not a ChatGPT or full blown all knowing AI**
+* This is an English only pattern based chat bot (for now)
+* Currently using regular expressions to catch and reply specific patterns of messaged and collecting inputs and unknown inputs to train in future
+* Once, With sufficient data and resources, we will perform AI training
+* If you have any idea or want to provide IO datas, please file an Issue or Pull Request
+* Documentation will be created soon for ease of group development.
+* Currently this is an one man project and my 1st language is not English, Using 1000 years of knowledge from animes and movies to enreach the chat input response.
+* So please don't expect much but I hope I'll be able to provide great performance with it.
 
 * My/Our main goal is to create a Multi platform accessable voice assistant.
 
@@ -14,7 +23,9 @@ Welcome to project Asuna.
 - [x] Create server and web UI
 - [x] Add anime live2D
 - [x] Connect chat 
-- [ ] Server and UI improvements
+- [x] Server and UI improvements
+- [x] Add intent and context
+- [ ] Understand and reply according to context
 - [ ] Add more Commands
 - [ ] Add voice recognition
 - [ ] Add voice output
@@ -23,7 +34,6 @@ Welcome to project Asuna.
 - [ ] Allow bot send pictures
 - [ ] Allow bot send audio
 - [ ] Allow bot send video
-- [ ] Understand and reply according to context
 
 
 
