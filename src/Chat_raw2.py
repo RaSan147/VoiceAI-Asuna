@@ -353,7 +353,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 	
 
 	print("Flags: ", user.flags)
-	print("ID:", id)
 
 	if user.flags.parrot:
 		if re_is_in(ip.stop_parrot, ui):
@@ -367,7 +366,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		
 	
 	if re_starts(ip.hi, ui):
-		print(9999999)
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
 		if user.flags.hi_bit<2:
@@ -383,8 +381,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			user.flags.hi_bit = 0
 
 		intent('say_hi')
-		
-		#return #TODO: DELETE IT
 
 	elif re_starts(ip.hello, ui):
 		if not user.flags.hello_bit:
