@@ -1,3 +1,5 @@
+from random import choice, shuffle
+import re
 from REGEX_TOOLS import re_check, re_is_in, re_starts
 from basic_conv_re_pattern import C,  merge, check_context
 
@@ -12,19 +14,15 @@ def patterns(context=[]):
 	return [
 [
 	[
-		C(r"about ((yo)?u|y(a|o))(('| )?r ?self)?( \<\:ai_name\>)?$"),
+		C(r"are ((yo)?u|y(a|o)) doing?"),
 	],
-	(Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki." +
-		Rchoice(" I'm 17 this year.",blank=2) + 
-		Rchoice(" I continue my education from SAO Survivor School.", blank=1)+
-		" I love to study and play video games with friends."+
-		shuf_merge(Rchoice(" I often go to the pool or beach for swimming.", blank=1), 
-			" I like to go shopping too!") +
-		Rchoice(" I also "+Rchoice("like ", "love ")+Rchoice("talking ", "being ", "staying ", "chatting ")+"with you.",
-			" I also love too cook.", blank=1)+
-		Rchoice("😁", " 😄", " 😇", " 😊", " ~", "...", blank=1)
+	(Rchoice("Just thinking about you"+ Rchoice(" and waiting for your text", blank=2)+".",
+		"Nothing particular... Just chatting with you ☺️",
+		"Just staring at you🥰",
+		"Wondering about you 😄"
+		)
 	),
-	"about_ai"
+	"(what)_ai_doing"
 ],
 [
 	[

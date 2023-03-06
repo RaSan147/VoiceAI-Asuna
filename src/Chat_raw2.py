@@ -25,7 +25,7 @@ import F_sys
 import yt_plugin
 from bbc_news import bbc_news
 
-from TIME_sys import from_jstime
+import TIME_sys
 from DS import str2
 
 from user_handler import User, user_handler
@@ -77,11 +77,8 @@ def searcher(search_txt):
 def find_person(name):
 	return searcher(name)
 
-def tell_time(user_time= 0):
-	"""tells the current time"""
-	nowits = datetime.datetime.fromtimestamp(user_time)
-	return (choice(ot.tell_time) + nowits.strftime("%I:%M %p."))
 
+	
 
 
 def wolfram(text, raw=''):
@@ -225,9 +222,9 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = None, user_time=0):
+def basic_output(INPUT, user: User = None, username: str = None):
 	if user is None and username is not None:
-		user = User(username)
+		user = user_handler.get_user(username)
 
 	_INPUT = parsed_names(INPUT, user)
 	_INPUT = preprocess(_INPUT)
@@ -238,12 +235,13 @@ def basic_output(INPUT, user: User = None, username: str = None, user_time=0):
 	if _ui == "":
 		return
 	
-
-
+	user.user_client_dt = user.get_user_dt()
+	# update client datetime
+	
 	_time = time()
-	id = user.add_chat(INPUT, _time, 1, _ui_raw, user_time=user_time) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
+	id = user.add_chat(INPUT, _time, 1, _ui_raw) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
 	msg = message_dict.copy()
-	x = _basic_output(INPUT, user, _ui, _ui_raw, id, user_time)
+	x = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	intent = user.chat.intent[id]
 
 	msg["rTo"] = id # reply to id # can be used in HTML to scroll to the message
@@ -323,17 +321,27 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			return outputs
 		return choice(outputs)
 		
-	def check_patterns(patterns, ui):
+	def check_patterns(patterns, ui, action=None):
 		found = False
 		uiParts = ui.split(" and ")
-		for i in uiParts:
+		remove_match = False 
+		if action=="remove":
+			remove_match =True
+		for n, i in enumerate(uiParts):
 			for ptrn, otpt, intnt in patterns:
-				if re_check(ptrn, i):
+				m = re_search(ptrn, i)
+				if m:
 					rep(rand_out(otpt))
 					intent(intnt)
+					
+					if remove_match:
+						uiParts[n] = re.sub(ptrn, '', i)
 						
 					found = True
 					# tell me about yourself *and* your favourite hobby
+				
+		if remove_match:
+			return " and ".join(uiParts)
 		return found
 	
 
@@ -390,6 +398,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 
 		intent('say_hello')
 		
+	if check_patterns(about_bot_patterns(), ui, action="remove"):
+		pass
+
+		
+	
+		
 	if re_check(ip.how_are_you, ui):
 		rep( Rchoice("I'm fine!", "I'm doing great."))
 
@@ -408,7 +422,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		intent('what_to_call_you')
 
 	elif re_check(ip.what_time, ui):
-		out += tell_time(user_time)
+		rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
 		intent('whats_the_time')
 		
@@ -452,11 +466,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			intent("(what)_my_self")
 
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
-			rep(tell_time())
+			rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
+
 
 			intent("(whats)_the_time")
 
-		elif uiopen in it.latest_news:
+		elif re_check(ip.latest_news, uiopen):
 			if check_internet():
 				news = bbc_news.task(bbc_topic)
 				if news is None:
@@ -685,7 +700,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		intent("whats_up")
 
 
-	elif re.search('((tell|speak|read )(out)?)?(the )?(latest )?news', ui):
+	elif re_check(ip.tell_latest_news, ui):
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
 			if news is None:
@@ -788,8 +803,13 @@ if __name__=="__main__":
 	user = user_handler.get_user("Ray")
 	user = user_handler.collection(user.username, user.id)
 	user_handler.get_skin_link(user.username, user.id)
+
+	user.user_client_time_offset = TIME_sys.get_time_offset()
 	while 1:
-		msg = basic_output(input(" >> "), user, user_time=time())
+		inp = input(" >> ")
+		user.user_client_time = time()
+
+		msg = basic_output(inp, user)
 		if not msg:
 			continue #break
 		msg = msg["message"]

@@ -321,12 +321,22 @@ ip.my_self = ["me( to ((yo)?u|y(a|o)))?",
 
 "what are you?"
 ip.you_self = [
-	C("((yo)?u|y(a|o)) ?(r|re)?( ?self)?( really)?"),
+	C("((yo)?u|y(a|o)) ?(re?)?( ?self)?( really)?"),
 ]
 
 
 "whats the latest news" "tell me the latest news"
-it.latest_news = ['latest news', 'news', 'latest news headlines', 'news headlines', "news update"]
+ip.latest_news = [
+	C('(latest|any|global|world)? ?(news|special|) ?(news|headlines?|events?|updates?)'), 
+]
+
+ip.tell_latest_news = ip.latest_news + [
+	"anything interesting happening",
+	C("(do ((yo)?u|y(a|o)))? ?(got|have) (some|any)(thing)? (news|headlines?|interesting)")
+]
+
+
+'((tell|speak|read )(out)?)?(the )?(latest )?news'
 
 "change Anime dress"
 it.change_cloth = ('change', "change cloth", "change skin", "change dress")
@@ -391,7 +401,7 @@ li_reload = ('re', 'reload', '11')
 li_fucku = ('fuck you', 'fuck u','fuck ya')
 
 ip.fuck_you = [
-	C(r"(i('| | wi)ll )?(fuckh?|rape|torture) ((yo)?u|y(a|o))(('| )?r ((mo(m|ther|mmy))|sis(ter)?))?"),
+	C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?r ((mo(m|ther|mmy))|sis(ter)?))?"),
 ]
 # this is terrible, i wish no one use this ever
 ot.fuck_you = ("I don't like you.", 'How rude!', "You're mean!", "You're rude", "Please refrain from using such terms", "You're horrible", "I don't want to talk to you", "You're disgusting")

@@ -183,6 +183,7 @@ class ChatHandler{
 		form_.append("uid", user.user_id);
 		form_.append("message", msg);
 		form_.append("time", tools.c_time());
+		form_.append("tzOffset", tools.time_offset());
 
 		const request = new XMLHttpRequest()
 		request.open("POST", form.action, true)

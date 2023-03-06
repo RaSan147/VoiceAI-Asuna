@@ -359,6 +359,8 @@ def chat(self: SH, *args, **kwargs):
 	_t, _time = post.get_part('time', decode=T)
 	_time = _time.strip()
 
+	_tz, _time_offset = post.get_part('tzOffset', decode=T)
+	_time_offset = _time_offset.strip()
 
 	if not _m or not _t:
 		raise PostError("Invalid post data")
@@ -382,8 +384,10 @@ def chat(self: SH, *args, **kwargs):
 		})()"""]
 		return self.send_json(out)
 
+	user.user_client_time_offset = int(_time_offset)/1000
+	user.user_client_time = int(_time)/1000
 
-	reply = basic_output(message, user, user_time=int(_time)/1000)
+	reply = basic_output(message, user)
 
 	if isinstance(reply, dict):
 		out.update(reply)

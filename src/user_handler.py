@@ -8,7 +8,7 @@ import inspect
 
 import F_sys
 import net_sys
-from TIME_sys import utc_to_bd_time
+import TIME_sys
 
 from CONFIG import appConfig
 from DS import GETdict, Flag
@@ -41,6 +41,11 @@ class User(GETdict):
 		self.flags = Flag()
 		self.chat = Flag()
 		self.chat.intent = {}
+		self.pointer = 0 # will be replaced on data read
+		self.user_client_time = 0 # in seconds
+		self.user_client_time_offset = 0 # in seconds
+		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
+		
 		#self.pointer = 0
 
 		# if the data asked for is already there
@@ -71,6 +76,7 @@ class User(GETdict):
 
 	# def __getattribute__(self, __name: str):
 	# 	return super().__getattribute__(__name)
+	
 
 	def save(self):
 		J = json.dumps(self, indent="\t", sort_keys=True)
@@ -100,7 +106,7 @@ class User(GETdict):
 		# so it will be determined later, on bot's reply
 	}
 
-	def add_chat(self, msg, time, user=1, parsed_msg="", rTo=-1, intent=[], context=[], user_time=0):
+	def add_chat(self, msg, time, user=1, parsed_msg="", rTo=-1, intent=[], context=[]):
 		"""
 		msg: message sent
 		time: time of message
@@ -124,7 +130,7 @@ class User(GETdict):
 		if user:
 			user= "USER"
 			# actual time on user side
-			chat["uTime"] = str(datetime.datetime.fromtimestamp(user_time))
+			chat["uTime"] = str(TIME_sys.ts2dt(self.user_client_time, self.user_client_time_offset))
 		else:
 			user= "BOT"
 
@@ -132,7 +138,7 @@ class User(GETdict):
 		id = self.msg_id
 		chat['id'] = id
 		chat['msg'] = msg # dict, contains msg, script and render mode
-		chat['time'] = str(utc_to_bd_time(time))
+		chat['time'] = str(TIME_sys.utc_to_bd_time(time))
 		chat["parsed_msg"] = parsed_msg
 		chat['rTo'] = rTo
 		chat['intent'] = "+".join(intent)
@@ -144,6 +150,10 @@ class User(GETdict):
 		F_sys.writer(pointer+'.json', 'w', J, self.user_path)
 
 		return id
+	
+
+	def get_user_dt(self):
+		return TIME_sys.ts2dt(self.user_client_time, self.user_client_time_offset)
 
 
 class UserHandler:
