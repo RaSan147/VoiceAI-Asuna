@@ -41,7 +41,7 @@ class User(GETdict):
 		self.flags = Flag()
 		self.chat = Flag()
 		self.chat.intent = {}
-		self.pointer = 0 # will be replaced on data read
+		self["pointer"] = 0 # will be replaced on data read
 		self.user_client_time = 0 # in seconds
 		self.user_client_time_offset = 0 # in seconds
 		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
