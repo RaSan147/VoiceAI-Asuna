@@ -59,8 +59,10 @@ ot.yes = ("Yeah!", "Sure...", "Sure!!" "Okkay~", "Okie~", "Okay!")
 ot.no = ("No", "Sorry but nope")
 ot.tell_time = ('The time is ', "It's ")
 
-ot.happy_emj = ("(◕‿◕)💞", " 😄", " 😇", " 😊", " ~", "...","", "")
-ot.sad_emj = ("(◕︵◕)", " 😢", " 😭", " 😞", " ~", "...","", "")
+ot.happy_emj = ("(◕‿◕)💞", "😄", 
+	"😇", "😊", "~", "...","", "")
+ot.sad_emj = ("😿", "😢", "😭", 
+	"😞", "😔", "~", "...","", "")
 
 ot.my_name_is = ["My name is ", "I am ", "Its ", "Call me ", "You can call me "]
 ot.call_me = ["You can call me ", "Call me ", "Its "]

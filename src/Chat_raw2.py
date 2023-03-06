@@ -35,7 +35,7 @@ from CONFIG import appConfig
 
 
 from chat_about_bot import patterns as about_bot_patterns
-
+from chat_what_extra import patterns as what_extra_patterns
 
 
 
@@ -484,6 +484,9 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 				rep('Sorry, No internet!')
 
 			intent("(whats)_the_news")
+			
+		elif check_patterns(what_extra_patterns(), ui)[0]:
+			return out
 
 		else:
 			rep(wikisearch(uiopen_raw, raw=ui, user=user))
@@ -786,7 +789,28 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 	
 	if out == '':
 		log_unknown(ui)
-		out = "Sorry, I don't understand..." + choice(ot.sad_emj)
+		out = (Rchoice("Sorry,", "My apologies.","I'm sorry...") + " I " + 
+			Rchoice(
+				Rchoice("don't","can't")+ " " +
+					Rchoice("understand", "figure out") + " " +
+					Rchoice("what you're saying", "what you've sent") + "... ",
+				
+				"don't know what to " +Rchoice("say", "reply") + "... "
+			) +
+		choice(ot.sad_emj)+ "\n\n" +
+		
+		Rchoice("I'm " +
+			Rchoice("still", "just", "currently", blank=1) + 
+			" learning " + 
+			Rchoice("basic conversion.", "simple conversion...", "how to speak.") +
+			Rchoice(" I am trying my best to be with you", blank=2)
+		,
+		
+			"I'm slowly learning new things every day with you 😇" +
+			Rchoice(" So don't give up on me...", blank=2),
+			
+		blank=1
+		))
 		
 		intent("unknown")
 
