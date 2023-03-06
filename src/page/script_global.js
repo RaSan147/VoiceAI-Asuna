@@ -86,7 +86,10 @@ class Tools {
 	}
 	time_offset() {
 		// returns the time offset in milliseconds
-		return new Date().getTimezoneOffset() * 60 * 1000;
+		// check https://stackoverflow.com/questions/60207534/new-date-gettimezoneoffset-returns-the-wrong-time-zone
+	
+	// for the reason of negative sign
+		return new Date().getTimezoneOffset() * 60 * 1000 * -1;
 	}
 	del_child(elm) {
 		if (typeof(elm) == "string") {
