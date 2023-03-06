@@ -210,7 +210,10 @@ class Tools {
 	}
 	
 	async is_installed(){
-		const listOfInstalledApps = await navigator.getInstalledRelatedApps();
+		var listOfInstalledApps = []
+		if("getInstalledRelatedApps" in navigator){
+			listOfInstalledApps  = await navigator.getInstalledRelatedApps();
+		}
 		console.log(listOfInstalledApps)
 		for (const app of listOfInstalledApps) {
 		// These fields are specified by the Web App Manifest spec.
