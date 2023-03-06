@@ -109,10 +109,10 @@ class USER{
 
 	logout(redirect=true) {
 		// logout
-		user.user_name = null;
-		user.user_id = null;
-		user.set_local_data();
-		if(redirect) user.redirect_2_login();
+		this.user_name = null;
+		this.user_id = null;
+		this.set_local_data();
+		if(redirect) this.redirect_2_login();
 	}
 
 }
