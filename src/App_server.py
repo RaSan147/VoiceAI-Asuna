@@ -380,7 +380,7 @@ def chat(self: SH, *args, **kwargs):
 		out["message"] = "User not found!\nPlease register first."
 		out["script"] = ["""(async () => {
 			tools.sleep(3000)
-			user.redirect_2_login()
+			user.logout()
 		})()"""]
 		return self.send_json(out)
 

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import pytz
 
 
+
 def get_time_offset():
 	utc = datetime.utcnow()
 	local = datetime.now()
@@ -15,8 +16,8 @@ def utc2local(utc_dt):
 	offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
 	return utc_dt + offset
 	
-def local2bd_time(time):
-	return datetime.fromtimestamp(time, tz=pytz.timezone('Asia/Dhaka'))
+def local2bd_time(ts):
+	return datetime.fromtimestamp(ts, tz=pytz.timezone('Asia/Dhaka'))
 	
 def local2bd_dt(dt=datetime.now()):
 	dt = dt.astimezone(pytz.timezone('Asia/Dhaka'))

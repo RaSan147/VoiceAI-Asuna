@@ -3,7 +3,7 @@ import json
 import hashlib
 import time, datetime
 import traceback
-import inspect
+# import inspect
 
 
 import F_sys
@@ -41,12 +41,12 @@ class User(GETdict):
 		self.flags = Flag()
 		self.chat = Flag()
 		self.chat.intent = {}
-		self["pointer"] = 0 # will be replaced on data read
+
 		self.user_client_time = 0 # in seconds
 		self.user_client_time_offset = 0 # in seconds
 		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
-		
-		#self.pointer = 0
+		self.pointer = self.msg_id = 0
+	
 
 		# if the data asked for is already there
 		data = F_sys.reader(self.file_path, on_missing=None)
@@ -55,11 +55,12 @@ class User(GETdict):
 
 		try:
 			json_data = json.loads(data)
-			for key in json_data:
-				self[key] = json_data[key]
-		except Exception:
+			#for key in json_data:
+#				self[key] = json_data[key]
+			self.update(json_data)
+		except Exception as e:
 			traceback.print_exc()
-			raise Exception("User data corrupted")
+			raise Exception("User data corrupted") from e
 				
 
 	def __setitem__(self, key, value):
@@ -79,11 +80,14 @@ class User(GETdict):
 	
 
 	def save(self):
-		J = json.dumps(self, indent="\t", sort_keys=True)
-		F_sys.writer("__init__.json", 'w', J, self.user_path)
+		"""Saves updated dict in users folder
+		"""
+		new = json.dumps(self, indent="\t", sort_keys=True)
+		F_sys.writer("__init__.json", 'w', new, self.user_path)
 
 	def get_chat(self, pointer=-1):
-		if pointer == -1: pointer = self.pointer
+		if pointer == -1:
+			pointer = self.pointer
 		pointer = str(pointer)
 		file_path = os.path.join(self.user_path, pointer+'.json')
 
@@ -106,10 +110,10 @@ class User(GETdict):
 		# so it will be determined later, on bot's reply
 	}
 
-	def add_chat(self, msg, time, user=1, parsed_msg="", rTo=-1, intent=[], context=[]):
+	def add_chat(self, msg, mtime, user=1, parsed_msg="", rTo=-1, intent=(), context=()):
 		"""
 		msg: message sent
-		time: time of message
+		mtime: time of message
 		user: 1 if user, 0 if bot
 		parsed_msg: parsed message by basic_output
 		rTo: reply to message id (-1 if not reply)
@@ -138,7 +142,7 @@ class User(GETdict):
 		id = self.msg_id
 		chat['id'] = id
 		chat['msg'] = msg # dict, contains msg, script and render mode
-		chat['time'] = str(TIME_sys.utc_to_bd_time(time))
+		chat['time'] = str(TIME_sys.utc_to_bd_time(mtime))
 		chat["parsed_msg"] = parsed_msg
 		chat['rTo'] = rTo
 		chat['intent'] = "+".join(intent)
@@ -183,6 +187,7 @@ class UserHandler:
 
 
 	def u_path(self, username):
+		"""returns user folder path"""
 		return os.path.join(appConfig.user_data_dir, username)
 
 	# def login(self, username, password):
@@ -224,8 +229,8 @@ class UserHandler:
 			"pointer": 0,
 		}
 
-		J = json.dumps(u_data, indent=2)
-		F_sys.writer("__init__.json", 'w', J, self.u_path(username))
+		new = json.dumps(u_data, indent=2)
+		F_sys.writer("__init__.json", 'w', new, self.u_path(username))
 
 		return id
 
@@ -238,9 +243,11 @@ class UserHandler:
 
 		# merge data
 		temp = self.default_user
-		for key in temp:
-			if key not in user:
-				user[key] = temp[key]
+		#for key in temp:
+		#	if key not in user:
+		#		user[key] = temp[key]
+		temp = {**temp, **user}
+		self.default_user.update(temp)
 
 	def server_signup(self, username, password):
 		# check if username is already taken
