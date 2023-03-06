@@ -106,7 +106,7 @@ class Tool_belt:
 					return m.group(0)
 				
 			else:
-				if string in i:
+				if i in string:
 					return i
 					
 	def is_in(self, patterns:Union[str,re.Pattern], string:str):

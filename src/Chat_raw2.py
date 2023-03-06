@@ -293,7 +293,10 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 
 	def intent(i):
 		nonlocal _intent
+		
 		_intent.append(i)
+		# print(_intent)
+		
 		user.chat.intent[id] = _intent
 		
 	def rep(msg):
@@ -340,9 +343,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 					found = True
 					# tell me about yourself *and* your favourite hobby
 				
-		if remove_match:
-			return " and ".join(uiParts)
-		return found
+
+		return (found, " and ".join(uiParts))
 	
 
 
@@ -351,6 +353,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 	
 
 	print("Flags: ", user.flags)
+	print("ID:", id)
 
 	if user.flags.parrot:
 		if re_is_in(ip.stop_parrot, ui):
@@ -362,10 +365,9 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			intent('parrot_say')
 		return out
 		
-	if check_patterns(about_bot_patterns(), ui):
-		return out
-
+	
 	if re_starts(ip.hi, ui):
+		print(9999999)
 		if not user.flags.hi_bit:
 			user.flags.hi_bit = 0
 		if user.flags.hi_bit<2:
@@ -381,6 +383,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			user.flags.hi_bit = 0
 
 		intent('say_hi')
+		
+		#return #TODO: DELETE IT
 
 	elif re_starts(ip.hello, ui):
 		if not user.flags.hello_bit:
@@ -398,8 +402,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 
 		intent('say_hello')
 		
-	if check_patterns(about_bot_patterns(), ui, action="remove"):
-		pass
+	_msg_is_about_ai, ui = check_patterns(about_bot_patterns(), ui, action="remove")
 
 		
 	
@@ -694,7 +697,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		intent("parrot_on")
 
 
-	elif re_check (ip.whats_up, ui):
+	elif re_check(ip.whats_up, ui):
 		rep( choice(ot.on_whats_up))
 		
 		intent("whats_up")

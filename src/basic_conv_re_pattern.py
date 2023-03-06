@@ -332,7 +332,7 @@ ip.latest_news = [
 
 ip.tell_latest_news = ip.latest_news + [
 	"anything interesting happening",
-	C("(do ((yo)?u|y(a|o)))? ?(got|have) (some|any)(thing)? (news|headlines?|interesting)")
+	C("(do ((yo)?u|y(a|o)))? ?(got|have) (some|any)(thing)? (news|headlines?|interesting)(today)?")
 ]
 
 
