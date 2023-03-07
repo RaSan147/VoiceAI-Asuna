@@ -1,6 +1,6 @@
 var app_installed = false
 var notify_install = false // is INSTALL button visible
-var is_standalone = false
+var is_standalone = tools.is_standalone()
 
 
 if (0 && 'serviceWorker' in navigator) {
