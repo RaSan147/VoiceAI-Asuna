@@ -1,4 +1,5 @@
 
+
 if (window.history && "pushState" in history) {
 	// because JSHint told me to
 	// handle forward/back buttons
@@ -7,16 +8,27 @@ if (window.history && "pushState" in history) {
 		evt.preventDefault();
 		// guard against popstate event on chrome init
 		//log(evt.state)
-		if(pages.current_page=="chat"){
-			pages.current_page= "home"
-			
-			history.replaceState({page:"home"}, "Home", ".")
-
-			pages._to_anime()
-			return
+		if(popup_msg.opened){
+			popup_msg.hide()
+			//fake_push()
+			return false
 		}
-		//location.reload();
+		if(sidebar_control.is_open("R")){
+			sidebar_control._closeNavR()()
+			//fake_push()
+			return false
+		}
+		
+		if(pages.current_page=="chat"){
+			pages.current_page = "home"
+			//fake_push()
+			pages._to_anime()
+			return false
+		}
+		
+		//location.reload(true);
 	};
 
 }
+
 

@@ -172,7 +172,7 @@ class Theme_Controller {
 
 		link.type = "text/css";
 		link.media = 'print';
-		link.href = "https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@18657a9/css/all.min.css";
+		link.href = "https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@44659d9/css/all.min.css";
 		link.onload = function () {
 			log("fa loaded")
 			that.fa_ok = true;
@@ -488,12 +488,9 @@ class ChatSidebarControl {
 			true
 		);
 	}
-
-	toggleNavR() {
-		if (this.is_open("R")) {
-			this.closeNavR();
-			return false;
-		}
+	
+	openNavR() {
+		tools.fake_push()
 
 		tools.toggle_scroll(0);
 		this.sidebar_bg.style.display = "block";
@@ -502,8 +499,16 @@ class ChatSidebarControl {
 		byId("app_header").classList.toggle("top-titleR-active");
 	}
 
-
-	closeNavR() {
+	toggleNavR() {
+		if (this.is_open("R")) {
+			this.closeNavR();
+			return;
+		}
+		
+		this.openNavR()
+	}
+	
+	_closeNavR(){
 		this.right_bar.classList.remove("mySidebar-active");
 		this.right_bar.classList.add("mySidebar-inactive");
 
@@ -513,6 +518,11 @@ class ChatSidebarControl {
 		tools.toggle_scroll(1);
 
 		top_bar.dont_move = false; // allow moving the top bar
+	}
+
+
+	closeNavR() {
+		history.back()
 	}
 
 	closeNav() {

@@ -155,6 +155,10 @@ class Tools {
 		link.download = filename;
 		link.click();
 	}
+	
+	fake_push(){
+		history.pushState({}, "AI Asuna", ".")
+	}
 
 	full_path(rel_path){
 		let fake_a = createElement("a")
@@ -255,6 +259,7 @@ class Popup_Msg {
 		this.made_popup = false;
 		this.init()
 		this.create()
+		this.opened = 0;
 	}
 	init() {
 		log("Initializing popup message")
@@ -382,7 +387,7 @@ opacity: 1;
 		close_btn = createElement("div");
 		close_btn.classList.add("popup-close-btn")
 		close_btn.onclick = function() {
-			that.close()
+			popup_msg.close()
 		}
 		close_btn.innerHTML = "&times;";
 		popup_box.appendChild(close_btn)
@@ -409,35 +414,32 @@ opacity: 1;
 	hide() {
 		this.popup_obj.classList.remove("active");
 		tools.toggle_scroll(1)
+		this.opened = 0
 	}
 	dismiss() {
-		this.hide()
+
+		history.back() //this.hide()
 		tools.del_child(this.header);
 		tools.del_child(this.content);
 		this.made_popup = false;
+		
 	}
-	async togglePopup(toggle_scroll = true) {
-		if (!this.made_popup) {
-			return
-		}
-		this.popup_obj.classList.toggle("active");
-		if (toggle_scroll) {
-			tools.toggle_scroll();
-		}
-		// log(tools.hasClass(this.popup_obj, "active"))
-		if (!tools.hasClass(this.popup_obj, "active")) {
-			this.close()
-		}
-	}
+
 	async open_popup(allow_scroll = false) {
 		if (!this.made_popup) {
 			return
 		}
+		
+		this.opened = 1
 		this.popup_obj.classList.add("active");
+		config.popup_msg_open = this;
+		
 		if (!allow_scroll) {
 			tools.toggle_scroll(0);
 			this.scroll_disabled = true;
 		}
+		
+		tools.fake_push()
 	}
 
 	async show(allow_scroll = false) {

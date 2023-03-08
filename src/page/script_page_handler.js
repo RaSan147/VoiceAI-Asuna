@@ -15,8 +15,7 @@ class PAGES{
 	}
 	
 	to_chat(){
-		history.pushState({page: "chat"}, "Chat AI", "#chat")
-		log(history)
+		tools.fake_push()
 		this._to_chat()
 	}
 	
@@ -31,7 +30,7 @@ class PAGES{
 		if (this.current_page == "home") return;
 		// history.pushState({page: "anime"}, "Anime AI", "#anime")
 		history.back()
-		log(history)
+
 		
 		this._to_anime()
 	}
