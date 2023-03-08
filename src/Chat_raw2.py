@@ -330,8 +330,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		uiParts = re.split(" (?:a?nd|&) ", ui)
 		uiRParts = re.split(" (?:a?nd|&) ", ui_raw, flags=re.IGNORECASE)
 		
-		print(uiRParts)
-		
 		to_del = []
 		remove_match = False 
 		if action=="remove":
