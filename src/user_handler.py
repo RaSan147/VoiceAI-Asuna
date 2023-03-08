@@ -45,7 +45,7 @@ class User(GETdict):
 		self.user_client_time = 0 # in seconds
 		self.user_client_time_offset = 0 # in seconds
 		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
-		self.pointer = self.msg_id = 0
+		# self.pointer = self.msg_id = 0
 	
 
 		# if the data asked for is already there

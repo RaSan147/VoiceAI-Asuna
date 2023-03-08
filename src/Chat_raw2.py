@@ -802,12 +802,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		Rchoice("I'm " +
 			Rchoice("still", "just", "currently", blank=1) + 
 			" learning " + 
-			Rchoice("basic conversion.", "simple conversion...", "how to speak.") +
+			Rchoice("basic conversation.", "simple conversation...", "how to speak.") +
 			Rchoice(" I am trying my best to be with you", blank=2)
 		,
 		
 			"I'm slowly learning new things every day with you 😇" +
-			Rchoice(" So don't give up on me...", blank=2),
+			Rchoice(" So don't give up on me...", blank=1),
 			
 		blank=1
 		))
@@ -823,11 +823,34 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 # tnt('/<style=a>/===hell===o')
 
 if __name__=="__main__":
+	"""user = user_handler.get_user("test")
+	user = user_handler.collection(user.username, user.id)
+	user_handler.get_skin_link(user.username, user.id)
+
+	user.user_client_time_offset = TIME_sys.get_time_offset()
+	a = set()
+	for i in range(2000):
+		inp = "random"
+		user.user_client_time = time()
+
+		msg = basic_output(inp, user)
+		if not msg:
+			continue #break
+		msg = msg["message"]
+		if msg == "exit": break
+		a.add(remove_style(msg))
+	
+	print(len(a))
+	print(a)
+	"""
+	
+	
 	user = user_handler.get_user("Ray")
 	user = user_handler.collection(user.username, user.id)
 	user_handler.get_skin_link(user.username, user.id)
 
 	user.user_client_time_offset = TIME_sys.get_time_offset()
+	
 	while 1:
 		inp = input(" >> ")
 		user.user_client_time = time()

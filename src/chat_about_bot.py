@@ -31,8 +31,8 @@ def patterns(context=[]):
 		C("(about )?((yo)?u|y(a|o))('| )?r fav(ourite)? (game|hobby|activity)"),
 		C("(about )?((yo)?u|y(a|o))('| )?r (hobb(y|ies)|pastimes?)"),
 	],
-	(Rchoice("Besides cooking, ", blank=2)+
-		"I like to play different types of games" + Rchoice("(specially anything with friends)", blank=1) + 
+	(Rchoice("Besides cooking, ", blank=1)+
+		"I like to play different types of games" + Rchoice(" (specially anything with friends)", blank=1) + 
 		". To be honest, my best game experience was from Sword Art Online." +
 		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", blank=1), blank=1)+
 		"I turned into our real world, fantacy into reality...\n"+
