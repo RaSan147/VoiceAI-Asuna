@@ -1,4 +1,23 @@
 
+:root {
+	--theme-background: #222;
+	--theme-color-focused: #00b7ff;
+	--theme-color: #1f83b6;
+	--theme-color-text: #fff;
+	--theme-color-text2: #3ab7ff;
+	--theme-hover-color: #444;
+	--button-background-color: #555;
+	--button-background-color-focused: #444;
+	--button-border-focused: #777;
+	--button-border: #666;
+	--button-border-radius: 0;
+	--border-width: 0;
+	--border-color: #000;
+	--space-height: 3em;
+	--tick-spacing: 0;
+
+}
+
 
 body {
 	/* position: relative; */
@@ -27,6 +46,31 @@ button {
 	scrollbar-color: #0f0f0f #454a4d;
 	scroll-behavior: smooth;
 }
+
+
+
+/* ++ patch to make things neat (remove I cursor) ++ */
+p,
+span {
+	cursor: default;
+}
+
+button,
+button * {
+	cursor: pointer !important;
+}
+
+/* ++++++++++++++++++++++++++++++++++++++++++++++++ */
+
+img {
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 
 
 .center {
@@ -249,6 +293,65 @@ a {
 
 
 
+
+
+
+
+
+
+
+
+
+.accordion {
+	background-color: var(--button-background-color);
+	color: var(--theme-color-text);
+	cursor: pointer;
+	padding: 13px;
+	width: 85%;
+	border: none;
+	text-align: left;
+	outline: none;
+	font-size: 15px;
+	transition: all 0.4s;
+	border-radius: 3px;
+	margin: 0 auto 10px auto;
+	box-shadow: 0 2px 3px 1px #3d8be4;
+}
+
+.accordion-button {
+	text-align: center;
+	font-size: larger;
+	font-weight: bold;
+	padding: 13px 6px;
+}
+
+.accordion>.tron-switch {
+	margin-right: 5px;
+}
+
+.accordion-active,
+.accordion:hover {
+	background-color: var(--button-background-color-focused);
+	color: var(--theme-color-text2);
+	box-shadow: 0 2px 3px 1px #d8d8d8;
+}
+
+.accordion-panel {
+	padding: 0 10px 10px;
+	display: none;
+	background-color: inherit;
+	color: #fff;
+	overflow: hidden;
+	transition: all 0.8s;
+}
+
+.accordion-panel-heading {
+	line-height: 40px;
+}
+
+
+
+
 .top_bar {
 	background-color: #111;
 	position: fixed;
@@ -273,6 +376,114 @@ a {
 	font-size: 20px;
 	font-family: sans-serif;
 }
+
+
+.sidebar {
+	display: block;
+	opacity: 0.8;
+	height: 100%;
+	width: 300px;
+	position: fixed;
+	z-index: 5;
+	top: 0;
+	background-color: #111;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	padding-top: 60px;
+	scrollbar-width: thin;
+	scrollbar-color: #2b2929 #9c9898;
+}
+
+#sidebar_bg {
+	display: none;
+	position: fixed;
+	z-index: 4;
+	padding-top: inherit;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
+#mySidebarL {
+	direction: rtl;
+}
+
+.sidebarR {
+	right: -300px;
+}
+
+
+.mySidebar-inactive {
+	transition: all 0.3s;
+}
+
+.mySidebar-active{
+	display: block;
+	opacity: 1;
+	transition: all 0.3s;
+}
+
+.mySidebar-active.sidebarR{
+	right: 0;
+}
+
+
+
+.sidebar-content {
+	direction: ltr;
+}
+
+
+.sidebar-end {
+	position: relative;
+	max-height: 80%;
+	min-height: 180px;
+	opacity: 0;
+}
+
+
+
+.sidebar a:hover {
+	color: #f1f1f1;
+	background-color: #444;
+}
+
+.sidebar .close-sidebar {
+	position: absolute;
+	top: 0;
+	right: 20px;
+	font-size: 40px;
+	width: 80%;
+	height: 28px;
+	border: none;
+	margin-top: -5px;
+	color: white;
+	cursor: pointer;
+}
+
+.sidebar .close-sidebar:hover {
+	background-color: inherit;
+}
+
+
+
+
+/* change value on media size */
+@media screen and (max-width: 450px) {
+	.sidebar {
+		width: 80%;
+	}
+}
+
+@media screen and (max-width: 340px) {
+	.sidebar {
+		width: 100vw;
+		overflow: auto;
+	}
+}
+
 
 
 
@@ -334,10 +545,6 @@ a {
 
 	.sidebar button {
 		font-size: 18px;
-	}
-
-	.proj-panel {
-		font-size: 22px;
 	}
 }
 

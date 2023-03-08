@@ -245,7 +245,9 @@ var tools = new Tools();
 tools.is_installed()
 
 '#########################################'
-tools.enable_debug() // TODO: Disable this in production
+if(localStorage.getItem('uname')=="Ray"){
+tools.enable_debug() // TODO:[DONE] Disable this in production 
+}
 '#########################################'
 
 class Popup_Msg {

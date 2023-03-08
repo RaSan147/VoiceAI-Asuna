@@ -4,6 +4,67 @@ class AppConfig {
 	constructor() {
 		this.location = window.location;
 	}
+	
+	show_author_note() {
+		const header = "Author's Note"
+		const content = `
+		<div style="text-align:left;">
+		<p><b>1.</b> This app isn't ChatGPT or AI based, instead it uses patterns to recognize messages. So it can't recognize everything you speak of. Check <a href="https://github.com/RaSan147/VoiceAI-Asuna#common-io-similar-inputs-maywill-work-too">demo inputs</a></p>
+<p><b>2.</b> Since its in alpha state, it uses user inputs anonymously to improve the system. So <u>please refrain from sending private data</u>. So feel free to text anything you want, to help improving this project.</p>
+<p><b>3.</b> Voice module is still in testing phase (2d model will act according to voice). So not putting it in live demo yet.</p>
+<p><b>4.</b> If you like it or got idea or want to improve, please file an issue <a href="https://github.com/RaSan147/VoiceAI-Asuna/issues ">here</a> and a <b>Star</b> would be inspiring.</p>
+
+</div>
+<br>
+<p>Thanks</p>
+<br>
+		`
+		popup_msg.createPopup(header, content);
+		popup_msg.show()
+		config.popup_msg_open = popup_msg;
+	}
+	
+	
+	show_help_note() {
+		const header = "Common IO: (similar inputs may/will work too)"
+		const content = `
+	<style>
+	.markdown {
+		text-align: left;
+	}
+	.markdown span {
+		font-family: monospace;
+		background: #000;
+		color: white;
+		border-radius: 3px;
+		padding: 3px;
+	}
+	.markdown li{
+		line-height: 20px;
+	}
+</style>
+
+<div class="markdown">
+
+<li>  Basic <span>hiiii</span>, <span>hello</span>
+</li> <li>  <span>What's your/my name</span> / <span>how're u</span>
+</li> <li>  <span>Whats the time</span> / <span>tell time</span>
+</li> <li>  <ins><b>Static Q/A</b></ins>, like <span>whats newtons 3rd law</span> / <span>whos the president of canada</span> / <span>whats root(69+420)</span>
+</li> <li>  <span>Whats the latest news</span> / <span>news highlights</span>
+</li> <li>  <span>Tell me about yourself</span> / <span>... your hobby/favorite game/anime</span>
+</li> <li>  <span>Love ya</span>
+</li> <li>  <span>Repeat after me</span> -> will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
+</li> <li>  <span>change dress</span> to change costumes and <span>change room</span> to switch background 
+</li> <li>  <b>Many more (forgot mostly) and many more coming soon</b>
+</li> 
+
+</div>
+`
+	popup_msg.createPopup(header, content);
+		popup_msg.show()
+		config.popup_msg_open = popup_msg;
+	}
+	
 }
 
 var appConfig = new AppConfig();
@@ -341,9 +402,10 @@ class Top_Bar {
 var top_bar = new Top_Bar();
 top_bar.hide();
 
+
+/*
 window.onscroll = function () {
-	// theres no need for this now
-	return false;
+
 
 	if(pages.current_page=="chat") return false;
 	var currentScrollPos = window.pageYOffset;
@@ -369,9 +431,6 @@ window.addEventListener('touchstart', (e) => {
   }, false);
   
 window.addEventListener('touchend', (e) => {
-	return false;
-	// there is no need for this now
-
 	let deltaX;
 	let deltaY;
 
@@ -390,11 +449,11 @@ window.addEventListener('touchend', (e) => {
 	}
   }, false);
 
-
+*/
 // r_u_sure()
 
 
-
+{ // why bracket? To make is isolated, coz I don't want variable names conflict with these mini functions or things
 const resizer = () => {
 	theme_controller.getViewportSize();
 	document.body.style.height = vh + "px";
@@ -403,8 +462,65 @@ const resizer = () => {
 window.addEventListener("resize", (_e) => resizer());
 
 document.addEventListener("DOMContentLoaded", (_e) => resizer());
+}
 
 
+
+
+class ChatSidebarControl {
+	constructor() {
+		this.right_bar = byId("mySidebarR");
+		this.sidebar_bg = byId("sidebar_bg");
+		
+		this.sidebar_bg.onclick = function () {
+			sidebar_control.closeNav();
+		};
+
+
+	}
+
+
+
+	is_open(side) {
+		return tools.hasClass(
+			byId("mySidebar" + side),
+			"mySidebar-active",
+			true
+		);
+	}
+
+	toggleNavR() {
+		if (this.is_open("R")) {
+			this.closeNavR();
+			return false;
+		}
+
+		tools.toggle_scroll(0);
+		this.sidebar_bg.style.display = "block";
+		this.right_bar.classList.add("mySidebar-active");
+		this.right_bar.classList.remove("mySidebar-inactive");
+		byId("app_header").classList.toggle("top-titleR-active");
+	}
+
+
+	closeNavR() {
+		this.right_bar.classList.remove("mySidebar-active");
+		this.right_bar.classList.add("mySidebar-inactive");
+
+		this.sidebar_bg.style.display = "none";
+
+		tools.sleep(3000);
+		tools.toggle_scroll(1);
+
+		top_bar.dont_move = false; // allow moving the top bar
+	}
+
+	closeNav() {
+		this.closeNavR();
+	}
+}
+
+var sidebar_control = new ChatSidebarControl()
 
 
 

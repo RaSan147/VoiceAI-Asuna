@@ -139,12 +139,8 @@ function isChrome() {
 function to_install_if_not_chrome(){
 	install_btn.style.display="block";
 	install_btn.onclick= () => {
-		popup_msg.show();
-	};
-	var body = createElement("div");
-	var msg = createElement("p");
-	
-	msg.innerHTML = `To install, please click <b>&#8962; Add to Home Screen</b>
+
+	const msg = `To install, please click <b>⌂ Add to Home Screen</b> from browser menu <b> &vellip;</b>
 	<br>
 	<h2>Already installed?</h2>
 	Kindly open it from <b>Home screen</b>
@@ -156,6 +152,9 @@ function to_install_if_not_chrome(){
 	
 	popup_msg.createPopup("Install as PWA for the best Experience", msg
 		);
+		
+	popup_msg.show();
+	};
 }
 
 if(!is_standalone && !isChrome() && config.is_touch_device){
