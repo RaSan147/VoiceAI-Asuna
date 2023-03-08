@@ -60,7 +60,6 @@ def web_go(link):
 # web_go('C:/Users/Dell/Documents/Python/Project_Asuna/datapy.html')
 def linker(link):
 	for i in links_li:
-		# print(i[0])
 		if link in i:
 			web_go(i[0])
 			return True
@@ -243,6 +242,8 @@ def basic_output(INPUT, user: User = None, username: str = None):
 	msg = message_dict.copy()
 	x = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	intent = user.chat.intent[id]
+	
+	xprint(f"/i/intent:/=/ {intent}")
 
 	msg["rTo"] = id # reply to id # can be used in HTML to scroll to the message
 
@@ -324,27 +325,39 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			return outputs
 		return choice(outputs)
 		
-	def check_patterns(patterns, ui, action=None):
+	def check_patterns(patterns, ui=ui, ui_raw=ui_raw, action=None):
 		found = False
-		uiParts = ui.split(" and ")
+		uiParts = re.split(" (?:a?nd|&) ", ui)
+		uiRParts = re.split(" (?:a?nd|&) ", ui_raw, flags=re.IGNORECASE)
+		
+		print(uiRParts)
+		
+		to_del = []
 		remove_match = False 
 		if action=="remove":
 			remove_match =True
-		for n, i in enumerate(uiParts):
-			for ptrn, otpt, intnt in patterns:
+		
+		for ptrn, otpt, intnt in patterns:
+			for n, i in enumerate(uiParts):
 				m = re_search(ptrn, i)
 				if m:
 					rep(rand_out(otpt))
 					intent(intnt)
 					
 					if remove_match:
-						uiParts[n] = re.sub(ptrn, '', i)
+						#uiParts[n] = re.sub(m.Pattern, '', i)
+						#uiParts[n] = uiParts[n].replace(m.group(0), "")
+						to_del.append(n)
 						
 					found = True
 					# tell me about yourself *and* your favourite hobby
-				
+					continue # so that same question won't give repeated answers 
+		
+		for index in sorted(to_del, reverse=True):
+			uiParts.pop(index)
+			uiRParts.pop(index)
 
-		return (found, " and ".join(uiParts))
+		return (found, " and ".join(uiParts), " and ".join(uiRParts))
 	
 
 
@@ -397,8 +410,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 			user.flags.hello_bit = 0
 
 		intent('say_hello')
-		
-	_msg_is_about_ai, ui = check_patterns(about_bot_patterns(), ui, action="remove")
 
 		
 	
@@ -428,6 +439,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 	elif re_check(ip.whats_, ui_raw):
 		_what = re_search(ip.whats_, ui)
 		_what_raw = re_search(ip.whats_, ui_raw)
+	
 		uiopen = remove_suffix(_what.group("query"))
 		uiopen_raw = remove_suffix(_what_raw.group("query"))
 		print("query:", uiopen_raw)
@@ -485,7 +497,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 
 			intent("(whats)_the_news")
 			
-		elif check_patterns(what_extra_patterns(), ui)[0]:
+		elif check_patterns(what_extra_patterns(), ui=uiopen, ui_raw=uiopen_raw, action="remove")[0]:
 			return out
 
 		else:
@@ -656,7 +668,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		else:
 			rep('No such link found')
 
-		print(link)
+		
 		intent("goto")
 
 	elif re_starts(ip.search, ui):
@@ -785,6 +797,11 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int, user_time=0):
 		intent("exit")
 
 		return choice(li_bye)+Rchoice(f" {user.nickname}", blank=1)+ Rchoice('', '!', '.')+ Rchoice('👋😄', '')
+		
+	_msg_is_about_ai, ui, ui_raw = check_patterns(about_bot_patterns(), action="remove")
+	
+	if (not ui) and out:
+		return out
 
 	
 	if out == '':

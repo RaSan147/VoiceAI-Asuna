@@ -3,12 +3,12 @@
 body {
 	/* position: relative; */
 	/* height: auto; */
-	overflow: hidden !important;
+	/*overflow: hidden !important;*/
 	/* max-width: 100vw; */
 }
 
 html {
-	overflow: hidden !important;
+	/*overflow: hidden !important;*/
 }
 html,body{margin:0;padding:0;height: 100%; }
 html,
