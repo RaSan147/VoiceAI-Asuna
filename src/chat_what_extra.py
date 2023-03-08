@@ -14,7 +14,7 @@ def patterns(context=[]):
 	return [
 [
 	[
-		C(r"((yo)?u|y(a|o)) doing?"),
+		C(r"((yo)?u|y(a|o)) (doing?|up ?to)"),
 	],
 	(Rchoice("Just thinking about you"+ Rchoice(" and waiting for your text", blank=2)+".",
 		"Nothing particular... Just chatting with you ☺️",
