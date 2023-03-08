@@ -4,7 +4,7 @@ PROJECT Asuna
 
 Welcome to project Asuna.
 
-## Live Demo: https://aigirl.repl.co
+## Live Demo (voice unavailable): https://aigirl.repl.co
 
 # Description:
 * **This is not a ChatGPT or full blown all knowing AI**
