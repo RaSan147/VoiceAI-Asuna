@@ -29,10 +29,7 @@ class PAGES{
 	to_anime(){
 		if (this.current_page == "home") return;
 		// history.pushState({page: "anime"}, "Anime AI", "#anime")
-		history.back()
-
-		
-		this._to_anime()
+		history.back(); // this._to_anime()
 	}
 }
 

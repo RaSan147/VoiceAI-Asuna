@@ -95,7 +95,7 @@ def send_favico(self: SH, *args, **kwargs):
 	re-direct favicon.ico request to cloud to make server less file bloated
 	"""
 	self.send_response(301)
-	self.send_header('Location','https://cdn.jsdelivr.net/gh/RaSan147/py_httpserver_Ult@main/assets/favicon.ico')
+	self.send_header('Location','/icons/icon-512x512.png')
 	self.end_headers()
 	return None
 
