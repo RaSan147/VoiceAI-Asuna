@@ -72,7 +72,7 @@ Welcome to project Asuna.
 * **Many more (forgot mostly) and many more coming soon**
 
 
-Thanks to:
+# Thanks to:
 0. Reki Kawahara and abec (for creating Asuna)
 1. Sony group (for Wake me up Asuna App idea and illustrations)
 2. Replit for continuously hosting Demo link for free
