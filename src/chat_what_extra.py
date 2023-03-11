@@ -1,7 +1,7 @@
 from random import choice, shuffle
 import re
 from REGEX_TOOLS import re_check, re_is_in, re_starts
-from basic_conv_re_pattern import C,  merge, check_context
+from basic_conv_re_pattern import C
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -9,8 +9,12 @@ from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 from OS_sys import null
 
 from collections import Counter
-def patterns(context=Counter(), context_func=null, prev_intent=[]):
-	"""context: previous message intent
+def patterns(context=Counter(), check_context=null):
+	"""
+	context: Counter object to keep track of previous message intents
+	check_context: function to check if someting is in the prev msg intent (context)
+
+
 	"""
 	return [
 [
@@ -27,8 +31,8 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 ],
 [
 	[
-		C("(about )?((yo)?u|y(a|o))('| )?r fav(ourite)? (game|hobby|activity)"),
-		C("(about )?((yo)?u|y(a|o))('| )?r (hobb(y|ies)|pastimes?)"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(ourite)? (game|hobby|activity)"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r (hobb(y|ies)|pastimes?)"),
 	],
 	(Rchoice("Besides cooking, ", blank=2)+
 		"I like to play different types of games" + Rchoice("(specially anything with friends)", blank=1) + 
@@ -45,8 +49,8 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 ],
 [
 	[
-		C("(about )?(the )?food (items? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
-		C("(about )?((yo)?u|y(a|o))('| )?r fav(orite)? food( items?)?( most|(a )?lot)?"),
+		C(r"(about )?(the )?food (items? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(orite)? food( items?)?( most|(a )?lot)?"),
 	],
 	(Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
@@ -57,11 +61,11 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 ],
 [
 	[
-		C("(about )?(the )?anime (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
-		C("(about )?((yo)?u|y(a|o))('| )?r fav(orite)? anime( shows?)?( most|(a )?lot)?"),
+		C(r"(about )?(the )?anime (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(orite)? anime( shows?)?( most|(a )?lot)?"),
 	],
 	(
-		("" if check_context(prev_intent, ["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
+		("" if check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
 		Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
 		"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my leage. ",
 		"I do watch anime on free times, but I try to watch short ones. ") + "\n" +

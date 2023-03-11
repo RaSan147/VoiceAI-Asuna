@@ -41,7 +41,7 @@ from CONFIG import appConfig
 from chat_about_bot import patterns as about_bot_patterns
 from chat_what_extra import patterns as what_extra_patterns
 from chat_expressions import patterns as expressions_patterns
-
+from chat_can_you import patterns as can_you_patterns
 
 bbc_topic = 'Asia_url'
 
@@ -167,60 +167,38 @@ def pre_rem_bot_call(ui):
 	""" 
 		remove *hey* whats ....
 		remove *hey Asuna* whats ....
-		remove *can you* ....
-		remove *will you* ....
-		remove *do you know* ....
 
 		"""
 	nick = "<:ai_name>"
-	# ui_parts = ui.split()
-	# if len(ui_parts)<2:
-	# 	# no job here
-	# 	return ui
-
-	# ui_LParts = ui.lower().split()
-	
-
-	# bkp = ui_parts.copy()
-	# Lbkp = ui_LParts.copy()
-	
-	# if ui_LParts[0] in ("hey", "miss", "dear", "yo"):
-	# 	ui_parts.pop(0)
-	# 	ui_LParts.pop(0)
-	# if ui_LParts[0] in ("girl", "babe", nick):
-	# 	ui_parts.pop(0)
-
 	ui = re.sub(rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})? ', '', ui, flags=re.IGNORECASE)
 
 
-	# if ui_LParts[0] in ("can", "will", "do"):
-	# 	ui_parts.pop(0)
-	# 	ui_LParts.pop(0)
-	# 	if ui_LParts[0] in ("you", "u"):
-	# 		ui_parts.pop(0)
-	# 		ui_LParts.pop(0)
-	# 		if ui_LParts[0] in ("know", "tell", "remember", "think"):
-	# 			ui_parts.pop(0)
-	# 			ui_LParts.pop(0)
-	# 			if ui_LParts[0] in ("of", "regarding"):
-	# 				ui_parts[0] = "about"
-	# 				ui_LParts[0] = "about"
-
-
 	ui = re.sub(r'^please ', '', ui, flags=re.IGNORECASE)
-	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please )?(even )?(know|tell|remember|speak|say)( me)? )(?P<msg>.+)', r'\g<msg>', ui, flags=re.IGNORECASE)
-	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 
 	return ui
 			
 	
-	
-	
+def post_rem_can_you(ui):
+	"""remove `*can you* ....`
+	remove `*will you* ....`
+	remove `*do you know* ....`
+
+	replace `*tell me* ....` with `....`
+	remove `*tell me regarding* ....` with `*about* ....`
+	"""
+	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please )?(even )?(know|tell|remember|speak|say)( to)? me)? (?P<msg>.+)', r'\g<msg>', ui, flags=re.IGNORECASE)
+	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
+
+	return ui
 
 def Rchoice(*args, blank=0):
+	"""
+		return random choice from (args and blank "")
+	"""
 	b = ['']*blank
 	return choice([*args, *b])
 
+# default message dict
 message_dict = {
 	"message": "",
 	"render": "innerText",
@@ -228,8 +206,13 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = None):
-	if user is None and username is not None:
+def basic_output(INPUT, user: User = None, username: str = ""):
+	"""
+		INPUT: user input
+		user: User object
+		username: username of user (if `user` object is not provided)
+	"""
+	if user is None and username:
 		user = user_handler.get_user(username)
 
 	_INPUT = parsed_names(INPUT, user)
@@ -237,7 +220,7 @@ def basic_output(INPUT, user: User = None, username: str = None):
 	_ui_raw = pre_rem_bot_call(_INPUT)
 	_ui = _ui_raw.lower().replace(".", " ") # remove . from input
 	# keep . in raw to make sure its not removed it mathmatical expressions
-	xprint(f" /hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/")
+	xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/")
 	if _ui == "":
 		return
 	
@@ -246,12 +229,12 @@ def basic_output(INPUT, user: User = None, username: str = None):
 	
 	_time = time()
 	id = user.add_chat(INPUT, _time, 1, _ui_raw) # why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
-	xprint(" /c/user msg id: /=/", id)
+	xprint("\t/c/user msg id: /=/", id)
 	msg = message_dict.copy()
 	out, intent, on_context = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	user.chat.intent.append(intent)
 	
-	xprint(f" /i/intent:/=/ {intent}")
+	xprint(f"\t/i/intent:/=/ {intent}")
 
 	msg["rTo"] = id # reply to id # can be used in HTML to scroll to the message
 
@@ -325,6 +308,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		nonlocal on_context
 		
 		on_context.append(i)
+
+	def check_context(context=[]):
+		for i in context:
+			if i in prev_intent:
+				return True 
+	
 		
 	def rep(msg):
 		"""add message to the output"""
@@ -365,7 +354,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		
 		to_del = []
 
-		print("Action: ", action)
 		
 		
 		for ptrn, otpt, intnt in patterns:
@@ -383,7 +371,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 						uiParts[n] = re.sub(m.re.pattern, '', i).strip()
 						uiRParts[n] = re.sub(m.re.pattern, '', uiRParts[n]).strip()
 
-						print("uiParts[n]: ", uiParts[n])
 						
 					found = True
 					# tell me about yourself *and* your favourite hobby
@@ -403,22 +390,30 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	
 	
 
-	xprint(" /c/Flags: /=/", user.flags)
+	xprint("\t/c/Flags: /=/", user.flags)
 
+	
 	if user.flags.parrot:
 		if re_is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
 			rep("Parrot mode disabled")
 			intent('stop_parrot')
 		else:
-			rep(ui)
+			rep(INPUT)
 			add_context('parrot_say')
 		return flush()
 	
-	
+	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		expressions_patterns(context=_context, context_func=add_context, prev_intent=prev_intent), action="remove_match") 
-	print("UI: ", ui)
+		can_you_patterns(context=_context, check_context=check_context), action="remove_match") 
+	
+	ui_raw = post_rem_can_you(ui_raw) # remove "can you" from the beginning of the sentence
+	ui = ui_raw.lower() # convert to lower case
+
+
+	_msg_is_expression, ui, ui_raw = check_patterns(
+		expressions_patterns(context=_context, check_context=check_context), action="remove_match") 
+
 	if re_check(ip.how_are_you, ui):
 		rep( Rchoice("I'm fine!", "I'm doing great."))
 
@@ -447,7 +442,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	
 		uiopen = remove_suffix(_what.group("query"))
 		uiopen_raw = remove_suffix(_what_raw.group("query"))
-		xprint(" /r/query:/=/", uiopen_raw)
+		xprint("\t/r/query:/=/", uiopen_raw)
 
 
 		if uiopen == "up":
@@ -504,7 +499,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 			intent("(whats)_the_news")
 			
 		elif check_patterns(
-			what_extra_patterns(context=_context, context_func=add_context, prev_intent=prev_intent), ui=uiopen, ui_raw=uiopen_raw, action="remove")[0]:
+			what_extra_patterns(context=_context, check_context=check_context), ui=uiopen, ui_raw=uiopen_raw, action="remove")[0]:
 			
 			return flush()
 
@@ -722,7 +717,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		_who_raw = re_search(ip.whos_, ui_raw)
 		uiopen = remove_suffix(_who.group("query"))
 		uiopen_raw = remove_suffix(_who_raw.group("query"))
-		xprint(" /r/query:/=/", uiopen_raw)
+		xprint("\t/r/query:/=/", uiopen_raw)
 
 
 
@@ -796,7 +791,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	# WHY [-2:-2]? => if len < 2, it will return empty list instead of error
 	# print(user.chat.intent)
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
-		about_bot_patterns(context=_context, context_func=add_context, prev_intent=prev_intent), action="remove") 
+		about_bot_patterns(context=_context, check_context=check_context), action="remove") 
 
 
 	if (not ui) and out:
@@ -871,8 +866,9 @@ if __name__=="__main__":
 	while 1:
 		inp = input(">> ")
 		user.user_client_time = time()
-
+		tt = time()
 		msg = basic_output(inp, user)
+		print(f"\tRESP time: {time()-tt}s")
 		if not msg:
 			continue #break
 		msg = msg["message"]

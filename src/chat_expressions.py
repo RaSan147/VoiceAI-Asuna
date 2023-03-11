@@ -1,17 +1,21 @@
 from REGEX_TOOLS import re_check, re_is_in, re_starts
-from basic_conv_re_pattern import C,  merge, check_context
+from basic_conv_re_pattern import C
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
 from collections import Counter
-def patterns(context=Counter(), context_func=null, prev_intent=[]):
-	"""context: previous message intent
+def patterns(context=Counter(), check_context=null):
+	"""
+	context: Counter object to keep track of previous message intents
+	check_context: function to check if someting is in the prev msg intent (context)
+
+
 	"""
 	return [
 
 [
-	[C("^h(i+|e+y+)( there)?"),], # hiiii/heey there Asuna
+	[C(r"^h(i+|e+y+)( there)?"),], # hiiii/heey there Asuna
 	( Rchoice('Hello', 'Hey', 'Hey','Hello') +
 				Rchoice(" there", blank=2)+
 				Rchoice(f' <:u_name>', blank=1)+ 
@@ -23,7 +27,7 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 	"say_hi"
 ],
 [
-	[C("^h(e|a)l+o+( there)?"),], # hiiii/heey there Asuna
+	[C(r"^h(e|a)l+o+( there)?"),], # hiiii/heey there Asuna
 	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
 				Rchoice(f' <:u_name>', blank=1)+ 
 				Rchoice('.', '...', '!', '~', blank=2)+ 
@@ -36,7 +40,7 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 		
 [
 
-	[C("^(really )*((cool|great|nice|wow|awesome|amazing|pretty|beautiful|wonderful) ?)+(app|stuff|code)?"),],
+	[C(r"^(really )*((cool|great|nice|wow|awesome|amazing|pretty|beautiful|wonderful) ?)+(app|stuff|code)?"),],
 	# doesn't match if the word "you" is in the sentence
 	( Rchoice("😇", "😁", "😽")+ " " +
 		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
@@ -49,7 +53,7 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 
 [
 
-	[C("(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(cool|great|nice|wow|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy)"),],
+	[C(r"(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(cool|great|nice|wow|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy)"),],
 	( Rchoice("😇", "😁", "😽")+ " " +
 		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
 	) if context["praise_bot"]<2 else (
@@ -60,7 +64,7 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 	"praise_bot"
 ],
 [	
-    [C('(i )?(really )?(love|wuv) ((yo)?u|y(a|o))( so much| a lot)?'),],
+    [C(r"(i )?(really )?(love|luv|wuv) ((yo)?u|y(a|o))( so much| a lot)?"),],
     ( Rchoice('love you too','love you so much','I love you too') + 
 			Rchoice(" dear", f" <:u_name>", " babe", blank=2) + 
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
@@ -69,7 +73,7 @@ def patterns(context=Counter(), context_func=null, prev_intent=[]):
 	"love_you"
 ],
 [
-    [C("(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),],
+    [C(r"(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),],
     ( Rchoice(Rchoice("I hate you too", "I hate you so much", "I hate you"),
             (
 				Rchoice("I'm sorry. ", 'Sorry to dissapoint you. ',"Please forgive me. ")+

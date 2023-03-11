@@ -112,6 +112,9 @@ class ChatHandler{
 	}
 
 	send_message(text=null){
+		byId("help-notice").style.display = "none"; // hide help notice on first message
+
+
 		var msg;
 		if(text==null) msg = this.chat_input.value;
 		else msg = text;
