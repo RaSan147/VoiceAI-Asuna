@@ -408,7 +408,7 @@ ip.hate_you = [
 ]
 
 ip.whats_up = [
-	C("wh?(u|a)t?s+ *up+"),
+	C("wh?(u|a)t?s+ up+"),
 	'sup',
 ]
 

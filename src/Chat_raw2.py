@@ -435,6 +435,12 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
 		intent('whats_the_time')
+
+	elif re_check(ip.whats_up, ui):
+		rep( choice(ot.on_whats_up))
+		
+		intent("whats_up")
+
 		
 	elif re_check(ip.whats_, ui_raw):
 		_what = re_search(ip.whats_, ui)
@@ -444,14 +450,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		uiopen_raw = remove_suffix(_what_raw.group("query"))
 		xprint("\t/r/query:/=/", uiopen_raw)
 
-
-		if uiopen == "up":
-			rep( choice(ot.on_whats_up))
-
-			intent("(whats)_up")
-		
-
-		elif re_is_in(ip.you_self, uiopen):
+		if re_is_in(ip.you_self, uiopen):
 			rep( choice(ot.about_self))
 			
 			intent('what are you')
@@ -690,12 +689,6 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		user.flags.parrot = True
 
 		intent("parrot_on")
-
-
-	elif re_check(ip.whats_up, ui):
-		rep( choice(ot.on_whats_up))
-		
-		intent("whats_up")
 
 
 	elif re_check(ip.tell_latest_news, ui):
