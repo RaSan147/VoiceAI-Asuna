@@ -28,22 +28,6 @@ class AppConfig {
 	show_help_note() {
 		const header = "Common IO: (similar inputs may/will work too)"
 		const content = `
-	<style>
-	.markdown {
-		text-align: left;
-	}
-	.markdown span {
-		font-family: monospace;
-		background: #000;
-		color: white;
-		border-radius: 3px;
-		padding: 3px;
-	}
-	.markdown li{
-		line-height: 20px;
-	}
-</style>
-
 <div class="markdown">
 
 <li>  Basic <span>hiiii</span>, <span>hello</span>
