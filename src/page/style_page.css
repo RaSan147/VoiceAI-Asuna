@@ -563,6 +563,8 @@ a {
 
 .markdown {
 	text-align: left;
+	font-size: 15px;
+	padding: 10px;
 }
 .markdown span {
 	font-family: monospace;

@@ -44,11 +44,11 @@
 				<table>
 					<tr>
 					<td><label for="username">Username</label></td>
-					<td><input type="text" name="username" id="username" placeholder="Username"></td>
+					<td><input type="text" name="username" class="txt_box" id="username" placeholder="Username"></td>
 					</tr>
 					<tr>
 					<td><label for="password">Password</label></td>
-					<td><input type="password" name="password" id="password" placeholder="Password"></td>
+					<td><input type="password" name="password" class="txt_box" id="password" placeholder="Password"></td>
 					</tr>
 				</table>
 				<div id="login-submit">
@@ -90,6 +90,18 @@ body {
 	align-items: flex-start;
 }
 
+
+#login-form {
+	width: 100%;
+	max-width: 400px;
+}
+
+.txt_box {
+	width: 100%;
+	height: 25px;
+	font-size: 1em;
+}
+
 #submit_btn {
 	width: 200px;
 	height: 50px;
@@ -99,6 +111,8 @@ body {
 table {
 	border-color: #00000000;
 	border-spacing: 4px;
+	width: 95%;
+	text-align: left;
 }
 </style>
 
