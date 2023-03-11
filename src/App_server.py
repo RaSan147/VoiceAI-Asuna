@@ -14,7 +14,7 @@ from http import HTTPStatus
 
 import json
 import traceback
-
+import importlib
 
 from CONFIG import appConfig
 from user_handler import User, user_handler
@@ -30,7 +30,7 @@ from pyroboxCore import PostError
 
 
 
-from Chat_raw2 import basic_output
+import Chat_raw2
 
 
 
@@ -379,7 +379,7 @@ def chat(self: SH, *args, **kwargs):
 		out["status"] = "error"
 		out["message"] = "User not found!\nPlease register first."
 		out["script"] = ["""(async () => {
-			tools.sleep(3000)
+			await tools.sleep(3000);
 			user.logout()
 		})()"""]
 		return self.send_json(out)
@@ -387,7 +387,10 @@ def chat(self: SH, *args, **kwargs):
 	user.user_client_time_offset = int(_time_offset)/1000
 	user.user_client_time = int(_time)/1000
 
-	reply = basic_output(message, user)
+	# TODO: REMOVE THIS IN PRODUCTION
+	importlib.reload(Chat_raw2)
+
+	reply = Chat_raw2.basic_output(message, user)
 
 	if isinstance(reply, dict):
 		out.update(reply)

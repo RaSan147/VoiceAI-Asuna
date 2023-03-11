@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 
 class Callable_dict(dict):
 	def __init__(self, *args, **kwargs):
@@ -34,19 +36,35 @@ class GETdict(Callable_dict):
 			return self.__getitem__(__name)
 		return super().__getattribute__(__name)
 
-	def __getitem__(self, __key):
-		return super().__getitem__(__key)
+	# def __getitem__(self, __key):
+	# 	return super().__getitem__(__key)
 
 class Flag(GETdict):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.__dict__ = self
 
+	def __getitem__(self, __key):
+		return super().get(__key, None)
+
 	def  __getattr__(self, __name: str):
-		try:
-			return super().__getitem__(__name)
-		except Exception:
-			return None
+		return super().get(__name, None)
+		# try:
+		# 	return super().__getitem__(__name)
+		# except Exception:
+		# 	return None
+
+
+class LimitedDict(OrderedDict):
+    def __init__(self, *args, max=0, **kwargs):
+        self._max = max
+        super().__init__(*args, **kwargs)
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        if self._max > 0:
+            if len(self) > self._max:
+                self.popitem(False)
 			
 class str2(str):
 	def __joiner__(self, joiner="\n\n"):

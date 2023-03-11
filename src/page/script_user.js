@@ -118,6 +118,6 @@ class USER{
 }
 	
 
-var user = new USER();
+window["user"] = new USER();
 
 

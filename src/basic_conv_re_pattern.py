@@ -19,7 +19,6 @@ def check_context(context=[], contextsss=[]):
 			return True 
 	
 
-
 def C(pattern):
 	""" return re.compile of the pattern with ignore case flag
 	also add to to_bot_suffix so that it can capture calling by bot name or other nouns
@@ -105,13 +104,6 @@ ip.no = [ C("(well )?(actually )?n(o(pe)?t?|ah?)( at all)?( never)?"),  #well ac
 				"never",
 			  ]
 
-ip.hello = [
-			C("h(e|a)l+o+( there)?"), # Helllooo there asuna
-				 ]
-				 
-ip.hi = [
-			C("h(i+|e+y+)( there)?"), # hiiii/heey there Asuna
-			]
 
 # print(ip["no"][0].match("well nope"))
 #print(is_in(ip["no"], "well nope"))
@@ -127,11 +119,9 @@ li_QmyName = 'my name', 'my name is'
 li_syn_created = 'created', 'programmed', 'invented', 'designed', 'made'
 li_Qcreator = tuple(i + " you" for i in li_syn_created)
 
-li_Acreator = 'I was %s by Ratul Hasan.', 'A boy named Ratul Hasan %s me.', 'Ratul Hasan %s me.'
 
 ip.created_program = [
-	C('(?P<action>created|programmed|invented|designed|made)  ((yo)?u|y(a|o))'),
-
+	C('(?P<action>created?|program(med)?|invent(ed)?|design(ed)?|ma(d|k)e) ((yo)?u|y(a|o))'),
 ]
 
 

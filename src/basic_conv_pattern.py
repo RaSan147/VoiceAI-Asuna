@@ -16,16 +16,11 @@ yeses = 'Yeah! ', 'Yeah. ', 'Yes! ', 'Yes. ', 'Sure! ', 'Sure. ', 'Yeah of cours
 
 li_QyuiName = "can i change your name", 'i want to change your name'
 li_QyuiNamePre = "can i call you ", 'may i call you'
-li_hello = "hello <:ai_name>", "helo <:ai_name>", 'hello', 'helo'
-li_hi = "hi <:ai_name>", "hey <:ai_name>", 'hi', 'hey', "hiii"
 
 li_redo = 'redo my last command', 'retry my last command', 'redo last command', 'redo last command', 'redo'
-li_QmyName = 'my name', 'my name is'
 
-li_syn_created = 'created', 'programmed', 'invented', 'designed', 'made'
-li_Qcreator = tuple(i + " you" for i in li_syn_created)
 
-li_Acreator = 'I was %s by Ratul Hasan.', 'A boy named Ratul Hasan %s me.', 'Ratul Hasan %s me.'
+li_Acreator = 'I was %s by Ratul Hasan.', 'Ratul Hasan %s me.', "I was %s by Rasan147 (Ratul Hasan)"
 
 
 
@@ -50,11 +45,6 @@ def js(x):
 	if isinstance(x, set):
 		return json.dumps(list(x))
 	return json.dumps(x)
-#print(js(set(li_whats)))
-#print(js(set(li_who)))
-#print(js(set(li_where)))
-#print(js(set(li_what_is)))
-
 
 li_whats2 = tuple('what'+x for x in _li_extra)
 li_what_is2 = tuple('what'+x for x in ('s', ' is'))

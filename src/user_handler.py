@@ -4,14 +4,14 @@ import hashlib
 import time, datetime
 import traceback
 # import inspect
-
+from collections import deque
 
 import F_sys
 import net_sys
 import TIME_sys
 
 from CONFIG import appConfig
-from DS import GETdict, Flag
+from DS import GETdict, Flag, LimitedDict
 import live2d_sys
 import CONSTANTS
 
@@ -40,8 +40,7 @@ class User(GETdict):
 
 		self.flags = Flag()
 		self.chat = Flag()
-		self.chat.intent = {}
-
+		self.chat.intent = deque(maxlen=20)
 		self.user_client_time = 0 # in seconds
 		self.user_client_time_offset = 0 # in seconds
 		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
@@ -138,8 +137,10 @@ class User(GETdict):
 		else:
 			user= "BOT"
 
-		self.msg_id += 1
 		id = self.msg_id
+
+		self.msg_id += 1 # starts from 0 => User, 1 => Bot, 2 => User, 3 => Bot, ...
+
 		chat['id'] = id
 		chat['msg'] = msg # dict, contains msg, script and render mode
 		chat['time'] = str(TIME_sys.utc_to_bd_time(mtime))

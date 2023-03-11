@@ -6,11 +6,12 @@ from basic_conv_re_pattern import C,  merge, check_context
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 
-def patterns(context=[]):
+from OS_sys import null
+
+from collections import Counter
+def patterns(context=Counter(), context_func=null, prev_intent=[]):
 	"""context: previous message intent
 	"""
-	if context is None:
-		context = []
 	return [
 [
 	[
@@ -60,7 +61,7 @@ def patterns(context=[]):
 		C("(about )?((yo)?u|y(a|o))('| )?r fav(orite)? anime( shows?)?( most|(a )?lot)?"),
 	],
 	(
-		("" if check_context(context, ["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
+		("" if check_context(prev_intent, ["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
 		Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
 		"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my leage. ",
 		"I do watch anime on free times, but I try to watch short ones. ") + "\n" +
