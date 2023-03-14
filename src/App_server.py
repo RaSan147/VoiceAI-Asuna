@@ -9,6 +9,8 @@ import sys
 import shutil
 import urllib.parse
 import urllib.request
+import time
+
 
 from http import HTTPStatus
 
@@ -353,6 +355,7 @@ def chat(self: SH, *args, **kwargs):
 	username, uid = Get_User_from_post(self, post, 'uid')
 
 
+
 	_m, message = post.get_part('message', decode=T)
 	message = message.strip()
 
@@ -371,6 +374,7 @@ def chat(self: SH, *args, **kwargs):
 		"message": '',
 		"mid": 1, # message id
 		"rid": 1, # reply id
+		"delay": 0, # delay in seconds
 	}
 	# print("Message from %s: %s"%(username, msg))
 
@@ -396,6 +400,7 @@ def chat(self: SH, *args, **kwargs):
 		out.update(reply)
 	else:
 		out["message"] = reply
+
 	return self.send_json(out)
 
 

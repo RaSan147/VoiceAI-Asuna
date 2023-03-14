@@ -59,6 +59,15 @@ class ChatHandler{
 		}
 	}
 
+	add_typing(){
+		let typing = createElement("div");
+		typing.classList.add("typing");
+		typing.innerText = "typing...";
+		return this.add_chat(typing, "bot");
+	}
+
+
+
 	// add chat to chat list
 	add_chat(chat, type="user"){
 		const m_id = this.cache_id+1
@@ -172,7 +181,7 @@ class ChatHandler{
 		}
 
 
-		
+		var typing = null;
 
 		const form = document.createElement("form");
 		form.method = "POST";
@@ -191,17 +200,50 @@ class ChatHandler{
 		const request = new XMLHttpRequest()
 		request.open("POST", form.action, true)
 		request.onreadystatechange = () => {
+			
 			if (request.readyState === XMLHttpRequest.DONE) {
+				
 				if (request.status === 204 || request.status === 200){
 					var response = JSON.parse(request.responseText);
+					if (typing) that.chats.removeChild(typing);
 					if (response.status){
 						that.success_msg(msg_ele)
 						return that.replied_msg(response)
 					}
 				}
-				that.not_sent(msg_ele, msg)
+				// that.not_sent(msg_ele, msg)
 			}
 		}
+		request.onprogress = (e) => {
+			log("ready state: " + request.readyState + " status: " + request.status)
+			if (typing==null){
+			if (request.status === 100) {
+				typing = that.add_typing();
+				return;
+			}}
+		}
+		request.onerror = (e) => {
+			
+			that.not_sent(msg_ele, msg)
+		}
+
+		
+	function handleEvent(e) {
+		log(`${e.type}: ${e.loaded} bytes transferred ${request.status}\n`);
+	}
+
+	function addListeners(xhr) {
+		xhr.addEventListener('loadstart', handleEvent);
+		xhr.addEventListener('load', handleEvent);
+		xhr.addEventListener('loadend', handleEvent);
+		xhr.addEventListener('progress', handleEvent);
+		xhr.addEventListener('error', handleEvent);
+		xhr.addEventListener('abort', handleEvent);
+	}
+
+	addListeners(request);
+
+
 
 	
 		request.send(form_)

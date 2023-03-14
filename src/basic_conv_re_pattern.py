@@ -408,7 +408,7 @@ ip.hate_you = [
 ]
 
 ip.whats_up = [
-	C("wh?(u|a)t?s+ up+"),
+	C("wh?(u|a)t?( |')?s+ up+"),
 	'sup',
 ]
 
@@ -468,8 +468,8 @@ stop_parrot = "stop", "stop it", "stop mimicing", "stop mimic", "stop parrot", "
 
 ip.stop_parrot = [
 			C("(stop|cancel)( (it|mimicing|repeating|parrot))?"),
-			C("(turn )?(parrot|it) of+")
-							]
+			C("(turn )?((parrot|it) )?of+"),
+				]
 
 
 

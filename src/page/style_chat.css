@@ -167,3 +167,11 @@
 	margin-top: -15px;
 	margin-left: -15px;
 }
+
+
+.typing {
+	font-family: 'Times New Roman', Times, serif;
+	font-size: 0.7em;
+	/* continuous fadein fadeout animationo */
+	animation: fadein 1s, fadeout 1s infinite;
+}

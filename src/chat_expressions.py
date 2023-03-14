@@ -27,7 +27,10 @@ def patterns(context=Counter(), check_context=null):
 	"say_hi"
 ],
 [
-	[C(r"^h(e|a)l+o+( there)?"),], # hiiii/heey there Asuna
+	[
+		C(r"^h(e|a)l+o+( there)?"),# hiiii/heey there Asuna
+		C("( |^)yo( |$)")
+	], 
 	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
 				Rchoice(f' <:u_name>', blank=1)+ 
 				Rchoice('.', '...', '!', '~', blank=2)+ 
@@ -104,6 +107,13 @@ def patterns(context=Counter(), check_context=null):
 	),
 
 	"i_will_(bad_words)"
+],
+[
+	["take care"],
+	("You too" +
+		Rchoice(" dear", " my love", " <:u_name>", " sweetheart", " darling", blank=2)+"."
+	),
+	"bid_take_care"
 ],
 	
 

@@ -150,7 +150,7 @@ def parsed_names_back(ui, user:User):
 
 def preprocess(in_dat):
 	""" replace . , " ' ? ! with space """
-	in_dat = in_dat.replace("'", " ")
+	#in_dat = in_dat.replace("'", " ")
 	in_dat = in_dat.replace("?", " ")
 	in_dat = in_dat.replace("!", " ")
 	in_dat = in_dat.replace(",", " ")
@@ -218,7 +218,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	_INPUT = parsed_names(INPUT, user)
 	_INPUT = preprocess(_INPUT)
 	_ui_raw = pre_rem_bot_call(_INPUT)
-	_ui = _ui_raw.lower().replace(".", " ") # remove . from input
+	_ui = _ui_raw.lower().replace(".", " ").replace("'", " ") # remove . from input
 	# keep . in raw to make sure its not removed it mathmatical expressions
 	xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/")
 	if _ui == "":
