@@ -75,5 +75,6 @@ Welcome to project Asuna.
 # Thanks to:
 0. Reki Kawahara and abec (for creating Asuna)
 1. Sony group (for Wake me up Asuna App idea and illustrations)
-2. Replit for continuously hosting Demo link for free
-3. Anyone who's willing to share chat data and ideas
+2. Pixi.js and live2D for character animation
+3. Replit for continuously hosting Demo link for free
+4. (Coming soon) Anyone who's willing to share chat data and ideas
