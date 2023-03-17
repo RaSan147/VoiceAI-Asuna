@@ -135,7 +135,8 @@
 	/*margin-left: auto; */
 	/*margin-right: 0;*/
 	color: #fff;
-	/*overflow-wrap: break-word;*/
+	overflow-wrap: anywhere;
+	word-break: break-all;
 }
 
 .message-text.user {

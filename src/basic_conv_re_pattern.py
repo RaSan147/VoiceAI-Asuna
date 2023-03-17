@@ -1,7 +1,11 @@
 import re
 from re import compile
+
+
 from REGEX_TOOLS import re_starts, re_check, re_is_in, re_search
 from DS import GETdict
+
+
 def generate_list(prefix):
 	#l = [globals()[name] for name in globals().keys() if name.startswith(prefix)]
 	#return (item for sublist in l for item in sublist)
@@ -182,9 +186,7 @@ ip.r_u_ok = [
 # li_how_r_u = ('how re you', 'how are ya today', 'how re u', 'how are ya doing today', 'how are ya doin', 'how are you doing today', 'how are u today', 'how are u doin', 'how r you doin now', 'how re you doin', 'how are u doing', 'how are u doin today', 'how are you doin now', 'how r u now', 'how re u doing now', 'how r u doin now', 'how re you doin today', 'how r you doing now', 'how re u doin', 'how re you doin now', 'how r ya', 'how r ya now', 'howre you', 'how re you doing', 'how re you now', 'how r u doin', 'how r ya doin now', 'how are you doing now', 'how r you', 'how r ya doin today', 'how are ya', 'how are ya doin today', 'how r u doing today', 'how are you doin', 'how are u now', 'how r you doin', 'how are you today', 'how re u doing today', 'how re ya now', 'how are u doing today', 'how r you now', 'how r you today', 'how re you today', 'how are u', 'how r u today', 'how re you doing today', 'howre ya', 'how r u doin today', 'how re ya doin now', 'how are you now', 'how re u doing', 'how re u doin today', 'how are you', 'how are you doing', 'howre u', 'how re ya today', 'how re ya doing today', 'howr ya', 'how r u doing', 'how re you doing now', 'how are ya doin now', 'how r you doin today', 'howr you', 'how r you doing', 'howr u', 'how re u now', 'how are u doin now', 'how re ya doin today', 'how r ya doing', 'how r u', 'how are ya now', 'how r ya today', 'how r ya doing now', 'how are u doing now', 'how re u doin now', 'how re ya doin', 'how re ya', 'how r u doing now', 'how re ya doing now', 'how are ya doing', 'how are you doin today', 'how re ya doing', 'how r ya doin', 'how are ya doing now', 'how r you doing today', 'how r ya doing today', 'how re u today')
 
 
-ip.how_are_you = [C("how ?a?re? ((yo)?u|y(a|o))( doing?)?( today| now)?"),
-								C("how do ((yo)?u|y(a|o)) do"),
-								]
+
 
 # print(check(ip.how_are_you, "how r u"))
 

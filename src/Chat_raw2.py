@@ -4,39 +4,41 @@ __all__ = ('basic_output',)
 import re
 re._MAXCACHE = 1024 # increase regex cache size
 
+
+
+from typing import Union
 from random import choice
 import webbrowser
-import datetime
+#import datetime
 from time import sleep, time
 import urllib.parse
-
 from collections import Counter
 
-import wikipedia
 
+# PIP PACKAGES 
+
+import wikipedia
 import requests
 
+# SELFMADE LIBS
+
 from PRINT_TEXT3 import xprint, remove_style
-
-from basic_conv_pattern import *
-from basic_conv_re_pattern import ip, ot, it, remove_suffix
-
 from REGEX_TOOLS import re_search, re_starts, re_check, re_is_in
 
-from OS_sys import os_name, check_internet
+from OS_sys import check_internet
 import F_sys
-
-import yt_plugin
+# import yt_plugin
 from bbc_news import bbc_news
-
 import TIME_sys
 from DS import str2
-
 from user_handler import User, user_handler
 from CONFIG import appConfig
 
 
+# CHAT PATTERN LIBS
 
+from basic_conv_pattern import *
+from basic_conv_re_pattern import ip, ot, it, remove_suffix
 
 from chat_about_bot import patterns as about_bot_patterns
 from chat_what_extra import patterns as what_extra_patterns
@@ -63,6 +65,7 @@ def web_go(link):
 
 # web_go('C:/Users/Dell/Documents/Python/Project_Asuna/datapy.html')
 def linker(link):
+	"""Match for link url and open the link in browser"""
 	for i in links_li:
 		if link in i:
 			web_go(i[0])
@@ -283,7 +286,9 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		"ai_name": "Asuna", # user preferred ai name
 	}
 	"""
-	out = str2()
+	# out = str2()
+	#out = str()
+	out = message_dict.copy()
 	
 	_intent = [] # intent of the current message
 	prev_intent = user.chat.intent[-1] if user.chat.intent else [] # intent of the previous message
@@ -312,28 +317,24 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	def check_context(context=[]):
 		for i in context:
 			if i in prev_intent:
-				return True 
+				return True
+				
+	def clean():
+		nonlocal out
+		out = message_dict.copy()
 	
 		
-	def rep(msg):
+	def rep(msg_txt, script="", render=""):
 		"""add message to the output"""
 		nonlocal out
 		
-		if isinstance(msg, dict):
-			if isinstance(out, dict):
-				_out = out
-
-			else:
-				_out = {"message": out}
+		out["message"]  += "\n\n" +  msg_txt
 				
-			_out["message"]  += "\n\n" +  msg["message"]
+		if render:
+			out["render"] = render
 				
-			if msg.get("render"):
-				_out["render"] = msg["render"]
-				
-			out = _out
-		else:
-			out += str(msg)
+		if script:
+			out["script"] += script
 			
 		return out
 	
@@ -342,7 +343,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		"""flush the output, intent and context"""
 		return out, _intent, on_context
 		
-	def rand_out(outputs:list):
+	def rand_out(outputs:Union[list,tuple,str]):
 		if isinstance(outputs, str):
 			return outputs
 		return choice(outputs)
@@ -414,10 +415,11 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns(context=_context, check_context=check_context), action="remove_match") 
 
-	if re_check(ip.how_are_you, ui):
-		rep( Rchoice("I'm fine!", "I'm doing great."))
+#	if re_check(ip.how_are_you, ui):
+#		rep( Rchoice("I'm fine!", "I'm doing great."))
 
-		intent('how_are_you')
+#		intent('how_are_you')
+
 		
 	if re_check(ip.whats_your_name, ui):
 		rep( choice(ot.my_name_is) + user.ai_name)
@@ -451,13 +453,10 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
-			rep( choice(ot.about_self))
+			rep( choice(ot.about_self),
+				render= "innerHTML")
 			
 			intent('what are you')
-
-			out = {"message": out,
-					"render": "innerHTML"
-					}
 			return flush()
 		
 
@@ -642,7 +641,8 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 	elif re_starts(ip.goto, ui):
 		link = re_search(ip.goto, ui)['query']
-		if linker(link):
+		_url = linker(link)
+		if _url:
 			rep(Rchoice('Opening ' + link, 
 							"Opening " + link + " for you", 
 							"Here you go",
@@ -715,13 +715,11 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 
 
 		if re_is_in(ip.you_self, uiopen):
-			rep(choice(ot.about_self))
+			rep(choice(ot.about_self),
+				render= "innerHTML")
 			
 			intent('(who) are you')
 
-			out= {"message": out,
-					"render": "innerHTML"
-					}
 			return flush()
 					
 		elif re_is_in(ip.my_self, uiopen):
@@ -792,7 +790,7 @@ def _basic_output(INPUT, user: User, ui:str, ui_raw:str, id:int):
 		return flush()
 
 	
-	if out == '':
+	if out["message"] == '':
 		log_unknown(ui)
 		out = (Rchoice("Sorry,", "My apologies.","I'm sorry...") + " I " + 
 			Rchoice(

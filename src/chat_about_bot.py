@@ -16,6 +16,17 @@ def patterns(context=Counter(), check_context=null):
 	return [
 [
 	[
+		C("how ?a?re? ((yo)?u|y(a|o))( doing?)?( today| now)?"),
+	C("how do ((yo)?u|y(a|o)) do"),
+	],
+	( Rchoice("I'm fine!", "I'm doing great.")),
+	
+	
+	"'how_are_you'"
+],
+
+[
+	[
 		C(r"about ((yo)?u|y(a|o))(('| )?r ?self)?( \<\:ai_name\>)?$"),
 	],
 	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki." +
@@ -28,6 +39,7 @@ def patterns(context=Counter(), check_context=null):
 			" I also love too cook.", blank=1)+
 		Rchoice("😁", " 😄", " 😇", " 😊", " ~", "...", blank=1)
 	),
+	
 	"about_ai"
 ],
 [

@@ -1,10 +1,12 @@
+from collections import Counter
+
 from REGEX_TOOLS import re_check, re_is_in, re_starts
 from basic_conv_re_pattern import C
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
-from collections import Counter
+
 def patterns(context=Counter(), check_context=null):
 	"""
 	context: Counter object to keep track of previous message intents
@@ -22,7 +24,7 @@ def patterns(context=Counter(), check_context=null):
 				Rchoice('.', '...', '!',  '~', blank=1)+ 
 				Rchoice("👋", blank=2)
 	) if context["say_hi"]<3 else
-	Rchoice('Hello','Yeah!','Yes?','Yeah, need something?'),
+	('Hello','Yeah!','Yes?','Yeah, need something?'),
 
 	"say_hi"
 ],
@@ -36,7 +38,7 @@ def patterns(context=Counter(), check_context=null):
 				Rchoice('.', '...', '!', '~', blank=2)+ 
 				Rchoice("👋", blank=1)
 	) if context["say_hello"]<3 else
-	Rchoice('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
+	('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
 
 	"say_hello"
 ],
@@ -106,16 +108,35 @@ def patterns(context=Counter(), check_context=null):
 	Rchoice(" 😞", " 😭", " 🥺", " 😢", " 😡", " 😠", blank=2)
 	),
 
-	"i_will_(bad_words)"
+	"user_will_(bad_words)"
 ],
 [
 	["take care"],
 	("You too" +
 		Rchoice(" dear", " my love", " <:u_name>", " sweetheart", " darling", blank=2)+"."
 	),
-	"bid_take_care"
+	"user_bid_take_care"
 ],
+[
+	[C(r"thank(s| ((yo)?u|y(a|o)))( a ?lot|very much)?( for .+)?"),
+	C(r"((many )+|((a )?lots? of ))thanks( for( the)? \S+( me)?)?"),
+	],
+	( Rchoice(
+		Rchoice("You're welcome", "Anything for you", "You're most welcome")+ Rchoice(" <:u_name>", " dear", " my love", blank=2),
+		"My pleasure",
+		"It's okay",
+		"No problem",
+		"Its nothing",
+		"I'm so glad it was helpful",
+		"It was my pleasure",
+		"It was the least I could do",
+		"Glad to help",
+	) + Rchoice(".", "!") + 
+	Rchoice("😇", "😁", "😽",  "🥰", "☺️", "❤️", blank=2)
+	),
 	
+	"thank_you_ai"
+]
 
 
 
