@@ -1,6 +1,7 @@
 # All source codes stay here
 # Note: Run Asuna.py (CLI) or GUI_Asuna.py (GUI) to launch the program.
 
-| File | Description |A sao ai
+| File | Description |
 | -----|----------- |
 | name | description...|
+
