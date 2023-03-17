@@ -78,3 +78,6 @@ Welcome to project Asuna.
 2. Pixi.js and live2D for character animation
 3. Replit for continuously hosting Demo link for free
 4. (Coming soon) Anyone who's willing to share chat data and ideas
+
+# Additional members:
+0. https://github.com/coolst3r (technical and knowledge-base support)
