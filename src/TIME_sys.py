@@ -25,7 +25,7 @@ def local2bd_dt(dt=datetime.now()):
 	return dt
 
 
-def ts2dt(ts, offset=0):
+def ts2dt(ts=0.0, offset=0.0):
 	tz = timezone(timedelta(seconds=offset))
 	return datetime.fromtimestamp(ts, tz=tz)
 

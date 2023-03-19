@@ -29,7 +29,7 @@ class User(GETdict):
 
 	but using dick.key = value 1st, will assign it as attribute and its temporary
 	"""
-	def __init__(self, username):
+	def __init__(self, username=""):
 
 
 		self.username = username
@@ -41,8 +41,8 @@ class User(GETdict):
 		self.flags = Flag()
 		self.chat = Flag()
 		self.chat.intent = deque(maxlen=20)
-		self.user_client_time = 0 # in seconds
-		self.user_client_time_offset = 0 # in seconds
+		self.user_client_time = 0.0 # in seconds
+		self.user_client_time_offset = 0.0 # in seconds
 		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
 		# self.pointer = self.msg_id = 0
 	
@@ -61,6 +61,11 @@ class User(GETdict):
 			traceback.print_exc()
 			raise Exception("User data corrupted") from e
 				
+	# def __eq__(self, __o: object) -> bool:
+	# 	if (bool(__o) or bool(self.username)) is False:
+	# 		# is user is none
+	# 		return True
+	# 	return super().__eq__(__o)
 
 	def __setitem__(self, key, value):
 		super().__setitem__(key, value)
@@ -318,7 +323,7 @@ class UserHandler:
 		return True
 
 
-	def collection(self, username, uid):
+	def collection(self, username:str, uid:str):
 		# verify uid from users collection
 		x = self.get_user(username)
 		if not x: return None
@@ -373,12 +378,13 @@ class UserHandler:
 		
 		return _skin
 
-	def room_bg(self, username="", uid="", command=None, custom=None, user=None):
+	def room_bg(self, username="", uid="", command="", custom="", user:User=None):
 		if not user:
-			user = self.collection(username, uid)
-		if not user:
-			print("USER NOT FOUND")
-			return None
+			_user = self.collection(username, uid)
+			if not _user:
+				print("USER NOT FOUND")
+				return None
+			user =  _user
 
 		if command=="change":
 			user.room = (user.room+1)%len(CONSTANTS.room_bg)

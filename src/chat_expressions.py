@@ -31,7 +31,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[
 		C(r"^h(e|a)l+o+( there)?"),# hiiii/heey there Asuna
-		C("( |^)yo( |$)")
+		C(r"( |^)yo( |$)")
 	], 
 	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
 				Rchoice(f' <:u_name>', blank=1)+ 

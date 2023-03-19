@@ -16,10 +16,22 @@ def patterns(context=Counter(), check_context=null):
 	return [
 [
 	[
-		C("how ?a?re? ((yo)?u|y(a|o))( doing?)?( today| now)?"),
-	C("how do ((yo)?u|y(a|o)) do"),
+		C(r"how ?a?re? ((yo)?u|y(a|o))( doing?)?( today| now)?"),
+		C(r"how do ((yo)?u|y(a|o)) do"),
 	],
 	( Rchoice("I'm fine!", "I'm doing great.")),
+	
+	
+	"'how_are_you'"
+],
+[
+	[
+		C(r"how old ?a?re? ((yo)?u|y(a|o))( now)?"),
+		C(r"((yo)?u|y(a|o))(('| )?r)? age"),
+	],
+	( Rchoice("I'm 17", 
+		"I'm 17 this year.",
+		)),
 	
 	
 	"'how_are_you'"
