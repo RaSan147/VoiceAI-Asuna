@@ -343,10 +343,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 			return outputs
 		return choice(outputs)
 
-	def check_patterns(patterns, ui=ui, ui_raw=ui_raw, action=None):
+	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None):
+		if _ui is None:
+			_ui = ui
+		if _ui_raw is None:
+			_ui_raw = ui_raw
+
 		found = False
-		uiParts = re.split(" (?:a?nd?|&) ", ui)
-		uiRParts = re.split(" (?:a?nd?|&) ", ui_raw, flags=re.IGNORECASE)
+		uiParts = re.split(" (?:a?nd?|&) ", _ui)
+		uiRParts = re.split(" (?:a?nd?|&) ", _ui_raw, flags=re.IGNORECASE)
 
 		to_del = []
 
@@ -402,6 +407,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
+	
+	print("ui: ", ui)
+	print('ui_raw: ', ui_raw)
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns(context=_context, check_context=check_context), action="remove_match")
