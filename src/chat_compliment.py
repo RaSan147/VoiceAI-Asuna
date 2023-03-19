@@ -95,11 +95,12 @@ def patterns(context=Counter(), check_context=null):
 				"💓", "💞", "💕", "💘", "💟", "💌", "💋",
 				blank=2) + " " +
 		Rchoice("*blushes*\n","*smugs*\n", "*smiles*\n", "*winks*\n", "*laughs*\n", blank=1) +
-		Rchoice("Hehe.. ", "Cut it out... ", "You are embarrassing me. ", "UwU ", blank=2) +
+		Rchoice("Hehe.. ", "Yay... ",  "uwu ", blank=2) +
 		Rchoice("You just made my day. Thanks!",
 				"Thanks for the compliment",
 				"Aw thank you!",
 				"Thanks!",
+				"You are embarrassing me.",
 				"Thanks! It makes me so happy you feel that way.",
 				"Thanks! I'm glad you think so.",
 				"Thank you, that means a lot to me.",

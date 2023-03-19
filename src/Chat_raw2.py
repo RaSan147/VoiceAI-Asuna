@@ -119,7 +119,7 @@ def _wiki(uix, raw=''):
 	return out
 
 
-def wikisearch(uix, raw='', user: User = None):
+def wikisearch(uix='', raw='', user: User = None):
 	if check_internet() == True:
 		wolf = wolfram(uix)
 		if not wolf:
@@ -408,8 +408,6 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
 	
-	print("ui: ", ui)
-	print('ui_raw: ', ui_raw)
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns(context=_context, check_context=check_context), action="remove_match")
@@ -424,8 +422,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	if re_starts(ip.r_u, ui):
 		_msg_is_expression, ui, ui_raw = check_patterns(
 			r_u_sub_patterns(context=_context, check_context=check_context), 
-			ui=ui, 
-			ui_raw=ui_raw, 
+			_ui=ui, 
+			_ui_raw=ui_raw, 
 			action="remove")
 
 
@@ -499,7 +497,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 			intent("(whats)_the_news")
 
 		elif check_patterns(
-				what_extra_patterns(context=_context, check_context=check_context), ui=uiopen, ui_raw=uiopen_raw, action="remove")[0]:
+				what_extra_patterns(context=_context, check_context=check_context), _ui=uiopen, _ui_raw=uiopen_raw, action="remove")[0]:
 
 			return flush()
 
@@ -731,7 +729,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 				act += 'ed'
 			rep(choice(li_Acreator) % act)
 		else:
-			x = wikisearch(uiopen_raw, user)
+			x = wikisearch(uiopen, uiopen_raw, user)
 			if x:
 				rep(x)
 			else:
