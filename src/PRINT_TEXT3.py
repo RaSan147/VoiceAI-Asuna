@@ -183,8 +183,7 @@ class XprintClass:
 						elif x == 'i':
 							self.custom_style_temp["style"].append(self.neg_tx)
 						elif x == 'h':
-							self.custom_style_temp["style"].append(
-								self.bold_tx)
+							self.custom_style_temp["style"].append(self.bold_tx)
 
 						if text[i+2] == '/':
 							has_code = True
@@ -208,14 +207,12 @@ class XprintClass:
 							elif x == 'w':
 								self.custom_style_temp["bg"] = self.white_b
 							elif x == 'u':
-								self.custom_style_temp["style"].append(
-									self.ul_tx)
+								self.custom_style_temp["style"].append(self.ul_tx)
 							elif x == 'i':
 								self.custom_style_temp["style"].append(
 									self.neg_tx)
 							elif x == 'h':
-								self.custom_style_temp["style"].append(
-									self.bold_tx)
+								self.custom_style_temp["style"].append(self.bold_tx)
 
 							if text[i+3] == '/':
 								has_code = True
@@ -223,14 +220,11 @@ class XprintClass:
 							elif text[i+3] in ('u', 'i', 'h'):
 								x = text[i+3]
 								if x == 'u':
-									self.custom_style_temp["style"].append(
-										self.ul_tx)
+									self.custom_style_temp["style"].append(self.ul_tx)
 								elif x == 'i':
-									self.custom_style_temp["style"].append(
-										self.neg_tx)
+									self.custom_style_temp["style"].append(self.neg_tx)
 								elif x == 'h':
-									self.custom_style_temp["style"].append(
-										self.bold_tx)
+									self.custom_style_temp["style"].append(self.bold_tx)
 
 								if text[i+4] == '/':
 									has_code = True
