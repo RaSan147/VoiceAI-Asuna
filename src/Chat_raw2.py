@@ -38,6 +38,8 @@ from chat_can_you import patterns as can_you_patterns
 from chat_expressions import patterns as expressions_patterns
 from chat_what_extra import patterns as what_extra_patterns
 from chat_about_bot import patterns as about_bot_patterns
+from chat_compliment import patterns as compliments_patterns
+from chat_r_u_patterns import patterns as r_u_sub_patterns
 
 import re
 re._MAXCACHE = 1024  # increase regex cache size
@@ -180,7 +182,7 @@ def pre_rem_bot_call(ui):
 	ui = re.sub(
 		rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})? ', '', ui, flags=re.IGNORECASE)
 
-	ui = re.sub(r'^please ', '', ui, flags=re.IGNORECASE)
+	ui = re.sub(r'^(please|plz) ', '', ui, flags=re.IGNORECASE)
 
 	return ui
 
@@ -194,7 +196,7 @@ def post_rem_can_you(ui):
 		3. replace `*tell me* ....` with `....`
 		4. remove `*tell me regarding* ....` with `*about* ....`
 	"""
-	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please )?(even )?(know|tell|remember|speak|say)( to)? me)? (?P<msg>.+)',
+	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please |plz )?(even )?(know|tell|remember|speak|say)( to)? me)? (?P<msg>.+)',
 				r'\g<msg>', ui, flags=re.IGNORECASE)
 	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 
@@ -400,11 +402,24 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns(context=_context, check_context=check_context), action="remove_match")
+	
+	
+	_msg_is_expression, ui, ui_raw = check_patterns(
+		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
 
 # if re_check(ip.how_are_you, ui):
 # rep( Rchoice("I'm fine!", "I'm doing great."))
 
 # intent('how_are_you')
+
+
+	if re_starts(ip.r_u, ui):
+		_msg_is_expression, ui, ui_raw = check_patterns(
+			r_u_sub_patterns(context=_context, check_context=check_context), 
+			ui=ui, 
+			ui_raw=ui_raw, 
+			action="remove")
+
 
 	if re_check(ip.whats_your_name, ui):
 		rep(choice(ot.my_name_is) + user.ai_name)

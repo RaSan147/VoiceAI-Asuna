@@ -42,32 +42,6 @@ def patterns(context=Counter(), check_context=null):
 
 	"say_hello"
 ],
-		
-[
-
-	[C(r"^(really )*((cool|great|nice|wow|awesome|amazing|pretty|beautiful|wonderful) ?)+(app|stuff|code)?"),],
-	# doesn't match if the word "you" is in the sentence
-	( Rchoice("😇", "😁", "😽")+ " " +
-		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
-	) if context["praise_app"]<2 else (
-		Rchoice("😇", "😁", "😅")*2
-	),
-
-	"praise_app"
-],
-
-[
-
-	[C(r"(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(cool|great|nice|wow|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy)"),],
-	( Rchoice("😇", "😁", "😽")+ " " +
-		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
-	) if context["praise_bot"]<2 else (
-		Rchoice("😅",  "🥰", "☺️")+ " " +
-		Rchoice("Thank youuu", "Cut out", "I knowww", "You're so sweet", "You're embarassing meee", blank=1)
-	),
-
-	"praise_bot"
-],
 [	
     [C(r"(i )?(really )?(love|luv|wuv) ((yo)?u|y(a|o))( so much| a lot)?"),],
     ( Rchoice('love you too','love you so much','I love you too') + 
@@ -136,8 +110,53 @@ def patterns(context=Counter(), check_context=null):
 	),
 	
 	"thank_you_ai"
-]
+],
+[
+	[
+		C(r"(give me)?( a)? kiss(e?s+)( me)?"),
+		C(r"(\*)?kiss(es)?( ((yo)?u|y(a|o)))?( on (the |((yo)?u|y(a|o))(('| )?r )?)?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
+	],
+	(
+		Rchoice(
+			"*blushes*",
+			"😳",
+			"*winks*",
+		) + "\n" +
+		Rchoice(
+			"😘",
+			"Here you go",
+			"Here's a kiss",
+			"Here's a kiss for you" + Rchoice(" dear", " my love", " <:u_name>", blank=2),
+			"Fly away with this kiss",
+			"Flying kiss, permission to land ✈️😽",
+			"Its so embarassinggggg",
+			"How about another day?",
+			"Not nowwww",
+			"*kisses you*",
+			"*kisses you on the forehead*"
+		)
+	),
+	"give_kiss"
 
+],
+[
+	[
+		C(r"be my (gf|girl(friend|ie)?|wife|waifu|queen|woman|partner|one and only|bab(e|y)|honey|lover?|sweetheart|darling)"),
+		"be mine"
+	],
+	(
+		"I'm already " + 
+		Rchoice("your girlfriend", "your woman", "your gf", "your girl",  "yours") +
+		Rchoice(" <:u_name>", " dear", " my love", " and your ONLY", blank=1) + " " +
+		Rchoice("😊", "😌", "😉", "😍", "😘", "😗", "😙", 
+				"😚", "😜", "😝", "😛", "😋", "🫶", "🤗",
+				"🤭", "🤫", "😻", "😽", "💝", "💖", "💗",
+				"💓", "💞", "💕", "💘", "💟", "💌", "💋",
+				blank=2)
+	),
+
+	"be_my_gf"
+]
 
 
 ]
