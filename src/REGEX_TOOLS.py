@@ -5,8 +5,11 @@ from re import compile as re_compile
 from DS import Callable_dict
 from typing import Union
 
+
 class WEB_RE:
-	link_extractor = re_compile( r'^(?P<noQuery>(?P<homepage>(?P<schema>((?P<scheme>[^:/?#]+):(?=//))?(//)?)(((?P<login>[^:/]+)(?::(?P<password>[^@]+)?)?@)?(?P<host>[^@/?#:]*)(?::(?P<port>\d+)?)?)?)?(?P<path>[^?#]*))(\?(?P<query>[^#]*))?(#(?P<fragment>.*))?')  # compiled regex tool for getting homepage
+	# compiled regex tool for getting homepage
+	link_extractor = re_compile(
+		r'^(?P<noQuery>(?P<homepage>(?P<schema>((?P<scheme>[^:/?#]+):(?=//))?(//)?)(((?P<login>[^:/]+)(?::(?P<password>[^@]+)?)?@)?(?P<host>[^@/?#:]*)(?::(?P<port>\d+)?)?)?)?(?P<path>[^?#]*))(\?(?P<query>[^#]*))?(#(?P<fragment>.*))?')
 	# https://regex101.com/r/UKWPmt/1
 	# noQuery: https://regex101.com/r/UKWPmt/1
 	# homepage: https://regex101.com
@@ -21,8 +24,6 @@ class WEB_RE:
 	# fragment: # part
 	link_facts = Callable_dict()
 
-
-	
 	def gen_link_facts(self, link):  # fc=080C
 		"""Generates facts for a link
 
@@ -34,7 +35,6 @@ class WEB_RE:
 			return self.link_facts[link]
 		facts = dict()
 
-		
 		facts['is link'] = None
 		facts['scheme'] = None
 		facts['scheme'] = None
@@ -50,7 +50,6 @@ class WEB_RE:
 		facts['after homepage'] = None
 		facts['needs scheme'] = None
 		facts['is absolute'] = None
-
 
 		x = self.link_extractor.search(link)
 		if x:
@@ -69,11 +68,13 @@ class WEB_RE:
 			facts['has homepage'] = (facts['homepage'] is not None)
 			facts['after homepage'] = link.startswith('/')
 			facts['needs scheme'] = link.startswith('//')
-			facts['is absolute'] = (facts['scheme'] is not None and facts['host'] is not None)
+			facts['is absolute'] = (
+				facts['scheme'] is not None and facts['host'] is not None)
 
 			self.link_facts[link] = facts
-		
+
 		return facts
+
 
 web_re = WEB_RE()
 
@@ -81,22 +82,22 @@ web_re = WEB_RE()
 class Tool_belt:
 	def __init__(self):
 		pass
-	def starts(self, patterns:Union[str,re.Pattern], string:str):
+
+	def starts(self, patterns: Union[str, re.Pattern], string: str):
 		"""checks and returns string if it **starts with** any of the patterns in the given patterns list
 		"""
 		for i in patterns:
 			if isinstance(i, re.Pattern):
 				m = i.match(string)
-			
+
 				if m:
 					return m.group(0)
-				
+
 			else:
 				if string.startswith(i):
 					return i
-				
-	
-	def check(self, patterns:Union[str,re.Pattern], string:str):
+
+	def check(self, patterns: Union[str, re.Pattern], string: str):
 		"""checks and returns string if it **has** any of the patterns in the given patterns list
 		"""
 		for i in patterns:
@@ -104,27 +105,26 @@ class Tool_belt:
 				m = i.search(string)
 				if m:
 					return m.group(0)
-				
+
 			else:
 				if i in string:
 					return i
-					
-	def is_in(self, patterns:Union[str,re.Pattern], string:str):
+
+	def is_in(self, patterns: Union[str, re.Pattern], string: str):
 		"""checks and returns string if it **full match** with any of the patterns in the given patterns list
 		"""
 		for i in patterns:
 			if isinstance(i, re.Pattern):
-				
+
 				m = i.fullmatch(string)
 				if m:
 					return m.group(0)
-				
+
 			else:
 				if string == i:
 					return i
-				
-	
-	def search(self, patterns:Union[str,re.Pattern], string:str):
+
+	def search(self, patterns: Union[str, re.Pattern], string: str):
 		"""checks and returns `re.match object` if it has any of the patterns in the given patterns list
 		"""
 		for i in patterns:
@@ -132,19 +132,19 @@ class Tool_belt:
 				m = i.search(string)
 				if m:
 					return m
-				
+
 			else:
 				m = re.search(re.escape(i), string)
 				if m:
 					return m
-				
+
 		# all m are None re.Match
 		return m
-	
+
+
 re_tools = Tool_belt()
 
 re_starts = re_tools.starts
 re_check = re_tools.check
 re_is_in = re_tools.is_in
 re_search = re_tools.search
-

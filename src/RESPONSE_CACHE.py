@@ -3,10 +3,11 @@ __all__ = ['Cached_Response']
 import charset_normalizer as chardet
 from os.path import isfile
 
+
 class Cached_Response:
 	# TODO: use JSON
 	# TODO: Need documentation
-	def __init__(self, status_code=None, content = None, content_location = None, headers = None, encoding = None, url = None):
+	def __init__(self, status_code=None, content=None, content_location=None, headers=None, encoding=None, url=None):
 		self.status_code = status_code
 		if content is not None:
 			self.content = content
@@ -26,6 +27,7 @@ class Cached_Response:
 
 	def __repr__(self):
 		return f'Cached_Response(status_code={self.status_code}, content={self.content}, headers={self.headers}, encoding="{self.encoding}", url="{self.url}")'
+
 	def __bool__(self):
 		return not 400 <= self.status_code < 600
 
@@ -33,7 +35,8 @@ class Cached_Response:
 		if name == 'text':
 			return self.text_()
 		else:
-			raise AttributeError("%s instance has no attribute '%s'" % (self.__class__, name))
+			raise AttributeError(
+				"%s instance has no attribute '%s'" % (self.__class__, name))
 
 	def text_(self):
 		"""Content of the response, in unicode.
