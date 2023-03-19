@@ -401,12 +401,12 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	ui = ui_raw.lower()  # convert to lower case
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
+		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
+
+	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns(context=_context, check_context=check_context), action="remove_match")
 	
 	
-	_msg_is_expression, ui, ui_raw = check_patterns(
-		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
-
 # if re_check(ip.how_are_you, ui):
 # rep( Rchoice("I'm fine!", "I'm doing great."))
 
