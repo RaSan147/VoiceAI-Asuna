@@ -44,7 +44,7 @@ def patterns(context=Counter(), check_context=null):
 	[
 		C(r"((yo)?u|y(a|o)) (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*(cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive) (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?"),
 		# you have amazing body
-		C(r"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?r)? ((cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)? ?(body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?( so much| a lot)?"),
+		C(r"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?r)? (cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)? ?(body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?( so much| a lot)?"),
 		# i fell in love with your beautiful body
 		# i love your beautiful body so much
 		# i love the shape of your body
