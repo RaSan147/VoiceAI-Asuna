@@ -303,6 +303,8 @@ class UserHandler:
 		try:
 			user = User(username)
 			self.users[username] = user
+			self.get_skin_link(user=user)
+			
 			return user
 		except:
 			return None
@@ -330,8 +332,9 @@ class UserHandler:
 		if x.get("id")!=uid: return None
 		return x
 
-	def get_skin_link(self, username, uid, retry=0):
-		user = self.collection(username, uid)
+	def get_skin_link(self, username="", uid="", user=None ,retry=0):
+		
+		user = user if user else self.collection(username, uid)
 		if not user:
 			print("USER NOT FOUND")
 			return None

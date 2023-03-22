@@ -255,15 +255,15 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	if not out:
 		log_unknown(ui_raw, INPUT)
 		out = "I don't know what to say..."
-
 	if isinstance(out, dict):
 		message = out["message"]
 		msg.update(out)
 
 	else:
 		message = out
-
+	
 	message = parsed_names_back(message, user)
+	
 	message = remove_style(message)
 	msg["message"] = message.strip()
 
@@ -510,32 +510,24 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 	if ui in it.change_cloth:
 		# TODO: NEED TO ADD IN PATTERNS
-		rep(Rchoice("Sure!", "Okay", "Okay, let me change my clothes",
-			"Hey, don't peek!", "Okk tell me how I look..."))
-		case = 'change_cloth'
+		
 		total_skins = len(user.skins)
 		user.bot_skin = (user.bot_skin + 1) % total_skins
 		_skin = user_handler.use_next_skin(user.username, user.id)
 
-		# _skin = str(user.bot_skin)
-
-		out = {
-			"message": out,
-			"script": "(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})()"
-		}
+		rep(Rchoice("Sure!", "Okay", "Okay, let me change my clothes",
+			"Hey, don't peek!", "Okk tell me how I look..."),
+			script="(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})() ")
 
 		intent('change_cloth')
 
 	elif ui in it.change_room:
 		# TODO: NEED TO ADD IN PATTERNS
-		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"))
-
+		
 		bg = user_handler.room_bg(user=user, command="change")
 
-		out = {
-			"message": out,
-			"script": f"anime.set_bg('{bg}')"
-		}
+		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"),
+			script=f"anime.set_bg('{bg}')" )
 
 		intent('change_room_bg')
 
