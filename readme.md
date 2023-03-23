@@ -41,6 +41,7 @@ Welcome to project Asuna.
 - [ ] Allow bot send pictures
 - [ ] Allow bot send audio
 - [ ] Allow bot send video
+- [ ] FINALLY TRAIN IT WITH GPT-2
 
 
 
