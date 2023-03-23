@@ -827,8 +827,11 @@ if __name__ == "__main__":
 	print(len(a))
 	print(a)
 	"""
+	# MAKE A TEST USER
+	user_handler.server_signup("TEST", "TEST")
 
-	user = user_handler.get_user("Ray")
+	# ACCESS THE USER
+	user = user_handler.get_user("TEST")
 	user = user_handler.collection(user.username, user.id)
 	user_handler.get_skin_link(user.username, user.id)
 

@@ -74,12 +74,14 @@ Welcome to project Asuna.
 
 # CONTRIBUTION GUIDELINE:
 * Make changes on whatever you feel like
-* Place some good comments (so that an intermediate python programmer understand)
+* Place some good comments (so that an intermediate python programmer can understand)
 * Make a PR and try to explain what you have changed and if theres any issue.
 * Keep in mind if you are interested :
   * pyrobox.py is the server main file (like django or flask)
   * App_server.py is the file that handles client-host request responses.
-  * Chat_raw2.py is the tool that actually handles what msg will do what and reply what
+  * Chat_raw2.py is the tool that actually handles what msg will do what and reply what (can be used as standalone in CLI mode for development mode, will use test account)
+* Don't worry about marge-issue, I'll update the code
+* Most importantly AS A MOBILE CODER, I USUALLY DON'T FOLLOW ANY CODE STYLE GUIDELINE (or pep8), SO PLEASE DON'T WORRY ABOUT THAT TOO MUCH. (I'll try to follow it in future)
 
 # Thanks to:
 0. Reki Kawahara and abec (for creating Asuna)
