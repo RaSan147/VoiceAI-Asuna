@@ -72,6 +72,15 @@ Welcome to project Asuna.
 * **Many more (forgot mostly) and many more coming soon**
 
 
+# CONTRIBUTION GUIDELINE:
+* Make changes on whatever you feel like
+* Place some good comments (so that an intermediate python programmer understand)
+* Make a PR and try to explain what you have changed and if theres any issue.
+* Keep in mind if you are interested :
+  * pyrobox.py is the server main file (like django or flask)
+  * App_server.py is the file that handles client-host request responses.
+  * Chat_raw2.py is the tool that actually handles what msg will do what and reply what
+
 # Thanks to:
 0. Reki Kawahara and abec (for creating Asuna)
 1. Sony group (for Wake me up Asuna App idea and illustrations)
