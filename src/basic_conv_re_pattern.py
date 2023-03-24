@@ -280,7 +280,7 @@ ip.what_to_call_you = [
 
 ip.what_time = [
     # C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-    C(r"(what('| )?(s|re|is|are|r|was|were|am|will|will be)? )?(the )?(current )?time( is| it)*( now)?( please| plz)?"),
+    C(r"(what('| )?(s|re|is|are|r|was|were|am|will|will be)? )?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?(please|plz)?"),
     'clock',
 ]
 
