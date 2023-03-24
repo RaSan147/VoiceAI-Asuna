@@ -205,7 +205,7 @@ ip.r_u_ok = [
 
 
 ip.thanks = [
-    C(r"thank(s( a (lot|bunch))?| ((yo)?u|y(a|o))( (so+|very) much))?")
+    C(r"thank(s( a (lot|bunch))?| ((yo)?u|y(a|o))( (so+|very) much))?"),
 ]
 
 ######################################################

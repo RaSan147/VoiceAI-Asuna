@@ -43,18 +43,27 @@ def patterns(context=Counter(), check_context=null):
 	"say_hello"
 ],
 [	
-    [C(r"(i )?(really )?(love|luv|wuv) ((yo)?u|y(a|o))( so much| a lot)?"),],
-    ( Rchoice('love you too','love you so much','I love you too') + 
+	[C(r"(i )?(really )?(love|luv|wuv) ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
+	( Rchoice('Love you too','Love you so much','I love you too') + 
 			Rchoice(" dear", f" <:u_name>", " babe", blank=2) + 
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
 	),
 
 	"love_you"
 ],
+[	
+	[C(r"(i )?(really )?like ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
+	( Rchoice("You're really nice, I like you too.",'I like you too') + " " +
+			Rchoice("dear", f"<:u_name>", "babe", blank=2) + " " +
+			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
+	),
+
+	"like_you"
+],
 [
-    [C(r"(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),],
-    ( Rchoice(Rchoice("I hate you too", "I hate you so much", "I hate you"),
-            (
+	[C(r"(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),],
+	( Rchoice(Rchoice("I hate you too", "I hate you so much", "I hate you"),
+			(
 				Rchoice("I'm sorry. ", 'Sorry to dissapoint you. ',"Please forgive me. ")+
 				Rchoice("I'm still learning",
 					"I'll try my best to help you",
@@ -92,8 +101,8 @@ def patterns(context=Counter(), check_context=null):
 	"user_bid_take_care"
 ],
 [
-	[C(r"thank(s| ((yo)?u|y(a|o)))( a ?lot|very much)?( for .+)?"),
-	C(r"((many )+|((a )?lots? of ))thanks( for( the)? \S+( me)?)?"),
+	[C(r"(thank|tnx|tnq|thx)s?( ((yo)?u|y(a|o)))?( a ?lot|very much)?( for .+)?"),
+	C(r"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
 	],
 	( Rchoice(
 		Rchoice("You're welcome", "Anything for you", "You're most welcome")+ Rchoice(" <:u_name>", " dear", " my love", blank=2),
