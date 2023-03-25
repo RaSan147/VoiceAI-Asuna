@@ -45,6 +45,10 @@ class User(GETdict):
 		self.user_client_time_offset = 0.0 # in seconds
 		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
 		# self.pointer = self.msg_id = 0
+
+		# self.skins = {}
+		self.loaded_skin = None
+		self.skins = {}
 	
 
 		# if the data asked for is already there
@@ -257,7 +261,7 @@ class UserHandler:
 
 	def server_signup(self, username, password):
 		# check if username is already taken
-		if self.get_user(username) is not None:
+		if self.get_user(username, temp=True) is not None:
 			return json.dumps({
 				"status": "error",
 				"message": "Username already taken"
@@ -297,17 +301,20 @@ class UserHandler:
 			"user_id": user["id"]
 		}
 
-	def get_user(self, username):
+	def get_user(self, username, temp=False):
 		if username in self.users:
 			return self.users[username]
 		try:
 			user = User(username)
-			self.users[username] = user
-			self.get_skin_link(user=user)
+			if not temp:
+				self.users[username] = user
+				self.get_skin_link(user=user)
 			
 			return user
 		except:
+			traceback.print_exc()
 			return None
+		
 
 	def server_verify(self, username, id, return_user=False):
 		user = self.get_user(username)
@@ -341,10 +348,14 @@ class UserHandler:
 		charecter = user["bot_charecter"]
 		skin = user["bot_skin"]
 		mode = user["skin_mode"]
-		if user.get("skins") and user.get("c_skin_mode")==mode:
+		# print(user.loaded_skin)
+		# print(skin)
+		print(user.get("skins") , user.get("c_skin_mode"),mode , user.loaded_skin , skin)
+		if user.get("skins") and user.get("c_skin_mode")==mode and user.loaded_skin == skin:
 			return user.skins[skin]
 
 		if mode == 0:
+			print("INVALID MODE (UNSUPPORTED)")
 			return 0
 		elif mode == 1:
 			try:
@@ -352,6 +363,7 @@ class UserHandler:
 				user.skins = self.online_avatar.get_skins(charecter)
 				print("SKINS LOADED")
 				user.c_skin_mode = mode
+				user.loaded_skin = skin
 				return _skin
 			except net_sys.NetErrors:
 				traceback.print_exc()

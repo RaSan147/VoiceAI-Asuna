@@ -35,6 +35,7 @@ class GETdict(Callable_dict):
 		if self(__name):
 			return self.__getitem__(__name)
 		return super().__getattribute__(__name)
+	
 
 	# def __getitem__(self, __key):
 	# 	return super().__getitem__(__key)

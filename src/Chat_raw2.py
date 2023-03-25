@@ -832,8 +832,9 @@ if __name__ == "__main__":
 
 	# ACCESS THE USER
 	user = user_handler.get_user("TEST")
-	user = user_handler.collection(user.username, user.id)
-	user_handler.get_skin_link(user.username, user.id)
+	# user = user_handler.collection(user.username, user.id)
+	# print(user.skins)
+	# user_handler.get_skin_link(user.username, user.id)
 
 	user.user_client_time_offset = TIME_sys.get_time_offset()
 
