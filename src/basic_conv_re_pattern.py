@@ -259,7 +259,7 @@ ip.who_are_you = [
 
 ip.whats_ = [
     # C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-    C(r"what('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
+    C(r"w(h|g)at('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
 ]
 
 ip.whos_ = [

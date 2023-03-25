@@ -30,7 +30,10 @@ def patterns(context=Counter(), check_context=null):
 
 [
 
-	[C(r"(((yo)?u|y(a|o))('| )?(a?re?)? )?( looking)?( really)*( very)* (cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),],
+	[
+		C(r"(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(very )*(cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),
+		"i like you"
+	],
 	( Rchoice("😇", "😁", "😽")+ " " +
 		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
 	) if context["praise_bot"]<2 else (

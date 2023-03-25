@@ -76,7 +76,45 @@ def patterns(context=Counter(), check_context=null):
 	),
 	"about_ai_favourite_anime"
 	
-]
+],
+[
+	[
+		C(r"(about )?(the )?manga (series )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(orite)? manga( most|(a )?lot)?"),
+	],
+	(
+		Rchoice(
+			"I usually don't read manga.",
+			"I don't get much time to read manga.",
+			"I usually prefer anime to manga, because I don't get much free time") + " "+
+		Rchoice("So, ", "If I must say ", "But, ", "However I enjoy reading this one. ") +
+		"I like " +
+		Rchoice("Demon slayer", "One punch man", "My hero academia", "Solo leveling")
+	),
+	
+	"about_ai_favourite_manga"
+],
+[
+	[
+		C(r"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(orite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
+	],
+	(
+		Rchoice(
+			"Baka!", "Hentaiii", "Perv...", "Loser", "Stupid....") + 
+			Rchoice(
+				"I don't watch such lowly things",
+				"I don't enjoy such entertainments",
+				"Please don't ask such questions. I DON'T WATCH THEM",
+				"Don't think everyone like yourself"
+			) + Rchoice("!", "!!", ".", "...") +
+			Rchoice("😞", "😒", "😐", "🙄") + "\n\n" +
+			Rchoice("Get a life.", "Touch some grass", "You'll never have a Gf like this")
+			
+	),
+	
+	"about_ai_favourite_hentai"
+], 
 		
 ][::-1]
 

@@ -51,7 +51,7 @@ def patterns(context=Counter(), check_context=null):
 
 	"love_you"
 ],
-[	
+[
 	[C(r"(i )?(really )?like ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
 	( Rchoice("You're really nice, I like you too.",'I like you too') + " " +
 			Rchoice("dear", f"<:u_name>", "babe", blank=2) + " " +
@@ -59,6 +59,18 @@ def patterns(context=Counter(), check_context=null):
 	),
 
 	"like_you"
+],
+[
+	[C(r"(i )?(really )?miss(ed|d|) ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
+	(
+		Rchoice("Aww~!", "Really?", "Seriously!!", "uwu...", blank=2) + " " +
+			Rchoice("Thankss... ", blank=2) +
+			Rchoice("I missed you too", "I miss you too") + " " +
+			Rchoice("dear", "<:u_name>", "babe","darling", blank=2) + " " +
+			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
+	),
+
+	"miss_you"
 ],
 [
 	[C(r"(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),],
@@ -76,6 +88,24 @@ def patterns(context=Counter(), check_context=null):
 	),
 
 	"hate_you"
+],
+[
+	[C(r"((a?re?)? ?)((yo)?u|y(a|o)) ((a?re?)? ?)(mad|crazy|stupid|psycho|baka)"),],
+	(
+		Rchoice("You meani...", "You baka...", "Huh..", "Whatt!!", blank=1) + "\n" +
+			Rchoice(
+				"Its not like I am an All Knowing Genie 🧞‍♂️ ",
+				"I'm not an All Knowing Wizard",
+				"It's not like i am ChatGPT or something"
+				) + '. '+
+			Rchoice(
+				"I'm still at early step of learning your language and I don't know what you mean most of the time",
+				"I'm still learning English and how to communicate. So you should encourage me more",
+				"I still don't know the basics of English. So I think it won't hurt you to wait for me to learn more",
+				"I'm learning English and Gosh it's so confusing. You should have more patience. Its not like I was learning English to talk to a loner like you") + "."
+	),
+
+	"you_stupid"
 ],
 [
 	[C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?r ((mo(m|ther|mmy))|sis(ter)?))?"),],
@@ -142,7 +172,8 @@ def patterns(context=Counter(), check_context=null):
 			"How about another day?",
 			"Not nowwww",
 			"*kisses you*",
-			"*kisses you on the forehead*"
+			"*kisses you on the forehead*",
+			"*chuuu* happy now?"
 		)
 	),
 	"give_kiss"
