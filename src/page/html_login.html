@@ -43,12 +43,12 @@
 				<input name="post-type" value="login" hidden>
 				<table>
 					<tr>
-					<td><label for="username">Username</label></td>
-					<td><input type="text" name="username" class="txt_box" id="username" placeholder="Username"></td>
+					<th><label for="username">Username</label></th>
+					<td><input type="text" name="username" class="txt_box" id="username" placeholder="Username" maxlength="64" minlength="1"></td>
 					</tr>
 					<tr>
-					<td><label for="password">Password</label></td>
-					<td><input type="password" name="password" class="txt_box" id="password" placeholder="Password"></td>
+					<th><label for="password">Password</label></th>
+					<td><input type="password" name="password" class="txt_box" id="password" placeholder="Password" maxlength="512"></td>
 					</tr>
 				</table>
 				<div id="login-submit">
@@ -127,7 +127,7 @@ user.get_local_data(false);
 user.verify_login();
 
 
-
+tools.enable_debug()
 
 byId("login").onsubmit = (e) => {
 	e.preventDefault()
@@ -136,8 +136,26 @@ byId("login").onsubmit = (e) => {
 
 
 	var msg = "";
-	const status = byId('status')
-
+	
+	
+	function update_note(note){
+		const status = byId('status')
+		status.style.display = 'block';
+		status.innerText = note;
+	}
+	const _uname = byId("username").value.length
+	const _pass = byId("password").value.length
+	
+	if(_uname<1){
+		update_note("Username must have at least 1 character!")
+		return 0;
+	} else if (_uname>64){
+		update_note("Username must be less than 64 character long")
+		return 0;
+	} else if (_pass>256){
+		update_note("Password can't be longer than 256 characters")
+		return 0;
+	}
 
 	// const filenames = formData.getAll('files').map(v => v.name).join(', ')
 	const request = new XMLHttpRequest()
@@ -163,8 +181,7 @@ byId("login").onsubmit = (e) => {
 			}
 			if (request.status === 401) msg = 'Incorrect password'
 
-			status.style.display = 'block'
-			status.innerText = msg
+			update_note(msg)
 		}
 	}
 	

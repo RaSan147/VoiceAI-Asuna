@@ -387,7 +387,10 @@ class UserHandler:
 		
 		self.get_skin_link(username, uid) # init
 		total_skins = len(user.skins)
-		user.bot_skin = (user.bot_skin + 1)%total_skins
+		print("....current skin", user.bot_skin)
+		print("....total skin ", total_skins)
+		user.bot_skin = (user.bot_skin + 1)%(total_skins)
+		print("sent skin", user.bot_skin)
 		
 		_skin = str(user.bot_skin)
 		

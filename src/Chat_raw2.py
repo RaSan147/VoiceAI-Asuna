@@ -508,11 +508,10 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 			return flush()
 
-	if ui in it.change_cloth:
-		# TODO: NEED TO ADD IN PATTERNS
-		
+	if re_check(ip.change_cloth, ui):
+
 		total_skins = len(user.skins)
-		user.bot_skin = (user.bot_skin + 1) % total_skins
+		#user.bot_skin = (user.bot_skin + 1) % total_skins
 		_skin = user_handler.use_next_skin(user.username, user.id)
 
 		rep(Rchoice("Sure!", "Okay", "Okay, let me change my clothes",
@@ -521,9 +520,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 		intent('change_cloth')
 
-	elif ui in it.change_room:
-		# TODO: NEED TO ADD IN PATTERNS
-		
+	elif re_check(ip.change_room, ui):
 		bg = user_handler.room_bg(user=user, command="change")
 
 		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"),

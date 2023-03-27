@@ -314,7 +314,7 @@ ip.my_self = [
 
 "what are you?"
 ip.you_self = [
-    C(r"((yo)?u|y(a|o)) ?(re?)?( ?self)?( really)?"),
+    C(r"((yo)?u|y(a|o))('| )?(re?)?( ?self)?( really)?"),
 ]
 
 
@@ -332,11 +332,16 @@ ip.tell_latest_news = ip.latest_news + [
 '((tell|speak|read )(out)?)?(the )?(latest )?news'
 
 "change Anime dress"
-it.change_cloth = ('change', "change cloth", "change skin", "change dress")
+ip.change_cloth = [
+	'change', 
+	C(r"change (((yo)?u|y(a|o))('| )?(re?)? )?(dress|cloth|skin|costume|wear)(e?s)?"),
+	C(r"wear (a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?(dress|cloth|skin|costume|wear)(e?s)?"), 
+]
 
 "change Anime room"
-it.change_room = ('change room', 'change place',
-                  'change location', 'switch room', "change background")
+ip.change_room = [
+	C(r"(change|switch|move) (to )?(a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?(room|place|location|background|bg)"), 
+]
 
 
 li_AmyName = 'Your name is ',

@@ -24,7 +24,7 @@ open_pwa_btn.onclick = (e) => {
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  alert("beforeinstallprompt")
+  //alert("beforeinstallprompt")
   app_installed = false; 
 
 	
