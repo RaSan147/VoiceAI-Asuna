@@ -25,7 +25,7 @@ def patterns(context=Counter(), check_context=null):
 			"Well, I am not an AI yet, but I'm learning to be one",
 			"I'm your chat partner, but I'm not an AI yet",
 			"I am trained on small dataset, so I can't call myself an AI yet",
-			"I don't have the ability of an AI yet, but I'm trying"
+			"I don't have the ability of an AI yet, but I'm trying",
 		) +  '.'
 	),
 
@@ -41,14 +41,14 @@ def patterns(context=Counter(), check_context=null):
 			"Yup, I'm awake",
 			"Yup, I'm here",
 			"Yes I'm always awake",
-			"Yup, I'm always here"
-			"Yeah"
-		) +  
+			"Yup, I'm always here",
+			"Yeah",
+		) + " " +
 		Rchoice(
-			" and ready to help you",
-			" and ready to talk to you",
-			" and ready to chat with you",
-			" and ready to do anything for you",
+			"and ready to help you",
+			"and ready to talk to you",
+			"and ready to chat with you",
+			"and ready to do anything for you",
 			blank=2
 		) + Rchoice('.', '...', '!',  '~', blank=1)
 	),

@@ -99,6 +99,10 @@ ip = input_PATTERNS
 input_text = GETdict()
 it = input_text
 
+ip.logout = [
+    C(r"(log|sign)o? ?(out|off)"),
+]
+
 
 ip.yeses = [
     C(r'(well )?(actually )?y(e|a)(ah|s|p)( of ?course)?( sure)'),
@@ -132,91 +136,19 @@ li_QyuiNamePre = "can i call you ", 'may i call you'
 # li_hi = "hi <:ai_name>", "hey <:ai_name>", 'hi', 'hey', "hiii"
 
 li_redo = 'redo my last command', 'retry my last command', 'redo last command', 'redo last command', 'redo'
-li_QmyName = 'my name', 'my name is'
-
-li_syn_created = 'created', 'programmed', 'invented', 'designed', 'made'
-li_Qcreator = tuple(i + " you" for i in li_syn_created)
-
 
 ip.created_program = [
     C(r'(?P<action>created?|program(med)?|invent(ed)?|design(ed)?|ma(d|k)e) ((yo)?u|y(a|o))'),
     C(r"((yo)?u|y(a|o))(( |')?r)? (?P<action>creat|programm?|invent|design|mak)(o|e)?r")
 ]
 
-
-li_do_u_know = 'do you know ', 'you know ', 'did you know ', ''
-_li_extra = 's', ' is', ' was', ' are', ' were', 're', ''
-
-li_whats = tuple()
-li_who = tuple()
-li_where = tuple()
-li_whats += tuple(s + 'what' + x +
-                  t for x in _li_extra for s in li_do_u_know for t in (' the', ''))
-li_who += tuple(s + 'who' + x +
-                t for x in _li_extra for s in li_do_u_know for t in (' the', ''))
-li_where += tuple(s + 'where' + x +
-                  t for x in _li_extra for s in li_do_u_know for t in (' the', ''))
-
-
-li_what_is = tuple('what' + x + t for x in ('s', ' is') for t in (' the', ''))
-
-
-def js(x):
-    if isinstance(x, set):
-        return json.dumps(list(x))
-    return json.dumps(x)
-# print(js(set(li_whats)))
-# print(js(set(li_who)))
-# print(js(set(li_where)))
-# print(js(set(li_what_is)))
-
-
-li_whats2 = tuple('what'+x for x in _li_extra)
-li_what_is2 = tuple('what'+x for x in ('s', ' is'))
-
-
-li_you = 'you', 'ya', 'u'
-li_your = tuple(i+'r' for i in li_you)
-li_r = 'are', 're', 're', 'r', 'r'
-li_r_u = tuple(merge(a, i) for i in li_you for a in li_r)
-
 ip.r_u_ok = [
     C(r"a?re? ((yo)?u|y(a|o)) (fine|ok((a|e)y)?|well|alright)"),
 ]
 
-####################################################
-# li_how_r_u = tuple(merge('how', i) for i in li_r_u)
-# li_how_r_u += tuple(merge('howr', i) for i in li_you)
-# li_how_r_u += tuple(merge('howre', i) for i in li_you)
-#
-# li_doing = 'doing', 'doin', ''
-# li_today = 'today', 'now', ''
-# li_doing_today = tuple(merge(i, a) for i in li_doing for a in li_today)
-#
-# li_how_r_u += tuple(merge('how', i, a) for i in li_r_u for a in li_doing_today)
-#
-# print(tuple(set(li_how_r_u)))
-####################################################
-
-# li_how_r_u = ('how re you', 'how are ya today', 'how re u', 'how are ya doing today', 'how are ya doin', 'how are you doing today', 'how are u today', 'how are u doin', 'how r you doin now', 'how re you doin', 'how are u doing', 'how are u doin today', 'how are you doin now', 'how r u now', 'how re u doing now', 'how r u doin now', 'how re you doin today', 'how r you doing now', 'how re u doin', 'how re you doin now', 'how r ya', 'how r ya now', 'howre you', 'how re you doing', 'how re you now', 'how r u doin', 'how r ya doin now', 'how are you doing now', 'how r you', 'how r ya doin today', 'how are ya', 'how are ya doin today', 'how r u doing today', 'how are you doin', 'how are u now', 'how r you doin', 'how are you today', 'how re u doing today', 'how re ya now', 'how are u doing today', 'how r you now', 'how r you today', 'how re you today', 'how are u', 'how r u today', 'how re you doing today', 'howre ya', 'how r u doin today', 'how re ya doin now', 'how are you now', 'how re u doing', 'how re u doin today', 'how are you', 'how are you doing', 'howre u', 'how re ya today', 'how re ya doing today', 'howr ya', 'how r u doing', 'how re you doing now', 'how are ya doin now', 'how r you doin today', 'howr you', 'how r you doing', 'howr u', 'how re u now', 'how are u doin now', 'how re ya doin today', 'how r ya doing', 'how r u', 'how are ya now', 'how r ya today', 'how r ya doing now', 'how are u doing now', 'how re u doin now', 'how re ya doin', 'how re ya', 'how r u doing now', 'how re ya doing now', 'how are ya doing', 'how are you doin today', 'how re ya doing', 'how r ya doin', 'how are ya doing now', 'how r you doing today', 'how r ya doing today', 'how re u today')
-
-
-# print(check(ip.how_are_you, "how r u"))
-
-
 ip.thanks = [
     C(r"thank(s( a (lot|bunch))?| ((yo)?u|y(a|o))( (so+|very) much))?"),
 ]
-
-######################################################
-# li_who_r_u = tuple(merge('who', i) for i in li_r_u)
-# li_who_r_u += tuple(merge('whor', i) for i in li_you)
-# li_who_r_u += tuple(merge('whore', i) for i in li_you)
-# print(tuple(set(li_who_r_u)))
-#####################################################
-
-
-# li_who_r_u = ('who re ya', 'whore you', 'who r you', 'whore ya', 'who r u', 'who are u', 'whor ya', 'who re you', 'whor you', 'who r ya', 'who re u', 'whore u', 'who are you', 'whor u', 'who are ya')
 
 ip.r_u = [
     C(r"a?re? ((yo)?u|y(a|o))"),
@@ -224,37 +156,6 @@ ip.r_u = [
 ip.who_are_you = [
     C(r"who ?a?re? ((yo)?u|y(a|o))"),  # who are u
 ]
-
-
-
-########################################################################
-# li_what_ur_name0 = tuple(merge(i, y, "name") for i in li_do_u_know for y in li_your)
-# li_what_ur_name= tuple(merge(w, i, "name") for i in li_your for w in li_whats2)
-# # print(li_what_ur_name)
-# li_what_ur_name1= tuple(merge("tell me", i) for i in li_what_ur_name)
-# li_what_ur_name1+= tuple(merge("tell me", i, "name") for i in li_your)
-# li_what_ur_name1+= tuple(merge("tell", i, "name") for i in li_your)
-# li_what_ur_name1+= tuple(merge("say", i, "name") for i in li_your)
-# li_what_ur_name1+= tuple(merge("speak", i, "name") for i in li_your)
-
-# li_what_ur_name2= tuple(merge("can",y, i) for i in li_what_ur_name1 for y in li_you)
-# li_what_ur_name2+= tuple(merge("can",y,"please", i) for i in li_what_ur_name1 for y in li_you)
-# li_what_ur_name2+= tuple(merge("please", i) for i in li_what_ur_name1)
-
-
-# li_what_ur_name3= tuple(merge(i, 'please') for i in li_what_ur_name)
-# li_what_ur_name3+= tuple(merge(i, 'name please') for i in li_your)
-# li_what_ur_name3+= tuple(merge(i, 'please') for i in li_what_ur_name1)
-
-# li_what_ur_name+= li_what_ur_name0
-# li_what_ur_name+= li_what_ur_name1
-# li_what_ur_name+= li_what_ur_name2
-# li_what_ur_name+= li_what_ur_name3
-
-# li_what_ur_name = tuple(set(li_what_ur_name))
-# print(li_what_ur_name)
-#######################################################################
-
 
 
 ip.whats_ = [
@@ -284,15 +185,6 @@ ip.what_time = [
     'clock',
 ]
 
-
-# print(search(ip.what_time, "do you even know what time it is"))
-
-# print(check(ip.whats_your_name, "can you tell me what should i call you"))
-# print(check(ip.whats_your_name, "can you tell me whats your name"))
-
-
-li_r_u_fine = tuple(merge(r, y, f)
-                    for r in li_r for y in li_you for f in ('fine', 'ok'))
 li_how_old_r_u = 'old are you', 'your age'
 li_where_r_u = 'you',
 li_where_r_u_frm = 'you from',

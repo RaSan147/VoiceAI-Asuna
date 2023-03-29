@@ -324,13 +324,19 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 		"""add message to the output"""
 		nonlocal out
 
+		if isinstance(msg_txt, dict):
+			_msg_txt = msg_txt["message"]
+			script = msg_txt.get("script", "")
+			render = msg_txt.get("render", "")
+			msg_txt = _msg_txt
+
 		out["message"] += "\n\n" + msg_txt
 
 		if render:
 			out["render"] = render
 
 		if script:
-			out["script"] += script
+			out["script"] += "\n\n" + script
 
 		return out
 
@@ -395,6 +401,16 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 		else:
 			rep(INPUT)
 			add_context('parrot_say')
+		return flush()
+	
+	if re_is_in(ip.logout, ui):
+		rep("Logging out...",
+			script="""
+				await tools.sleep(1000)
+				user.logout()
+				"""
+			)
+		intent('logout')
 		return flush()
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING

@@ -172,13 +172,13 @@ class ChatHandler{
 		// actually send message 
 
 		if(msg == "clear") return tools.del_child(this.chats)
-		if(tools.is_in(msg.toLowerCase(), ["logout", "log out", "sign off", "signoff"])){
-			let reply = this.default_reply;
-			reply.message = "Ok bye!!!";
-			that.replied_msg(reply);
-			await tools.sleep(1000)
-			return user.logout()
-		}
+		// if(tools.is_in(msg.toLowerCase(), ["logout", "log out", "sign off", "signoff", "sign out", "signout", "logoout"])){
+		// 	let reply = this.default_reply;
+		// 	reply.message = "Ok bye!!!";
+		// 	that.replied_msg(reply);
+		// 	await tools.sleep(1000)
+		// 	return user.logout()
+		// }
 
 
 		var typing = null;

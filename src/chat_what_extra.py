@@ -31,7 +31,7 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(ourite)? (game|hobby|activity)"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(ou?rite)? (game|hobby|activity)"),
 		C(r"(about )?((yo)?u|y(a|o))('| )?r (hobb(y|ies)|pastimes?)"),
 	],
 	(Rchoice("Besides cooking, ", blank=2)+
@@ -49,8 +49,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?food (items? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
-		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(orite)? food( items?)?( most|(a )?lot)?"),
+		C(r"(about )?(the )?food (items? )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(ou?rite)? food( items?)?( most|(a )?lot)?"),
 	],
 	(Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
@@ -61,8 +61,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?anime (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
-		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(orite)? anime( shows?)?( most|(a )?lot)?"),
+		C(r"(about )?(the )?anime (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(ou?rite)? anime( shows?)?( most|(a )?lot)?"),
 	],
 	(
 		("" if check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
@@ -79,8 +79,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?manga (series )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
-		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(orite)? manga( most|(a )?lot)?"),
+		C(r"(about )?(the )?manga (series )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(ou?rite)? manga( most|(a )?lot)?"),
 	],
 	(
 		Rchoice(
@@ -96,8 +96,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(orite)?)( most|(a )?lot)?"),
-		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(orite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
+		C(r"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(ou?rite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
 	],
 	(
 		Rchoice(
