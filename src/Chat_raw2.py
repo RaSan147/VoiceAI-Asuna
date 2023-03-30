@@ -1,4 +1,3 @@
-
 from collections import Counter
 import urllib.parse
 import webbrowser
@@ -219,12 +218,14 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = ""):
+def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool = True):
 	"""
 		INPUT: user input
 		user: User object
 		username: username of user (if `user` object is not provided)
 	"""
+	tt = time()
+
 	if user is None and username:
 		user = user_handler.get_user(username)
 
@@ -233,17 +234,19 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	_ui_raw = pre_rem_bot_call(_INPUT)
 	_ui = _ui_raw.lower().replace(".", " ").replace("'", " ")  # remove . from input
 	# keep . in raw to make sure its not removed it mathmatical expressions
-	xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/")
+	if PRINT_LOG:
+		xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/")
 	if _ui == "":
 		return
 
 	user.user_client_dt = user.get_user_dt()
 	# update client datetime
 
-	_time = time()
+	receive_time = tt
 	# why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
-	id = user.add_chat(INPUT, _time, 1, _ui_raw)
-	xprint("\t/c/user msg id: /=/", id)
+	id = user.add_chat(INPUT, receive_time, 1, _ui_raw)
+	if PRINT_LOG:
+		xprint(f"\t/c/`{user.username}` msg id: /=/", id)
 	msg = message_dict.copy()
 	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	user.chat.intent.append(intent)
@@ -270,8 +273,11 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	if msg["render"] == "innerHTML":
 		msg["message"] = msg["message"].replace("\n", "<br>")
 
-	_time = time()
-	user.add_chat(msg, _time, 0, rTo=id, intent=intent, context=on_context)
+	processed_time = time()
+	user.add_chat(msg, processed_time, 0, rTo=id, intent=intent, context=on_context)
+	
+	
+	print(f"\tRESP time: {time()-tt}s")
 	return msg
 
 
@@ -389,7 +395,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
 
-	xprint("\t/c/Flags: /=/", user.flags)
+	if PRINT_LOG:
+		xprint("\t/c/Flags: /=/", user.flags)
 
 	if user.flags.parrot:
 		if re_is_in(ip.stop_parrot, ui):
@@ -469,7 +476,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 		uiopen = remove_suffix(_what.group("query"))
 		uiopen_raw = remove_suffix(_what_raw.group("query"))
-		xprint("\t/r/query:/=/", uiopen_raw)
+		
+		if PRINT_LOG:
+			xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
 			rep(choice(ot.about_self),
@@ -708,7 +717,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 		_who_raw = re_search(ip.whos_, ui_raw)
 		uiopen = remove_suffix(_who.group("query"))
 		uiopen_raw = remove_suffix(_who_raw.group("query"))
-		xprint("\t/r/query:/=/", uiopen_raw)
+		
+		if PRINT_LOG:
+			xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
 			rep(choice(ot.about_self),
@@ -854,9 +865,9 @@ if __name__ == "__main__":
 	while 1:
 		inp = input(">> ")
 		user.user_client_time = time()
-		tt = time()
+
 		msg = basic_output(inp, user)
-		print(f"\tRESP time: {time()-tt}s")
+
 		if not msg:
 			continue  # break
 		msg = msg["message"]
