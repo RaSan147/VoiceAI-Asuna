@@ -248,7 +248,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	if PRINT_LOG:
 		xprint(f"\t/c/`{user.username}` msg id: /=/", id)
 	msg = message_dict.copy()
-	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id)
+	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id, PRINT_LOG=PRINT_LOG)
 	user.chat.intent.append(intent)
 
 	xprint(f"\t/i/intent:/=/ {intent}")
@@ -281,7 +281,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	return msg
 
 
-def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
+def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_LOG: bool = True):
 	"""
 		Input:  UNTOUCHED user input
 		user:   user object
