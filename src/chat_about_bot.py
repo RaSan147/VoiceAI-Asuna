@@ -27,7 +27,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[
 		C(r"how old ?a?re? ((yo)?u|y(a|o))( now)?"),
-		C(r"((yo)?u|y(a|o))(('| )?r)? age"),
+		C(r"((yo)?u|y(a|o))(('| )?(re?)?)? age"),
 	],
 	( Rchoice("I'm 17", 
 		"I'm 17 this year.",
@@ -39,7 +39,7 @@ def patterns(context=Counter(), check_context=null):
 
 [
 	[
-		C(r"about ((yo)?u|y(a|o))(('| )?r ?self)?( \<\:ai_name\>)?$"),
+		C(r"about ((yo)?u|y(a|o))(('| )?(re?)? ?self)?( \<\:ai_name\>)?$"),
 	],
 	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki." +
 		Rchoice(" I'm 17 this year.",blank=2) + 
@@ -56,8 +56,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(ou?rite)? (game|hobby|activity)"),
-		C(r"(about )?((yo)?u|y(a|o))('| )?r (hobb(y|ies)|pastimes?)"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?(re?)? )?fav(ou?rite)? (game|hobby|activity)"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?(re?)? (hobb(y|ies)|pastimes?)"),
 	],
 	( Rchoice("Besides cooking, ", blank=1)+
 		"I like to play different types of games" + Rchoice(" (specially anything with friends)", blank=1) + 
@@ -65,8 +65,8 @@ def patterns(context=Counter(), check_context=null):
 		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", blank=1), blank=1)+
 		"I turned into our real world, fantacy into reality...\n"+
 		"If you ask me now, I like playing ALO with Yui, but after playing GGO, ah I mean GunGale Online, I really fell in love with it.\n\n"+
-		"The thrill and everything, speed and precision. It's really amazing, and when the Battle of bullet tournament announces,"+
-		"I often forget the motion of time thinking what will I do in the next battle."+
+		"The thrill and everything, speed and precision. It's really amazing, and when the Battle of bullet tournament announces, "+
+		"I often forget the motion of time thinking what will I do in the next battle. "+
 		Rchoice("This is getting embarassing 🥶", blank=1)+
 		"\nI'll tell you more another day"
 	),
@@ -74,8 +74,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?food (items? )?(((yo)?u|y(a|o))('| )?r )?(like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(r"(about )?((yo)?u|y(a|o))('| )?r fav(ou?rite)? food( items?)?( most|(a )?lot)?"),
+		C(r"(about )?(the )?food (items? )?(((yo)?u|y(a|o))('| )?(re?)? )?(like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?((yo)?u|y(a|o))('| )?(re?)? fav(ou?rite)? food( items?)?( most|(a )?lot)?"),
 	],
 	( Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
@@ -86,8 +86,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?anime (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(ou?rite)? anime( shows?)?( most|(a )?lot)?"),
+		C(r"(about )?(the )?anime (shows? )?((yo)?u|y(a|o))('| )?(re?)? (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?(re?)? )?fav(ou?rite)? anime( shows?)?( most|(a )?lot)?"),
 	],
 	(
 		((Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
@@ -104,8 +104,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?manga (series )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(ou?rite)? manga( most|(a )?lot)?"),
+		C(r"(about )?(the )?manga (series )?((yo)?u|y(a|o))('| )?(re?)? (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?(re?)? )?fav(ou?rite)? manga( most|(a )?lot)?"),
 	],
 	(
 		Rchoice(
@@ -121,8 +121,8 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?((yo)?u|y(a|o))('| )?r (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(r"(about )?(((yo)?u|y(a|o))('| )?r )?fav(ou?rite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
+		C(r"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?((yo)?u|y(a|o))('| )?(re?)? (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(r"(about )?(((yo)?u|y(a|o))('| )?(re?)? )?fav(ou?rite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
 	],
 	(
 		Rchoice(

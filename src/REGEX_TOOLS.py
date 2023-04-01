@@ -4,7 +4,7 @@ import re
 from re import compile as re_compile
 from DS import Callable_dict
 from typing import Union
-
+from PRINT_TEXT3 import xprint
 
 class WEB_RE:
 	# compiled regex tool for getting homepage
@@ -83,63 +83,82 @@ class Tool_belt:
 	def __init__(self):
 		pass
 
-	def starts(self, patterns: Union[str, re.Pattern], string: str):
+	def starts(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns string if it **starts with** any of the patterns in the given patterns list
 		"""
+		if isinstance(patterns, (re.Pattern, str)):
+			patterns = [patterns,]
+
 		for i in patterns:
 			if isinstance(i, re.Pattern):
 				m = i.match(string)
 
 				if m:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return m.group(0)
 
 			else:
 				if string.startswith(i):
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return i
 
-	def check(self, patterns: Union[str, re.Pattern], string: str):
+	def check(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns string if it **has** any of the patterns in the given patterns list
 		"""
+		if isinstance(patterns, (re.Pattern, str)):
+			patterns = [patterns,]
+
 		for i in patterns:
 			if isinstance(i, re.Pattern):
 				m = i.search(string)
 				if m:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return m.group(0)
 
 			else:
 				if i in string:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return i
 
-	def is_in(self, patterns: Union[str, re.Pattern], string: str):
+	def is_in(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns string if it **full match** with any of the patterns in the given patterns list
 		"""
+		if isinstance(patterns, (re.Pattern, str)):
+			patterns = [patterns,]
+
 		for i in patterns:
 			if isinstance(i, re.Pattern):
 
 				m = i.fullmatch(string)
 				if m:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return m.group(0)
 
 			else:
 				if string == i:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return i
 
-	def search(self, patterns: Union[str, re.Pattern], string: str):
+	def search(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns `re.match object` if it has any of the patterns in the given patterns list
 		"""
+		m = None
+		if isinstance(patterns, (re.Pattern, str)):
+			patterns = [patterns,]
+
 		for i in patterns:
 			if isinstance(i, re.Pattern):
 				m = i.search(string)
 				if m:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return m
 
 			else:
 				m = re.search(re.escape(i), string)
 				if m:
+					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
 					return m
 
-		# all m are None re.Match
-		return m
 
 
 re_tools = Tool_belt()

@@ -31,7 +31,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[
 		C(r"^h(e|a)l+o+( there)?"),# hiiii/heey there Asuna
-		C(r"( |^)yo( |$)")
+		C(r"^yo( |$)")
 	], 
 	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
 				Rchoice(f' <:u_name>', blank=1)+ 
@@ -108,7 +108,7 @@ def patterns(context=Counter(), check_context=null):
 	"you_stupid"
 ],
 [
-	[C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?r ((mo(m|ther|mmy))|sis(ter)?))?"),],
+	[C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?(re?)? ((mo(m|ther|mmy))|sis(ter)?))?"),],
 	# this is terrible, i wish no one use this ever
 	(Rchoice("I don't like you.", 
 		'How rude!', 
@@ -153,7 +153,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[
 		C(r"(give me)?( a)? kiss(e?s+)( me)?"),
-		C(r"(\*)?kiss(es)?( ((yo)?u|y(a|o)))?( on (the |((yo)?u|y(a|o))(('| )?r )?)?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
+		C(r"(\*)?kiss(es)?( ((yo)?u|y(a|o)))?( on (the |((yo)?u|y(a|o))(('| )?(re?)? )?)?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
 	],
 	(
 		Rchoice(

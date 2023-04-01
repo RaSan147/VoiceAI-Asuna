@@ -285,7 +285,7 @@ li_reload = ('re', 'reload', '11')
 li_fucku = ('fuck you', 'fuck u', 'fuck ya')
 
 ip.fuck_you = [
-    C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?r ((mo(m|ther|mmy))|sis(ter)?))?"),
+    C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?(re?)? ((mo(m|ther|mmy))|sis(ter)?))?"),
 ]
 # this is terrible, i wish no one use this ever
 ot.fuck_you = (

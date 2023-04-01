@@ -47,11 +47,11 @@ def patterns(context=Counter(), check_context=null):
 	[
 		C(r"((yo)?u|y(a|o)) (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive) (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?"),
 		# you have amazing body
-		C(r"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?r)? (cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)? ?(body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?( so much| a lot)?"),
+		C(r"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?(re?)?)? (cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)? ?(body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?( so much| a lot)?"),
 		# i fell in love with your beautiful body
 		# i love your beautiful body so much
 		# i love the shape of your body
-		C(r"((yo)?u|y(a|o))(('| )?r)? (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so |(real|absolute)ly )?(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),
+		C(r"((yo)?u|y(a|o))(('| )?(re?)?)? (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so |(real|absolute)ly )?(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),
 		# your body is beautiful
 		# your body looks beautiful
 	],
@@ -81,11 +81,11 @@ def patterns(context=Counter(), check_context=null):
 	[
 		C(r"((yo)?u|y(a|o)) (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive) (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?"),
 		# you have amazing body
-		C(r"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?r)? (cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)? ?(eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?( so much| a lot)?"),
+		C(r"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?(re?)?)? (cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)? ?(eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?( so much| a lot)?"),
 		# i fell in love with your beautiful eyes
 		# i love your beautiful eyes so much
 		# i love the shape of your smile
-		C(r"((yo)?u|y(a|o))(('| )?r)? (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so|(real|absolute)ly )?(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),
+		C(r"((yo)?u|y(a|o))(('| )?(re?)?)? (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so|(real|absolute)ly )?(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),
 		# your eyes are beautiful
 		# your eyes look beautiful
 		C(r"(what|how) (an? )?(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive) (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? ((yo)?u|y(a|o)) (have|got|have got|have gotten|have gotten)")

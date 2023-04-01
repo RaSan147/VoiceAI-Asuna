@@ -369,7 +369,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 
 		for ptrn, otpt, intnt in patterns:
 			for n, i in enumerate(uiParts):
-				m = re_search(ptrn, i)
+				m = re_search(ptrn, i, PRINT_PATTERN=PRINT_LOG)
 				if m:
 					rep(rand_out(otpt))
 					intent(intnt)
