@@ -22,10 +22,10 @@ def patterns(context=Counter(), check_context=null):
 	], # hiiii/heey there Asuna
 	(
 		Rchoice(
-			"Well, I am not an AI yet, but I'm learning to be one",
-			"I'm your chat partner, but I'm not an AI yet",
-			"I am trained on small dataset, so I can't call myself an AI yet",
-			"I don't have the ability of an AI yet, but I'm trying",
+			"Well, I am not an smart AI yet, but I'm learning to be one",
+			"I'm your chat partner, but I'm not that much knowledgable yet",
+			"I am trained on small dataset, so I can't call myself an smart AI yet",
+			"I don't have the ability of an Chat GPT like AI yet, but I'm trying",
 		) +  '.'
 	),
 

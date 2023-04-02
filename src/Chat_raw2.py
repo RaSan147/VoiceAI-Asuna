@@ -355,15 +355,26 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			return outputs
 		return choice(outputs)
 
-	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None):
+	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None, split=None):
 		if _ui is None:
 			_ui = ui
 		if _ui_raw is None:
 			_ui_raw = ui_raw
 
 		found = False
-		uiParts = re.split(" (?:a?nd?|&) ", _ui)
-		uiRParts = re.split(" (?:a?nd?|&) ", _ui_raw, flags=re.IGNORECASE)
+		if split=="AND":
+			uiParts = re.split(" (?:a?nd?|&) ", _ui)
+			uiRParts = re.split(" (?:a?nd?|&) ", _ui_raw, flags=re.IGNORECASE)
+		elif split=="LINE":
+			uiParts = _ui.split("\n")
+			uiRParts = _ui_raw.split("\n")
+		elif split=="SENTENCE":
+			uiParts = re.split("(?<=[.!?]) +", _ui)
+			uiRParts = re.split("(?<=[.!?]) +", _ui_raw)
+		else:
+			uiParts = [_ui]
+			uiRParts = [_ui_raw]
+
 
 		to_del = []
 
@@ -422,7 +433,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		can_you_patterns(context=_context, check_context=check_context), action="remove_match")
+		can_you_patterns(context=_context, check_context=check_context), action="remove_match", split="AND")
 
 	# remove "can you" from the beginning of the sentence
 	ui_raw = post_rem_can_you(ui_raw)
@@ -522,7 +533,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			intent("(whats)_the_news")
 
 		elif check_patterns(
-				what_extra_patterns(context=_context, check_context=check_context), _ui=uiopen, _ui_raw=uiopen_raw, action="remove")[0]:
+				what_extra_patterns(context=_context, check_context=check_context), _ui=uiopen, _ui_raw=uiopen_raw, action="remove", split="AND")[0]:
 
 			return flush()
 
@@ -785,7 +796,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 	# WHY [-2:-2]? => if len < 2, it will return empty list instead of error
 	# print(user.chat.intent)
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
-		about_bot_patterns(context=_context, check_context=check_context), action="remove")
+		about_bot_patterns(context=_context, check_context=check_context), action="remove", split="AND")
 
 	if (not ui) and out:
 
