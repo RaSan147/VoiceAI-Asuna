@@ -71,8 +71,7 @@ def linker(link):
 	"""Match for link url and open the link in browser"""
 	for i in links_li:
 		if link in i:
-			web_go(i[0])
-			return True
+			return i[0]
 
 	return False
 
@@ -195,7 +194,7 @@ def post_rem_can_you(ui):
 		3. replace `*tell me* ....` with `....`
 		4. remove `*tell me regarding* ....` with `*about* ....`
 	"""
-	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please |plz )?(even )?(know|tell|remember|speak|say)( to)? me)? (?P<msg>.+)',
+	ui = re.sub(r'^((can|will|do|did) ((yo)?u|y(a|o)))?( please| plz)?( even)? ?(know|tell|remember|speak|say)?( to)?( me)? (?P<msg>.+)',
 				r'\g<msg>', ui, flags=re.IGNORECASE)
 	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 
@@ -439,6 +438,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 	ui_raw = post_rem_can_you(ui_raw)
 	ui = ui_raw.lower()  # convert to lower case
 
+	print("ui_raw", ui_raw)
+	
+
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
 	
@@ -668,9 +670,12 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 						"Opening " + link + " for you",
 											"Here you go",
 											"There you go"
-						))
+						),
+				script=f"window.open('{_url}', '_blank')"
+				)
 		else:
-			rep('No such link found')
+			rep('Couldn\'t find the link. Here\'s a google search for it instead. \n')
+			rep(searcher(link))
 
 		intent("goto")
 
