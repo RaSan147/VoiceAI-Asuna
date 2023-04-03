@@ -21,7 +21,10 @@ import TIME_sys
 # PIP PACKAGES
 
 import requests
-import wikipedia
+import wikipediaapi
+wikipedia = wikipediaapi.Wikipedia('en')
+from unidecode import unidecode
+import wikix
 
 # SELFMADE LIBS
 
@@ -47,6 +50,8 @@ re._MAXCACHE = 1024  # increase regex cache size
 
 __all__ = ('basic_output',)
 
+LOG_DEBUG = True
+
 
 
 
@@ -60,6 +65,11 @@ def log_unknown(*args, **kwargs):
 
 def log_type(*args, **kwargs):
 	xprint("USER INPUT", *args, **kwargs, end="\n\n")
+
+def log_xprint(*args, **kwargs):
+	if not LOG_DEBUG:
+		return 
+	xprint(*args, **kwargs)
 
 
 def web_go(link):
@@ -95,22 +105,18 @@ def wolfram(text, raw=''):
 	return r.text
 
 
-def _wiki(uix, raw=''):
-	if uix in [i.lower() for i in wikipedia.search(uix)]:
-		ny = wikipedia.page(uix)
-		return {"message": wikipedia.summary(uix, sentences=2) + 'f\n<a href={ny.url}">More</a>',
-				"render": "innerHTML"
-				}
-
-	elif wikipedia.search(uix) != []:
-		uix = wikipedia.search(uix)[0]
-
-		out = 'Did you mean ' + uix + '? '
-	else:
-		log_unknown(uix, raw)
-		out = "Couldn't find " + uix + "!\nWould you like to search instead?  "
-
-	return out
+def _wiki(uix):
+	ny = wikipedia.page(uix)
+	link = ny.fullurl
+			
+	# returns 4 line of summary
+	s = ny.summary
+	s = re.sub("</?br>", " <br>", s)
+	s = re.sub("( ){2,}", " ", s)
+	s = (". ").join(ny.summary.split(". ")[:4])
+	
+	return link, s
+			
 
 
 def wikisearch(uix='', raw='', user: User = None):
@@ -125,70 +131,70 @@ def wikisearch(uix='', raw='', user: User = None):
 		return wolf
 		
 	xprint("\t/c/Searching wiki:/=/", uix)
-		
-	wiki_search= [i.lower() for i in wikipedia.search(uix, results=5)]
 	
-	xprint("\t/c/Found wiki:/=/", wiki_search)
-	
-	match_search = [i for i in wiki_search  if uix in i.lower()]
+	try:
+		_uix = wikix.fix_promt(uix)
+		wiki_search= [i.title for i in wikix.search(_uix, 5)]
 		
-	if match_search:
-		uix_ = match_search[0]
-		xprint("\t/c/Getting wiki:/=/", uix_)
-		try:
-			ny = wikipedia.page(uix_)
-			response = wikipedia.summary(uix_, sentences=2)
+		
+		# using unidecode for pokemon and pokémon issue
+		match_search = [i for i in wiki_search if unidecode(uix.lower()) in unidecode(i.lower())]
+				
+		log_xprint("\t/c/Found wiki:/=/", wiki_search)
+		log_xprint("\t/c/Match wiki:/=/", match_search)
+		
 			
-			return {"message": response + 'f\n<a href={ny.url}">More</a>',
+		if match_search:
+			uix_ = match_search[0]
+			log_xprint("\t/c/Getting wiki:/=/", uix_)
+		
+			link, response = _wiki(uix_)
+			return {"message": response + 'f\n<a href={link}">More</a>',
 				"render": "innerHTML"
 				}
-		
-		except wikipedia.exceptions.DisambiguationError as e:
-			print(e.options)
-		except wikipedia.exceptions.PageError:
-			xprint("/r/Failed to wiki/=/: ", uix_, "\n\n")
-			traceback.print_exc()
-		except Exception:
-			xprint("/r/Failed to wiki/=/: ", uix_, "\n\n")
-			traceback.print_exc()
 
-
-	elif wiki_search:
-		uix = wiki_search[0]
-
-		out = 'Did you mean ' + uix + '? '
-		
-		if user:
-			# TODO: add to user flags for later use "yes/no" message
+		elif wiki_search:
+			uix_ = wiki_search[0]
+	
+			out = 'Did you mean ' + uix_ + '? '
+			
+			if not user:
+				return out
+				
+			
 			user.flags.ask_yes = user.msg_id
-			
-			ny = wikipedia.page(uix)
-			user.flags.on_yes = {"message": wikipedia.summary(uix, sentences=2) + 'f\n<a href={ny.url}">More</a>',
+				
+			link, response = _wiki(uix_)
+			user.flags.on_yes = {"message": response + 'f\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
-				}
+			}
 			return out
 	
-	else:
-		log_unknown(uix, raw)
-		safe_string = urllib.parse.quote_plus(uix)
-		link = "https://www.google.com/search?q=" + safe_string
+	except Exception:
+		xprint("/r/Failed to wiki/=/: ", uix_, "\n\n")
+		traceback.print_exc()
+	
+	
+	log_unknown(uix, raw)
+	safe_string = urllib.parse.quote_plus(uix)
+	link = "https://www.google.com/search?q=" + safe_string
 
-		if user:
-			# TODO: add to user flags for later use "yes/no" message
-			user.flags.ask_yes = user.msg_id
-			user.flags.on_yes = {
-				"message": "Okayy",
-				"script": f"""
-					window.open('{link}', '_blank')"
-				"""
-			}
+	if user:
+		# TODO: add to user flags for later use "yes/no" message
+		user.flags.ask_yes = user.msg_id
+		user.flags.on_yes = {
+			"message": "Okayy",
+			"script": f"""
+				window.open('{link}', '_blank')"
+			"""
+		}
 
-		return {"message": f"I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?",
-				"render": "innerHTML"
-				}
+	return {"message": f"I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?",		
+			"render": "innerHTML"
+		}
 
 def find_person(name, user:User = None):
-	return searcher(name)
+	# return searcher(name)
 	return wikisearch(name, name, user)
  
 
@@ -288,8 +294,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	_ui_raw = pre_rem_bot_call(_INPUT)
 	_ui = _ui_raw.lower().replace(".", " ").replace("'", " ")  # remove . from input
 	# keep . in raw to make sure its not removed it mathmatical expressions
-	if PRINT_LOG:
-		xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/")
+	log_xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/ ")
 	if _ui == "":
 		return
 
@@ -299,8 +304,8 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	receive_time = tt
 	# why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
 	id = user.add_chat(INPUT, receive_time, 1, _ui_raw)
-	if PRINT_LOG:
-		xprint(f"\t/c/`{user.username}` msg id: /=/", id)
+	
+	log_xprint(f"\t/c/`{user.username}` msg id: /=/", id)
 	msg = message_dict.copy()
 	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id, PRINT_LOG=PRINT_LOG)
 	user.chat.intent.append(intent)
@@ -460,8 +465,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 
 	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
 
-	if PRINT_LOG:
-		xprint("\t/c/Flags: /=/", user.flags)
+	log_xprint("\t/c/Flags: /=/", user.flags)
 
 	if user.flags.parrot:
 		if re_is_in(ip.stop_parrot, ui):
@@ -485,9 +489,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 		intent('logout')
 		return flush()
 		
-		
-	print([user.flags.ask_yes, user.flags.ask_yes, user.msg_id-3, ui])
-		
+
 	if user.flags.ask_yes and (user.flags.ask_yes > user.msg_id-3):
 		if re_is_in(ip.yeses, ui):
 			rep(user.flags.on_yes)
@@ -508,8 +510,6 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 	# remove "can you" from the beginning of the sentence
 	ui_raw = post_rem_can_you(ui_raw)
 	ui = ui_raw.lower()  # convert to lower case
-
-	print("ui_raw", ui_raw)
 	
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
@@ -561,8 +561,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 		uiopen = remove_suffix(_what.group("query"))
 		uiopen_raw = remove_suffix(_what_raw.group("query"))
 		
-		if PRINT_LOG:
-			xprint("\t/r/query:/=/", uiopen_raw)
+		log_xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
 			rep(choice(ot.about_self),
@@ -805,8 +804,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 		uiopen = remove_suffix(_who.group("query"))
 		uiopen_raw = remove_suffix(_who_raw.group("query"))
 		
-		if PRINT_LOG:
-			xprint("\t/r/query:/=/", uiopen_raw)
+		log_xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
 			rep(choice(ot.about_self),
