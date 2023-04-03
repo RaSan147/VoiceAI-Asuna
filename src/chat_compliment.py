@@ -17,7 +17,7 @@ def patterns(context=Counter(), check_context=null):
 	return [
 [
 
-	[C(r"^(really )*((cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive) ?)+(app|stuff|code)?"),],
+	[C(r"^(really )*((cool|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive|smart) ?)+(app|stuff|code)?"),],
 	# doesn't match if the word "you" is in the sentence
 	( Rchoice("😇", "😁", "😽")+ " " +
 		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
@@ -31,7 +31,7 @@ def patterns(context=Counter(), check_context=null):
 [
 
 	[
-		C(r"(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive)"),
+		C(r"(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(very )*(cool|cute|great|good|nice|awesome|amazing|pretty|beautiful|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive|smart)"),
 		"i like you"
 	],
 	( Rchoice("😇", "😁", "😽")+ " " +

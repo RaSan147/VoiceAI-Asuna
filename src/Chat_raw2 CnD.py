@@ -3,7 +3,7 @@ import urllib.parse
 import webbrowser
 from random import choice
 from typing import Union
-import traceback
+
 
 from basic_conv_re_pattern import ip, ot, it, remove_suffix
 from basic_conv_pattern import *
@@ -52,7 +52,7 @@ __all__ = ('basic_output',)
 
 
 bbc_topic = 'Asia_url'
-
+PRINT_LOG = True
 
 def log_unknown(*args, **kwargs):
 	F_sys.writer(appConfig.log_unknown, "a", str(list(args)) + "\n", timeout=0)
@@ -71,16 +71,21 @@ def linker(link):
 	"""Match for link url and open the link in browser"""
 	for i in links_li:
 		if link in i:
-			return i[0]
+			web_go(i[0])
+			return True
 
 	return False
 
 
 def searcher(search_txt):
 	loc = urllib.parse.quote(search_txt)
-	return {"message": f'Please check here <a href="https://www.google.com/search?q={loc}">{search_txt}</a>',
+	return {"message": f'<a href="https://www.google.com/search?q={loc}">{search_txt}</a>',
 			"render": "innerHTML"
 			}
+
+
+def find_person(name):
+	return searcher(name)
 
 
 def wolfram(text, raw=''):
@@ -114,84 +119,25 @@ def _wiki(uix, raw=''):
 
 
 def wikisearch(uix='', raw='', user: User = None):
-	if not check_internet():
-		return 'No internet connection!'
-		
-	if user:
-		uix = parsed_names_back(uix, user)
-		
-	wolf = wolfram(uix)
-	if wolf:
+	if check_internet() == True:
+		wolf = wolfram(uix)
+		if not wolf:
+			log_unknown(uix, raw)
+			safe_string = urllib.parse.quote_plus(uix)
+			link = "https://www.google.com/search?q=" + safe_string
+
+			if user:
+				# TODO: add to user flags for later use "yes/no" message
+				user.flags
+
+			return {"message": f"I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?",
+					"render": "innerHTML"
+					}
+
 		return wolf
-		
-	xprint("\t/c/Searching wiki:/=/", uix)
-		
-	wiki_search= [i.lower() for i in wikipedia.search(uix, results=5)]
-	
-	xprint("\t/c/Found wiki:/=/", wiki_search)
-	
-	match_search = [i for i in wiki_search  if uix in i.lower()]
-		
-	if match_search:
-		uix_ = match_search[0]
-		xprint("\t/c/Getting wiki:/=/", uix_)
-		try:
-			ny = wikipedia.page(uix_)
-			response = wikipedia.summary(uix_, sentences=2)
-			
-			return {"message": response + 'f\n<a href={ny.url}">More</a>',
-				"render": "innerHTML"
-				}
-		
-		except wikipedia.exceptions.DisambiguationError as e:
-			print(e.options)
-		except wikipedia.exceptions.PageError:
-			xprint("/r/Failed to wiki/=/: ", uix_, "\n\n")
-			traceback.print_exc()
-		except Exception:
-			xprint("/r/Failed to wiki/=/: ", uix_, "\n\n")
-			traceback.print_exc()
 
-
-	elif wiki_search:
-		uix = wiki_search[0]
-
-		out = 'Did you mean ' + uix + '? '
-		
-		if user:
-			# TODO: add to user flags for later use "yes/no" message
-			user.flags.ask_yes = user.msg_id
-			
-			ny = wikipedia.page(uix)
-			user.flags.on_yes = {"message": wikipedia.summary(uix, sentences=2) + 'f\n<a href={ny.url}">More</a>',
-				"render": "innerHTML"
-				}
-			return out
-	
 	else:
-		log_unknown(uix, raw)
-		safe_string = urllib.parse.quote_plus(uix)
-		link = "https://www.google.com/search?q=" + safe_string
-
-		if user:
-			# TODO: add to user flags for later use "yes/no" message
-			user.flags.ask_yes = user.msg_id
-			user.flags.on_yes = {
-				"message": "Okayy",
-				"script": f"""
-					window.open('{link}', '_blank')"
-				"""
-			}
-
-		return {"message": f"I don't know the answer ...\nShall I <a href='{link}' target='_blank'>Google</a>?",
-				"render": "innerHTML"
-				}
-
-def find_person(name, user:User = None):
-	return searcher(name)
-	return wikisearch(name, name, user)
- 
-
+		return 'No internet connection!'
 
 
 def parsed_names(ui, user: User):
@@ -249,7 +195,7 @@ def post_rem_can_you(ui):
 		3. replace `*tell me* ....` with `....`
 		4. remove `*tell me regarding* ....` with `*about* ....`
 	"""
-	ui = re.sub(r'^((can|will|do|did) ((yo)?u|y(a|o)))?( please| plz)?( even)? ?(know|tell|remember|speak|say)?( to)?( me)? (?P<msg>.+)',
+	ui = re.sub(r'^(((can|will|do|did) ((yo)?u|y(a|o)) )?(please |plz )?(even )?(know|tell|remember|speak|say)( to)? me)? (?P<msg>.+)',
 				r'\g<msg>', ui, flags=re.IGNORECASE)
 	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 
@@ -272,7 +218,7 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool = True):
+def basic_output(INPUT, user: User = None, username: str = ""):
 	"""
 		INPUT: user input
 		user: User object
@@ -302,7 +248,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	if PRINT_LOG:
 		xprint(f"\t/c/`{user.username}` msg id: /=/", id)
 	msg = message_dict.copy()
-	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id, PRINT_LOG=PRINT_LOG)
+	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	user.chat.intent.append(intent)
 
 	xprint(f"\t/i/intent:/=/ {intent}")
@@ -335,7 +281,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	return msg
 
 
-def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_LOG: bool = True):
+def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	"""
 		Input:  UNTOUCHED user input
 		user:   user object
@@ -390,13 +336,13 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			render = msg_txt.get("render", "")
 			msg_txt = _msg_txt
 
-		out["message"] += "\n\n" + str(msg_txt)
+		out["message"] += "\n\n" + msg_txt
 
 		if render:
-			out["render"] = str(render)
+			out["render"] = render
 
 		if script:
-			out["script"] += "\n\n" + str(script)
+			out["script"] += "\n\n" + script
 
 		return out
 
@@ -409,32 +355,21 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			return outputs
 		return choice(outputs)
 
-	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None, split=None):
+	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None):
 		if _ui is None:
 			_ui = ui
 		if _ui_raw is None:
 			_ui_raw = ui_raw
 
 		found = False
-		if split=="AND":
-			uiParts = re.split(" (?:a?nd?|&) ", _ui)
-			uiRParts = re.split(" (?:a?nd?|&) ", _ui_raw, flags=re.IGNORECASE)
-		elif split=="LINE":
-			uiParts = _ui.split("\n")
-			uiRParts = _ui_raw.split("\n")
-		elif split=="SENTENCE":
-			uiParts = re.split("(?<=[.!?]) +", _ui)
-			uiRParts = re.split("(?<=[.!?]) +", _ui_raw)
-		else:
-			uiParts = [_ui]
-			uiRParts = [_ui_raw]
-
+		uiParts = re.split(" (?:a?nd?|&) ", _ui)
+		uiRParts = re.split(" (?:a?nd?|&) ", _ui_raw, flags=re.IGNORECASE)
 
 		to_del = []
 
 		for ptrn, otpt, intnt in patterns:
 			for n, i in enumerate(uiParts):
-				m = re_search(ptrn, i, PRINT_PATTERN=PRINT_LOG)
+				m = re_search(ptrn, i)
 				if m:
 					rep(rand_out(otpt))
 					intent(intnt)
@@ -484,33 +419,14 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			)
 		intent('logout')
 		return flush()
-		
-		
-	print([user.flags.ask_yes, user.flags.ask_yes, user.msg_id-3, ui])
-		
-	if user.flags.ask_yes and (user.flags.ask_yes > user.msg_id-3):
-		if re_is_in(ip.yeses, ui):
-			rep(user.flags.on_yes)
-			
-			intent("accept_yes_no")
-		elif re_is_in(ip.no, ui):
-			rep("Got it!")
-			
-			intent("decline_yes_no")
-
-		user.flags.ask_yes = user.flags.on_yes = None
-		
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		can_you_patterns(context=_context, check_context=check_context), action="remove_match", split="AND")
+		can_you_patterns(context=_context, check_context=check_context), action="remove_match")
 
 	# remove "can you" from the beginning of the sentence
 	ui_raw = post_rem_can_you(ui_raw)
 	ui = ui_raw.lower()  # convert to lower case
-
-	print("ui_raw", ui_raw)
-	
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
@@ -585,6 +501,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
 
 			intent("(what)_my_self")
+			
+		elif re_is_in(ip.your_bday, uiopen):
+			rep(
+				Rchoice("It's", "My birthday is") + " " + 
+				Rchoice("on ", blank=1) + "September 30th" +
+				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
+			)
+			
+			intent("(what)_my_bday")
 
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
 			rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
@@ -606,16 +531,16 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			intent("(whats)_the_news")
 
 		elif check_patterns(
-				what_extra_patterns(context=_context, check_context=check_context), _ui=uiopen, _ui_raw=uiopen_raw, action="remove", split="AND")[0]:
+				what_extra_patterns(context=_context, check_context=check_context), _ui=uiopen, _ui_raw=uiopen_raw, action="remove")[0]:
 
-			pass
+			return flush()
 
 		else:
 			rep(wikisearch(uiopen_raw, raw=ui, user=user))
 
 			intent("(whats)_something")
 
-		return flush()
+			return flush()
 
 	if re_check(ip.change_cloth, ui):
 
@@ -741,12 +666,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 						"Opening " + link + " for you",
 											"Here you go",
 											"There you go"
-						),
-				script=f"window.open('{_url}', '_blank')"
-				)
+						))
 		else:
-			rep('Couldn\'t find the link. Here\'s a google search for it instead. \n')
-			rep(searcher(link))
+			rep('No such link found')
 
 		intent("goto")
 
@@ -798,6 +720,35 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 			rep('No internet!')
 
 		intent("whats_the_news")
+		
+	elif re_starts(ip.whens_, ui):
+		_when = re_search(ip.whens_, ui)
+		_when_raw = re_search(ip.whens_, ui_raw)
+		uiopen = remove_suffix(_when.group("query"))
+		uiopen_raw = remove_suffix(_when_raw.group("query"))
+		
+		if PRINT_LOG:
+			xprint("\t/r/query:/=/", uiopen_raw)
+
+		
+		if re_is_in(ip.your_bday, uiopen):
+			rep(
+				Rchoice("It's", "My birthday is") + " " + 
+				Rchoice("on ", blank=1) + "September 30th" +
+				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
+			)
+			
+			intent("(what)_my_bday")
+		
+		else:
+			x = wikisearch(uiopen, uiopen_raw, user)
+			if x:
+				rep(x)
+			else:
+				rep(find_person(uiopen_raw))
+				
+			intent("(when)_something")
+ 
 
 	elif re_starts(ip.whos_, ui):
 		_who = re_search(ip.whos_, ui)
@@ -855,7 +806,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 
 		intent("set_timer")
 
-	elif re_check(ip.bye, ui):
+	elif ui in escape:
 		reloaded = False
 		reloader = False
 		BREAK_POINT = True
@@ -868,44 +819,11 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 				Rchoice('👋😄', blank=1))
 
 		return flush()
-		
-	elif re_check(ip.take_care, ui):
-		
-		intent("take_care")
-
-		out = (Rchoice("You too", "Same to you") + " " +
-				Rchoice(f" {user.nickname}", blank=1) +
-				Rchoice('!', '.', blank=1) +
-				Rchoice('👋😄', "😘", blank=1))
-
-		return flush()
 
 	# WHY [-2:-2]? => if len < 2, it will return empty list instead of error
 	# print(user.chat.intent)
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
-		about_bot_patterns(context=_context, check_context=check_context), action="remove", split="AND")
-
-
-	if re_check(ip.help, ui):
-		rep(
-			Rchoice(
-				"I'm not a discord bot or something.",
-				"It's not like I'm a discord bot or something.",
-			) + "\n" +
-			Rchoice("But it seems", "Looks like") + " you're looking for this..." ,
-			
-			script=("""
-				(async () => {await tools.sleep(2000);
-				appConfig.show_help_note();
-				}).()
-			""")
-			
-		)
-		
-	if re.search("\d", ui):
-		rep(wikisearch(ui, ui_raw, user))
-
-
+		about_bot_patterns(context=_context, check_context=check_context), action="remove")
 
 	if (not ui) and out:
 

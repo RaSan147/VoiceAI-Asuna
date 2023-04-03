@@ -21,7 +21,9 @@ import TIME_sys
 # PIP PACKAGES
 
 import requests
-import wikipedia
+import wikipediaapi
+wikipedia = wikipediaapi.Wikipedia('en')
+
 
 # SELFMADE LIBS
 

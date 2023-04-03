@@ -181,7 +181,7 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"be my (gf|girl(friend|ie)?|wife|waifu|queen|woman|partner|one and only|bab(e|y)|honey|lover?|sweetheart|darling)"),
+		C(r"be my (gf|girl(friend|ie)?|wife|waif(u|y)|queen|woman|partner|one and only|bab(e|y)|honey|lover?|sweetheart|darling)"),
 		"be mine"
 	],
 	(

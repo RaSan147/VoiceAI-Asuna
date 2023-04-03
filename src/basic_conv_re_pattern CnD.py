@@ -105,13 +105,12 @@ ip.logout = [
 
 
 ip.yeses = [
-    C(r'(well )?(actually )?y(e|a)(ah|s|p)( of ?course)?( sure)?'),
+    C(r'(well )?(actually )?y(e|a)(ah|s|p)( of ?course)?( sure)'),
     # well actually yes/yep/yeah of~course
     'sure',
-    'of( |-)?course',
+    'of course',
     C(r"ok+(ay|h|eh)?"),  # okkay/okeh
-    "go (on|ahead)",
-    C("^y$")
+    "go (on|ahead)"
 ]
 
 # print(ip["yeses"][3].match("okkeh"))
@@ -169,6 +168,10 @@ ip.whos_ = [
     C(r"who('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
 ]
 
+ip.whens_ = [
+    C(r"when('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
+]
+
 ip.whats_your_name = [
     # C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
     C(r"(what('| )?(s|re|is|are|r|was|were|am|will|will be)? )?((yo)?u|y(a|o))(r|re)? name"),
@@ -208,6 +211,10 @@ ip.my_self = [
 "what are you?"
 ip.you_self = [
     C(r"((yo)?u|y(a|o))('| )?(re?)?( ?self)?( really)?"),
+]
+
+ip.your_bday = [
+	C(r"((yo)?u|y(a|o))('| )?(re?)? (birthday|bday)")
 ]
 
 
@@ -345,26 +352,11 @@ set_timer_pattern = "set ?a? timer of (.*)"
 
 # db = generate_list('li_')
 
-ip.bye = [
-    "exit", "close", 
-    C("(shut|turn) ?(down|off)"), 
-    "quit",
-    C("(good )?(bye+ ?)+"), 
-    C("esc(ape)?"), 
-    C("ta( |-)?ta"), 
-    C("see ((yo)?u|y(a|o))"),
+escape = [
+    "exit", "close", "shut down", "quit",
+    "bye", "esc", "tata", "see ya", "see you"
 ]
-#li_bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."
-
-ip.take_care = [
-	C("take( |-)?care"),
-	C("sweet( |-)?dreams?"),
-	"have a nice day",
-]
-
-ip.help = [
-	C("(\/|\\\)?(show(-| )?)?(help|commands?|menu)"),
-]
+li_bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."
 
 
 m_comm = generate_list('mc_')

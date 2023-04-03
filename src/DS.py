@@ -98,6 +98,8 @@ class Template(_Template):
 
 
 
+from queue import Queue
+
 class Zfunc(object):
 	"""Thread safe sequncial printing/queue task handler class"""
 
@@ -144,6 +146,6 @@ class Zfunc(object):
 		
 
 
-	def new(self):
-		self.__init__()
+	def new(self, caller, store_return=False):
+		self.__init__(caller, store_return)
 

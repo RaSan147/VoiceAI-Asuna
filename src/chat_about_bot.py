@@ -16,6 +16,21 @@ def patterns(context=Counter(), check_context=null):
 	return [
 [
 	[
+		C("((yo)?u|y(a|o))('| )?(re?)? (an? )?(bot|gpt|chat( |-)?gpt|ai|robot)"),
+	],
+	(
+		Rchoice(
+			"Well, I am not an smart AI yet, but I'm learning to be one",
+			"I'm your chat partner, but I'm not that much knowledgable yet",
+			"I am trained on small dataset, so I can't call myself an smart AI yet",
+			"I don't have the ability of an Chat GPT like AI yet, but I'm trying",
+		) +  '.'
+	),
+
+	"are_you_ai"
+],
+[
+	[
 		C(r"how ?a?re? ((yo)?u|y(a|o))( doing?)?( today| now)?"),
 		C(r"how do ((yo)?u|y(a|o)) do"),
 	],
