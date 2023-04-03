@@ -33,7 +33,7 @@ from pyroboxCore import PostError
 
 # CHAT LIB
 
-import Chat_raw3
+import Chat_raw2
 
 
 
@@ -393,9 +393,9 @@ def chat(self: SH, *args, **kwargs):
 	user.user_client_time = int(_time)/1000
 
 	# TODO: REMOVE THIS IN PRODUCTION
-	importlib.reload(Chat_raw3)
+	importlib.reload(Chat_raw2)
 
-	reply = Chat_raw3.basic_output(message, user)
+	reply = Chat_raw2.basic_output(message, user)
 
 	if isinstance(reply, dict):
 		out.update(reply)
