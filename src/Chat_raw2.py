@@ -111,6 +111,7 @@ def _wiki(uix):
 			
 	# returns 4 line of summary
 	s = ny.summary
+	s = s.replace("\n", "<br>")
 	s = re.sub("</?br>", " <br>", s)
 	s = re.sub("( ){2,}", " ", s)
 	s = (". ").join(ny.summary.split(". ")[:4])
@@ -149,7 +150,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			log_xprint("\t/c/Getting wiki:/=/", uix_)
 		
 			link, response = _wiki(uix_)
-			return {"message": response + 'f\n<a href={link}">More</a>',
+			return {"message": response + 'f\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
 				}
 
@@ -278,7 +279,7 @@ message_dict = {
 }
 
 
-def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool = True):
+def basic_output(INPUT, user: User = None, username: str = ""):
 	"""
 		INPUT: user input
 		user: User object
@@ -307,7 +308,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	
 	log_xprint(f"\t/c/`{user.username}` msg id: /=/", id)
 	msg = message_dict.copy()
-	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id, PRINT_LOG=PRINT_LOG)
+	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id)
 	user.chat.intent.append(intent)
 
 	xprint(f"\t/i/intent:/=/ {intent}")
@@ -340,7 +341,7 @@ def basic_output(INPUT, user: User = None, username: str = "", PRINT_LOG: bool =
 	return msg
 
 
-def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_LOG: bool = True):
+def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	"""
 		Input:  UNTOUCHED user input
 		user:   user object
@@ -439,7 +440,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int, PRINT_L
 
 		for ptrn, otpt, intnt in patterns:
 			for n, i in enumerate(uiParts):
-				m = re_search(ptrn, i, PRINT_PATTERN=PRINT_LOG)
+				m = re_search(ptrn, i, PRINT_PATTERN=LOG_DEBUG)
 				if m:
 					rep(rand_out(otpt))
 					intent(intnt)

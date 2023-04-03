@@ -394,6 +394,8 @@ def chat(self: SH, *args, **kwargs):
 
 	# TODO: REMOVE THIS IN PRODUCTION
 	importlib.reload(Chat_raw2)
+	
+	Chat_raw2.LOG_DEBUG = True
 
 	reply = Chat_raw2.basic_output(message, user)
 
