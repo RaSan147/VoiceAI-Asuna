@@ -3,7 +3,7 @@ import re
 from re import compile
 
 
-from REGEX_TOOLS import re_starts, re_check, re_is_in, re_search
+from REGEX_TOOLS import re_starts, re_check, re_is_in, re_search, eos
 from DS import GETdict
 
 
@@ -169,6 +169,10 @@ ip.whos_ = [
     C(r"who('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
 ]
 
+ip.whens_ = [
+    C(r"when('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
+]
+
 ip.whats_your_name = [
     # C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
     C(r"(what('| )?(s|re|is|are|r|was|were|am|will|will be)? )?((yo)?u|y(a|o))(r|re)? name"),
@@ -208,6 +212,10 @@ ip.my_self = [
 "what are you?"
 ip.you_self = [
     C(r"((yo)?u|y(a|o))('| )?(re?)?( ?self)?( really)?"),
+]
+
+ip.your_bday = [
+	C(r"((yo)?u|y(a|o))('| )?(re?)? (birthday|bday)")
 ]
 
 
@@ -304,7 +312,7 @@ ip.hate_you = [
 
 ip.whats_up = [
     C(r"wh?(u|a)t?( |')?s+ up+"),
-    C('^sup( |$)'),
+    C(r'^sup' + eos),
 ]
 
 
@@ -347,23 +355,23 @@ set_timer_pattern = "set ?a? timer of (.*)"
 
 ip.bye = [
     "exit", "close", 
-    C("(shut|turn) ?(down|off)"), 
+    C(r"(shut|turn) ?(down|off)"), 
     "quit",
-    C("(good )?(bye+ ?)+"), 
-    C("esc(ape)?"), 
-    C("ta( |-)?ta"), 
-    C("see ((yo)?u|y(a|o))"),
+    C(r"(good )?(bye+ ?)+"), 
+    C(r"esc(ape)?"), 
+    C(r"ta( |-)?ta"), 
+    C(r"see ((yo)?u|y(a|o))"),
 ]
 #li_bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."
 
 ip.take_care = [
-	C("take( |-)?care"),
-	C("sweet( |-)?dreams?"),
+	C(r"take( |-)?care"),
+	C(r"sweet( |-)?dreams?"),
 	"have a nice day",
 ]
 
 ip.help = [
-	C("(\/|\\\)?(show(-| )?)?(help|commands?|menu)"),
+	C(r"[/\\]?(show(-| )?)?(help|commands?|menu)"),
 ]
 
 

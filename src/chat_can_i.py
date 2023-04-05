@@ -14,42 +14,45 @@ def patterns(context=Counter(), check_context=null):
 	return [
 [
 	[
-		C(r"(speak|talk|tell)( it)?( aloud| out loud)?( to me)?$"),
+		C(r"(ask|say|tell) ((yo)?u|y(a|o)) (something?|smtg)"),
 	],
-	( Rchoice("Sorry, I lost my headphones",
+	( Rchoice(
+		"Sure! Ask away",
+		"Of course. I'll try my best to answer",
+		"Yes indeed... Thats why I am here.",
+		"Go ahead. But I might disappoint you "
+	) +
+		Rchoice(" 😅", " 😁", " ~", "...", blank=1)
+	),
+	"can_i_ask_u"
+],
+[
+	[
+		C(r"help ((yo)?u|y(a|o))( with anything)?"),
+		C(r"(suggest|report) ((yo)?u|y(a|o))? ?(an? )?(something?|smtg|issue|problem )?"),
+	],
+	( Rchoice(
+		"Sure!",
+		"Of course",
+		"Yes indeed...",
+		"Go ahead."
+	) +
+	"Just go here and create a new issue.<br><a href='https://github.com/RaSan147/VoiceAI-Asuna/issues' target='_blank'>Github issue</a>"
+	),
+	"can_i_report_u"
+],
+[
+	[
+		C(r"(listen|hear) ((yo)?u|y(a|o))( voice)?"),
+	],
+		( Rchoice("Sorry, I lost my headphones",
 			"Sorry, I don't have a voice device yet",
 			"I'll buy a headset soon",
 			"Sorry, Can't talk right now",
 			"Sorry, I'm not allowed to talk now") +
 		Rchoice(" 😅", " ~", "...", blank=1)
 	),
-	"can_you_speak"
-],
-[
-	[
-		C(r"(voice )?(listen|hear)(( to)? ?(me|my voice|what(ever)? i (say|speak)))?$"),
-	],
-	( Rchoice("Sorry, I lost my headphones",
-			"Sorry, I don't have a headset yet",
-			"I'll buy a headset soon",
-			"Sorry, Can't hear you right now") +
-		Rchoice(" so that i can hear you", blank=1) +
-		Rchoice(" 😅", " ~", "...", blank=1)
-	),
-	"can_you_speak"
-],
-[
-	[
-		C(r"voice( listen)?( to me)?$"),
-	],
-	( Rchoice("Sorry, I lost my headphones",
-			"Sorry, I don't have a headset yet",
-			"I'll buy a headset soon",
-			"Sorry, Can't hear you right now") +
-		Rchoice(" so that i can hear you", blank=1) +
-		Rchoice(" 😅", " ~", "...", blank=1)
-	),
-	"can_you_speak"
+	"can_i_hear_you"
 ],
 
 

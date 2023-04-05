@@ -37,6 +37,7 @@ from PRINT_TEXT3 import xprint, remove_style
 # CHAT PATTERN LIBS
 
 from chat_can_you import patterns as can_you_patterns
+from chat_can_i import patterns as can_you_patterns
 from chat_expressions import patterns as expressions_patterns
 from chat_what_extra import patterns as what_extra_patterns
 from chat_about_bot import patterns as about_bot_patterns
@@ -172,7 +173,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			return out
 	
 	except Exception:
-		xprint("/r/Failed to wiki/=/: ", uix_, "\n\n")
+		xprint("/r/Failed to wiki/=/: ", uix, "\n\n")
 		traceback.print_exc()
 	
 	
@@ -585,6 +586,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
 
 			intent("(what)_my_self")
+			
+		elif re_is_in(ip.your_bday, uiopen):
+			rep(
+				Rchoice("It's", "My birthday is") + " " + 
+				Rchoice("on ", blank=1) + "September 30th" +
+				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
+			)
+			
+			intent("(what)_my_bday")
 
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
 			rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
@@ -799,6 +809,34 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 		intent("whats_the_news")
 
+	elif re_starts(ip.whens_, ui):
+		_when = re_search(ip.whens_, ui)
+		_when_raw = re_search(ip.whens_, ui_raw)
+		uiopen = remove_suffix(_when.group("query"))
+		uiopen_raw = remove_suffix(_when_raw.group("query"))
+		
+		log_xprint("\t/r/query:/=/", uiopen_raw)
+
+		
+		if re_is_in(ip.your_bday, uiopen):
+			rep(
+				Rchoice("It's", "My birthday is") + " " + 
+				Rchoice("on ", blank=1) + "September 30th" +
+				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
+			)
+			
+			intent("(what)_my_bday")
+		
+		else:
+			x = wikisearch(uiopen, uiopen_raw, user)
+			if x:
+				rep(x)
+			else:
+				rep(find_person(uiopen_raw))
+				
+			intent("(when)_something")
+ 
+
 	elif re_starts(ip.whos_, ui):
 		_who = re_search(ip.whos_, ui)
 		_who_raw = re_search(ip.whos_, ui_raw)
@@ -901,7 +939,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 			
 		)
 		
-	if re.search("\d", ui):
+	if re.search(r"\d", ui):
 		rep(wikisearch(ui, ui_raw, user))
 
 

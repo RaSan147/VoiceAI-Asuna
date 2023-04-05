@@ -167,3 +167,6 @@ re_starts = re_tools.starts
 re_check = re_tools.check
 re_is_in = re_tools.is_in
 re_search = re_tools.search
+
+eos = r"(?:\s|$)"
+

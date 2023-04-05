@@ -1,6 +1,6 @@
 from collections import Counter
 
-from REGEX_TOOLS import re_check, re_is_in, re_starts
+from REGEX_TOOLS import re_check, re_is_in, re_starts, eos
 from basic_conv_re_pattern import C
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
@@ -31,7 +31,6 @@ def patterns(context=Counter(), check_context=null):
 
 	"are_you_ai"
 ],
-
 [
 	[
 		C(r"awake"),
@@ -55,7 +54,44 @@ def patterns(context=Counter(), check_context=null):
 
 	"are_you_awake"
 ],
+[
+	[
+		C(r"(an? )?boy( or g[iu]rl)?"),
+		C(r"(an? )?g[iu]rl( or boy)?"),
+		C(r"(an? )?m[ae]n( or wom[ae]n)?"),
+		C(r"(an? )?wom|ae]n( or m[ae]n)?"),
+		C(r"(an? )?male( or female)?"),
+		C(r"(an? )?female( or male)?"),
+		
+	], # hiiii/heey there Asuna
+	(
+		Rchoice(
+			"Well, of course I am girl. 🤨",
+			"As you can see, I am a woman.",
+			"I am a girl and you clearly know that. 😬",
+		) 
+	),
 
+	"are_you_boy"
+],
+[
+	[
+		C(r"(an? )?(gay|geh|gah)" + eos),
+		C(r"(an? )?lesb(o|ian)?"),
+		C(r"(an? )?straight"),
+	
+		
+	], # hiiii/heey there Asuna
+	(
+		Rchoice(
+			"Well, of course I am straight . 🤨",
+			"As you can see, I am a straight.",
+			"I am straight and you clearly know that. 😬",
+		)
+	),
+
+	"are_you_lesb"
+], 
 
 
 
