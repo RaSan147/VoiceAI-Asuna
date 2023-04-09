@@ -2,15 +2,19 @@
 
 import webbrowser
 import time
-import urllib3, requests
-import urllib3.exceptions
 from random import choice as random_choice
 
-import requests
+
 from re import compile as re_compile, sub as re_sub
 from os.path import isfile as os_isfile
 import os
 from hashlib import md5
+
+
+import urllib3
+import urllib3.exceptions
+import requests
+from bs4 import BeautifulSoup as bs, FeatureNotFound as bs_FeatureNotFound
 
 
 from headers_file import header_list
@@ -23,11 +27,34 @@ from PRINT_TEXT3 import xprint
 from RESPONSE_CACHE import Cached_Response
 from CONFIG import appConfig
 NetErrors = (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError,
-			 requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout, requests.exceptions.MissingSchema,
-			 requests.exceptions.InvalidSchema, requests.exceptions.SSLError, urllib3.exceptions.SSLError)
+			 requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout,
+			 requests.exceptions.MissingSchema, requests.exceptions.InvalidSchema,
+			 requests.exceptions.SSLError, urllib3.exceptions.SSLError)
 
 # print(8)  # x
 
+_parser = 'lxml'
+try:
+	bs('<br>', _parser)
+except bs_FeatureNotFound:
+	_parser = 'html.parser'
+	
+
+def html2str(data:str):
+	data = data.replace("<br>", "\n").replace("<br/>", "\n")
+	data = data.replace("&emsp;", "\t")
+	
+	data = bs(data, _parser).text
+	
+	return data
+	
+def str2html(data:str):
+	data = data.replace("\n", "<br>")
+	data = data.replace("\t", "&emsp;")
+	
+	return data
+	
+	
 
 
 def header_(referer=None):  # fc=0802 v

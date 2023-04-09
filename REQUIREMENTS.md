@@ -2,7 +2,7 @@
 
 ```
 pip install --upgrade pip wheel
-pip install -U pafy mutagen comtypes six yt-dlp requests pytz
+pip install -U pafy mutagen comtypes six yt-dlp requests pytz beautifulsoup4
 pip install Unidecode Wikipedia-API 
 ```
 

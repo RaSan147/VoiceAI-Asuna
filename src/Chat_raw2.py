@@ -4,25 +4,21 @@ import webbrowser
 from random import choice
 from typing import Union
 import traceback
+from time import time
+
+import TIME_sys
 
 from basic_conv_re_pattern import ip, ot, it, remove_suffix
 from basic_conv_pattern import *
 from CONFIG import appConfig
 from user_handler import User, user_handler
-from DS import str2
-
-# import datetime
-
-from time import sleep, time
-import TIME_sys
-
+# from DS import str2
 
 
 # PIP PACKAGES
 
 import requests
 import wikipediaapi
-wikipedia = wikipediaapi.Wikipedia('en')
 from unidecode import unidecode
 import wikix
 
@@ -33,6 +29,9 @@ import F_sys
 from OS_sys import check_internet
 from REGEX_TOOLS import re_search, re_starts, re_check, re_is_in
 from PRINT_TEXT3 import xprint, remove_style
+from DATA_sys import call_or_return
+
+import net_sys
 
 # CHAT PATTERN LIBS
 
@@ -56,7 +55,7 @@ LOG_DEBUG = True
 
 
 
-
+wikipedia = wikipediaapi.Wikipedia('en')
 bbc_topic = 'Asia_url'
 
 
@@ -64,10 +63,11 @@ def log_unknown(*args, **kwargs):
 	F_sys.writer(appConfig.log_unknown, "a", str(list(args)) + "\n", timeout=0)
 
 
-def log_type(*args, **kwargs):
-	xprint("USER INPUT", *args, **kwargs, end="\n\n")
 
 def log_xprint(*args, **kwargs):
+	"""
+		print log in print format
+	"""
 	if not LOG_DEBUG:
 		return 
 	xprint(*args, **kwargs)
@@ -88,6 +88,9 @@ def linker(link):
 
 
 def searcher(search_txt):
+	"""
+	return the google link for search_txt query
+	"""
 	loc = urllib.parse.quote(search_txt)
 	return {"message": f'Please check here <a href="https://www.google.com/search?q={loc}">{search_txt}</a>',
 			"render": "innerHTML"
@@ -95,6 +98,11 @@ def searcher(search_txt):
 
 
 def wolfram(text, raw=''):
+	"""
+	returns wolfram alpha response based on query text
+	text: query
+	raw: the untouched user input for logging
+	"""
 	r = requests.get("http://api.wolframalpha.com/v1/spoken",
 					 params={
 						 "i": text,
@@ -107,6 +115,11 @@ def wolfram(text, raw=''):
 
 
 def _wiki(uix):
+	"""
+	search in wikipedia,
+	split only 4 sentences 
+	parse results to HTML
+	"""
 	ny = wikipedia.page(uix)
 	link = ny.fullurl
 			
@@ -122,6 +135,13 @@ def _wiki(uix):
 
 
 def wikisearch(uix='', raw='', user: User = None):
+	"""
+	search for text response for data query.
+	1st, checks for wolfram alpha response 
+	2nd, checks if there's any data in wikipedia
+	3rd, after failing above, returns google search link
+	"""
+	
 	if not check_internet():
 		return 'No internet connection!'
 		
@@ -155,7 +175,7 @@ def wikisearch(uix='', raw='', user: User = None):
 				"render": "innerHTML"
 				}
 
-		elif wiki_search:
+		if wiki_search:
 			uix_ = wiki_search[0]
 	
 			out = 'Did you mean ' + uix_ + '? '
@@ -182,7 +202,6 @@ def wikisearch(uix='', raw='', user: User = None):
 	link = "https://www.google.com/search?q=" + safe_string
 
 	if user:
-		# TODO: add to user flags for later use "yes/no" message
 		user.flags.ask_yes = user.msg_id
 		user.flags.on_yes = {
 			"message": "Okayy",
@@ -286,7 +305,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 		user: User object
 		username: username of user (if `user` object is not provided)
 	"""
-	tt = time()
+	receive_time = time()
 
 	if user is None and username:
 		user = user_handler.get_user(username)
@@ -303,18 +322,18 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	user.user_client_dt = user.get_user_dt()
 	# update client datetime
 
-	receive_time = tt
 	# why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
-	id = user.add_chat(INPUT, receive_time, 1, _ui_raw)
+	mid = user.add_chat(INPUT, receive_time, 1, _ui_raw)
+	# mid = message id
 	
-	log_xprint(f"\t/c/`{user.username}` msg id: /=/", id)
+	log_xprint(f"\t/c/`{user.username}` msg id: /=/", mid)
 	msg = message_dict.copy()
-	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, id)
+	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, mid)
 	user.chat.intent.append(intent)
 
 	xprint(f"\t/i/intent:/=/ {intent}")
 
-	msg["rTo"] = id  # reply to id # can be used in HTML to scroll to the message
+	msg["rTo"] = mid  # reply to id # can be used in HTML to scroll to the message
 
 	if not out:
 		log_unknown(ui_raw, INPUT)
@@ -332,23 +351,23 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	msg["message"] = message.strip()
 
 	if msg["render"] == "innerHTML":
-		msg["message"] = msg["message"].replace("\n", "<br>")
+		msg["message"] = net_sys.str2html(msg["message"])
 
 	processed_time = time()
-	user.add_chat(msg, processed_time, 0, rTo=id, intent=intent, context=on_context)
+	user.add_chat(msg, processed_time, 0, rTo=mid, intent=intent, context=on_context)
 	
 	
-	print(f"\tRESP time: {time()-tt}s")
+	print(f"\tRESP time: {time()-receive_time}s")
 	return msg
 
 
-def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
+def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	"""
 		Input:  UNTOUCHED user input
 		user:   user object
 		ui_raw: (cleaned) user input
 		ui:     (cleaned lower case) user input
-		id:     chat id
+		mid:     msg id
 	"""
 	# out = str2()
 	# out = str()
@@ -378,12 +397,18 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 		on_context.append(i)
 
-	def check_context(context=[]):
+	def check_context(context=()):
+		"""
+		check if any of the context list is in previous msg intent
+		"""
 		for i in context:
 			if i in prev_intent:
 				return True
 
 	def clean():
+		"""
+		forgot what it is
+		"""
 		nonlocal out
 		out = message_dict.copy()
 
@@ -412,11 +437,20 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 		return out, _intent, on_context, ui, ui_raw
 
 	def rand_out(outputs: Union[list, tuple, str]):
+		"""
+		randomly send a string from a list
+		"""
 		if isinstance(outputs, str):
 			return outputs
 		return choice(outputs)
 
 	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None, split=None):
+		"""
+		check for pattern match in list of patterns,
+		if match add the reply in out and intent,
+		if matched part needs to be removed, thats also done here,
+		if input needs to be split before checking for multiple query (based of different type , like sentence , and etc), using split that is done
+		"""
 		if _ui is None:
 			_ui = ui
 		if _ui_raw is None:
@@ -474,7 +508,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 			user.flags.parrot = False
 			rep(
 				Rchoice("Okay!", "Alright!", "Alright, I'll stop.", "Okay, I'll stop.")
-			)	
+			)
 			intent('stop_parrot')
 		else:
 			rep(INPUT)
@@ -494,11 +528,17 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 	if user.flags.ask_yes and (user.flags.ask_yes > user.msg_id-3):
 		if re_is_in(ip.yeses, ui):
-			rep(user.flags.on_yes)
+			
+			if user.flags.on_yes:
+				rep(call_or_return(user.flags.on_yes))
 			
 			intent("accept_yes_no")
 		elif re_is_in(ip.no, ui):
-			rep("Got it!")
+			if user.flags.on_no:
+				rep(call_or_return(user.flags.on_no))
+			
+			else:
+				rep("Got it!")
 			
 			intent("decline_yes_no")
 
@@ -507,7 +547,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		can_you_patterns(context=_context, check_context=check_context), action="remove_match", split="AND")
+		can_you_patterns(context=_context, check_context=check_context),
+		action="remove_match",
+		split="AND")
 
 	# remove "can you" from the beginning of the sentence
 	ui_raw = post_rem_can_you(ui_raw)
@@ -515,11 +557,14 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		compliments_patterns(context=_context, check_context=check_context), action="remove_match")
+		compliments_patterns(context=_context, check_context=check_context),
+		action="remove_match")
 	
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		expressions_patterns(context=_context, check_context=check_context), action="remove_match")
+		expressions_patterns(
+			context=_context, check_context=check_context),
+			action="remove_match")
 	
 	
 # if re_check(ip.how_are_you, ui):
@@ -572,7 +617,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 			intent('what are you')
 			return flush()
 
-		elif uiopen in it.my_name:
+		if uiopen in it.my_name:
 			rep(Rchoice("Your name is ", "You are ", "You're ") +
 				user.nickname +
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
@@ -616,7 +661,11 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 			intent("(whats)_the_news")
 
 		elif check_patterns(
-				what_extra_patterns(context=_context, check_context=check_context), _ui=uiopen, _ui_raw=uiopen_raw, action="remove", split="AND")[0]:
+				what_extra_patterns(context=_context, check_context=check_context),
+				_ui=uiopen,
+				_ui_raw=uiopen_raw,
+				action="remove",
+				split="AND")[0]:
 
 			pass
 
@@ -752,10 +801,10 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 											"Here you go",
 											"There you go"
 						),
-				script=f"window.open('{_url}', '_blank')"
+				script = f"window.open('{_url}', '_blank')"
 				)
 		else:
-			rep('Couldn\'t find the link. Here\'s a google search for it instead. \n')
+			rep("Couldn't find the link. Here's a google search for it instead. \n")
 			rep(searcher(link))
 
 		intent("goto")
@@ -853,7 +902,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 			return flush()
 
-		elif re_is_in(ip.my_self, uiopen):
+		if re_is_in(ip.my_self, uiopen):
 			rep(Rchoice("Your are ", "You are ", "You're ") +
 				Rchoice("my beloved ", "my sweetheart ", "my master ", "my dear ", blank=2) +
 				user.nickname +
@@ -893,10 +942,6 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 		intent("set_timer")
 
 	elif re_check(ip.bye, ui):
-		reloaded = False
-		reloader = False
-		BREAK_POINT = True
-
 		intent("exit")
 
 		out = (choice(li_bye) +
@@ -920,7 +965,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 	# WHY [-2:-2]? => if len < 2, it will return empty list instead of error
 	# print(user.chat.intent)
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
-		about_bot_patterns(context=_context, check_context=check_context), action="remove", split="AND")
+		about_bot_patterns(context=_context, check_context=check_context),
+		action="remove",
+		split="AND")
 
 
 	if re_check(ip.help, ui):
@@ -977,10 +1024,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, id: int):
 
 		intent("unknown")
 
-		uibit1 = 1
-	ui1 = ui
 	if ui not in li_redo:
-		ui2 = ui
+		#TODO: add redo
+		pass
 
 	return flush()
 # tnt('/<style=a>/===hell===o')
@@ -1023,11 +1069,11 @@ if __name__ == "__main__":
 		inp = input(">> ")
 		user.user_client_time = time()
 
-		msg = basic_output(inp, user)
+		_msg = basic_output(inp, user)
 
-		if not msg:
+		if not _msg:
 			continue  # break
-		msg = msg["message"]
-		if msg == "exit":
+		_msg = net_sys.html2str(_msg["message"])
+		if _msg == "exit":
 			break
-		xprint("/ih/>>/=/", msg)
+		xprint("/ih/>>/=/", _msg)

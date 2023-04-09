@@ -1,5 +1,6 @@
 import json
 import io
+from types import FunctionType
 
 from functools import reduce as functools_reduce
 from operator import iconcat as operator_iconcat
@@ -96,7 +97,17 @@ def is_json(data, raise_=False): # fc=xxxx
 		return False
 
 
-
+def call_or_return(arg, *i_args):
+	"""
+	if `arg` is callable it will call it with `i_args` and return
+	else it will return it as what it is
+	"""
+	if isinstance(arg, FunctionType):
+		return arg(*i_args)
+	
+	return arg
+		
+	
 
 
 
