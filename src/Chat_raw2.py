@@ -128,7 +128,7 @@ def _wiki(uix):
 	s = s.replace("\n", "<br>")
 	s = re.sub("</?br>", " <br>", s)
 	s = re.sub("( ){2,}", " ", s)
-	s = (". ").join(ny.summary.split(". ")[:4])
+	s = (". ").join(ny.summary.split(". ")[:4]) + "." # should end with a fullstop as well
 	
 	return link, s
 			
@@ -171,7 +171,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			log_xprint("\t/c/Getting wiki:/=/", uix_)
 		
 			link, response = _wiki(uix_)
-			return {"message": response + 'f\n\n<a href={link}">Read More</a>',
+			return {"message": response + f'\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
 				}
 
@@ -179,9 +179,6 @@ def wikisearch(uix='', raw='', user: User = None):
 			uix_ = wiki_search[0]
 	
 			out = 'Did you mean ' + uix_ + '? '
-
-			log_unknown(uix, raw)
-			# because it failed to find the exact match
 			
 			if not user:
 				return out

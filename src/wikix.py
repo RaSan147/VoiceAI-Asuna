@@ -29,6 +29,7 @@ def search(SEARCHPAGE:str, max=10):
 	    #"srqiprofile": "wsum_inclinks_pv",
 	    "srprop": "timestamp",
 	    "srlimit": max,
+	    "srenablerewrites": True,
 	}
 	
 	R = S.get(url=URL, params=PARAMS)
@@ -55,6 +56,6 @@ def fix_promt(ui):
 
 
 if __name__ == "__main__":
-	for i in search("Naruto"):
+	for i in search("green vitriol"):
 		print(i)
 		print("\n"*2)
