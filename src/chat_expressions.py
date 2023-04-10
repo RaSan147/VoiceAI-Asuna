@@ -20,7 +20,7 @@ def patterns(context=Counter(), check_context=null):
 	[C(r"^h(i+|e+y+)( there)?"),], # hiiii/heey there Asuna
 	( Rchoice('Hello', 'Hey', 'Hey','Hello') +
 				Rchoice(" there", blank=2)+
-				Rchoice(f' <:u_name>', blank=1)+ 
+				Rchoice(' <:u_name>', blank=1)+ 
 				Rchoice('.', '...', '!',  '~', blank=1)+ 
 				Rchoice("👋", blank=2)
 	) if context["say_hi"]<3 else
@@ -34,7 +34,7 @@ def patterns(context=Counter(), check_context=null):
 		C(r"^yo( |$)")
 	], 
 	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
-				Rchoice(f' <:u_name>', blank=1)+ 
+				Rchoice(' <:u_name>', blank=1)+ 
 				Rchoice('.', '...', '!', '~', blank=2)+ 
 				Rchoice("👋", blank=1)
 	) if context["say_hello"]<3 else
@@ -45,7 +45,7 @@ def patterns(context=Counter(), check_context=null):
 [	
 	[C(r"(i )?(really )?(love|luv|wuv) ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
 	( Rchoice('Love you too','Love you so much','I love you too') + 
-			Rchoice(" dear", f" <:u_name>", " babe", blank=2) + 
+			Rchoice(" dear", " <:u_name>", " babe", blank=2) + 
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
 	),
 
@@ -54,7 +54,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[C(r"(i )?(really )?like ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
 	( Rchoice("You're really nice, I like you too.",'I like you too') + " " +
-			Rchoice("dear", f"<:u_name>", "babe", blank=2) + " " +
+			Rchoice("dear", "<:u_name>", "babe", blank=2) + " " +
 			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
 	),
 
@@ -135,7 +135,8 @@ def patterns(context=Counter(), check_context=null):
 	C(r"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
 	],
 	( Rchoice(
-		Rchoice("You're welcome", "Anything for you", "You're most welcome")+ Rchoice(" <:u_name>", " dear", " my love", blank=2),
+		Rchoice("You're welcome", "Anything for you", "You're most welcome")+
+		Rchoice(" <:u_name>", " dear", " my love", blank=2),
 		"My pleasure",
 		"It's okay",
 		"No problem",

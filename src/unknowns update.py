@@ -24,7 +24,7 @@ def run(inp):
 	xprint("/ih/>>/=/", msg)
 
 
-with open("./Asuna_data/server/unknown query (upto 17-mar-2023).txt", "r") as f:
+with open("./Asuna_data/server/unknown query (upto 09-apr-2023).txt", "r") as f:
 	for line in f.readlines():
 		try:
 			line = line.strip()

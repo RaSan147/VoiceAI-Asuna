@@ -179,6 +179,9 @@ def wikisearch(uix='', raw='', user: User = None):
 			uix_ = wiki_search[0]
 	
 			out = 'Did you mean ' + uix_ + '? '
+
+			log_unknown(uix, raw)
+			# because it failed to find the exact match
 			
 			if not user:
 				return out
