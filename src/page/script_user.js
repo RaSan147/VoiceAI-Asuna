@@ -12,25 +12,22 @@ class USER{
 		// get userdata from localstorage
 		let user_name = localStorage.getItem('uname');
 		let uid = localStorage.getItem('uid');
-		let skin = localStorage.getItem('skin');
 		if (user_name===null||uid===null){
-			if(redirect) this.redirect_2_login();
+			if(redirect){this.redirect_2_login();
+			}
 			return false;
 	}
 
-
-
-		
 		this.user_name = user_name;
 		this.user_id = uid;
-		if(skin) this.bot_skin = skin;
+		
 	}
 
 	set_local_data() {
 		// set userdata to localstorage
 		localStorage.setItem('uname', this.user_name);
 		localStorage.setItem('uid', this.user_id);
-		localStorage.setItem('skin', this.bot_skin);
+		//localStorage.setItem('skin', this.bot_skin);
 	}
 
 	redirect_2_login() {
@@ -42,7 +39,7 @@ class USER{
 		const user = this;
 		if (user.user_name===null||user.user_id===null) return
 
-	
+		
 		const form = document.createElement("form");
 		form.method = "POST";
 		form.action = "?do_verify";
@@ -109,15 +106,13 @@ class USER{
 
 	logout(redirect=true) {
 		// logout
-		this.user_name = null;
-		this.user_id = null;
-		this.set_local_data();
+		localStorage.clear();
 		if(redirect) this.redirect_2_login();
 	}
 
 }
 	
 
-window["user"] = new USER();
+var user = new USER();
 
 

@@ -168,7 +168,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			
 		if match_search:
 			uix_ = match_search[0]
-			log_xprint("\t/c/Getting wiki:/=/", uix_)
+			log_xprint("\t/c/Getting wiki:/=//~`", uix_, "`~/")
 		
 			link, response = _wiki(uix_)
 			return {"message": response + f'\n\n<a href={link}">Read More</a>',
@@ -193,7 +193,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			return out
 	
 	except Exception:
-		xprint("/r/Failed to wiki/=/: ", uix, "\n\n")
+		xprint("\t/r/Failed to wiki/=/ \n")
 		traceback.print_exc()
 	
 	
@@ -315,7 +315,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	_ui_raw = pre_rem_bot_call(_INPUT)
 	_ui = _ui_raw.lower().replace(".", " ").replace("'", " ")  # remove . from input
 	# keep . in raw to make sure its not removed it mathmatical expressions
-	log_xprint(f"\t/hi/{INPUT}/=/ >> /chi/{_ui_raw}/=/ ")
+	log_xprint(f"\t/hi//~`{INPUT}`~//=/ >> /chi//~`{_ui_raw}`~//=/ ")
 	if _ui == "":
 		return
 
@@ -352,6 +352,13 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 
 	if msg["render"] == "innerHTML":
 		msg["message"] = net_sys.str2html(msg["message"])
+		
+	if msg["script"]:
+		msg["script"] = """
+		(async ()=>{
+		""" + msg["script"] + """
+		})()
+		"""
 
 	processed_time = time()
 	user.add_chat(msg, processed_time, 0, rTo=mid, intent=intent, context=on_context)
@@ -518,7 +525,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	if re_is_in(ip.logout, ui):
 		rep("Logging out...",
 			script="""
-				await tools.sleep(1000)
+				await tools.sleep(1000);
 				user.logout()
 				"""
 			)
@@ -941,7 +948,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		intent("set_timer")
 
-	elif re_check(ip.bye, ui):
+	elif re_starts(ip.bye, ui):
 		intent("exit")
 
 		out = (choice(li_bye) +

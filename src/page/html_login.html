@@ -123,39 +123,61 @@ table {
 <script>
 
 user.get_local_data(false);
-
+tools.enable_debug()
 user.verify_login();
 
+function update_note(note='', color="gray"){
+	
+	const status = byId('status')
+	status.style.display = 'none';
+	if(note != ''){
+		status.style.display = 'block';
+	}
+	status.style.color = color;
+	status.innerText = note;
+}
 
-tools.enable_debug()
+
+
+function test_fields(){
+	const note = (msg) => {update_note(msg, "red")}
+	
+	const _uname = byId("username").value
+	const _pass = byId("password").value
+	const usernameRegex = /^[a-zA-Z0-9_]+$/g;
+	
+
+	if(_uname.length<1){
+		note("Username must have at least 1 character!")
+		return 0;
+	}
+	if (_uname.length>64){
+		note("Username must be less than 64 character long") 
+		return 0;
+	}
+	if (_pass.length>256){
+		note("Password can't be longer than 256 characters")
+		return 0;
+	}
+	if (!usernameRegex.test(_uname)){
+		note("Username can only have A-Z, a-z, 0-9, _")
+		return 0;
+	}
+	note()
+	return 1;
+}
+
 
 byId("login").onsubmit = (e) => {
 	e.preventDefault()
 	
 	const formData = new FormData(e.target)
 
-
+	if (!test_fields()){
+		return 0
+	}
 	var msg = "";
-	
-	
-	function update_note(note){
-		const status = byId('status')
-		status.style.display = 'block';
-		status.innerText = note;
-	}
-	const _uname = byId("username").value.length
-	const _pass = byId("password").value.length
-	
-	if(_uname<1){
-		update_note("Username must have at least 1 character!")
-		return 0;
-	} else if (_uname>64){
-		update_note("Username must be less than 64 character long")
-		return 0;
-	} else if (_pass>256){
-		update_note("Password can't be longer than 256 characters")
-		return 0;
-	}
+	var color = "red"
 
 	// const filenames = formData.getAll('files').map(v => v.name).join(', ')
 	const request = new XMLHttpRequest()
@@ -169,6 +191,7 @@ byId("login").onsubmit = (e) => {
 				var response = JSON.parse(request.responseText);
 				if (response.status == "success"){
 					msg = "Signed up. REDIRECTING...";
+					color = "green"
 					user.user_name = response.user_name;
 					user.user_id = response.user_id;
 					user.set_local_data();
@@ -176,12 +199,13 @@ byId("login").onsubmit = (e) => {
 				}
 				else{
 					msg = response.message;
+					color = "yellow";
 				}
 				
 			}
 			if (request.status === 401) msg = 'Incorrect password'
 
-			update_note(msg)
+			update_note(msg, color)
 		}
 	}
 	

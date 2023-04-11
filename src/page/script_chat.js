@@ -128,6 +128,10 @@ class ChatHandler{
 		if(text==null) msg = this.chat_input.value;
 		else msg = text;
 		msg = msg.trim();
+		if(msg.length>512){
+			toaster.toast("Message too long")
+			return
+		}
 		this.chat_input.value = "";
 		this.chat_input.focus();
 		if (msg.length == 0) return;
@@ -160,8 +164,8 @@ class ChatHandler{
 			log("script: " + json.script)
 			const script = createElement("script");
 			script.innerText = json.script;
-			script.setAttribute("async", true);
-			msg_ele.appendChild(script);
+			// script.setAttribute("async", true);
+			document.body.appendChild(script);
 		}
 
 		return msg_ele
@@ -170,6 +174,7 @@ class ChatHandler{
 	async push_msg(msg_ele, msg){
 		const that = this;
 		// actually send message 
+		
 
 		if(msg == "clear") return tools.del_child(this.chats)
 		// if(tools.is_in(msg.toLowerCase(), ["logout", "log out", "sign off", "signoff", "sign out", "signout", "logoout"])){

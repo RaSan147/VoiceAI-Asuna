@@ -14,6 +14,7 @@ from http import HTTPStatus
 import json
 # import traceback
 import importlib
+import re
 
 # SELFMADE LIBS
 
@@ -257,6 +258,17 @@ def resp_json(success, message='', **kwargs):
 	out = {"status": success, "message": message}
 	out.update(kwargs)
 	return json.dumps(out)
+	
+def auth_uname_pass_data(uname, pw, max_pw=64):
+	"""
+	check if username and pass has weird data
+	"""
+	uname_re = re.compile(r"[^a-zA-Z0-9_]")
+	if len(uname)==0 or uname_re.search(uname) or len(pw)>max_pw:
+		return resp_json("error", "nice coc i mean nice try")
+		
+	return true
+		
 
 
 @SH.on_req('POST', hasQ='do_login')
@@ -273,6 +285,11 @@ def do_login(self: SH, *args, **kwargs):
 	AUTHORIZE_POST(self, post, 'login')
 
 	username, password = Get_User_from_post(self, post)
+	
+	validity = auth_uname_pass_data(username, password)
+	if validity !=True:
+		return self.send_json(validity)
+		
 
 
 	return self.send_json(user_handler.server_login(username, password))
@@ -290,6 +307,12 @@ def do_signup(self: SH, *args, **kwargs):
 	AUTHORIZE_POST(self, post, 'signup')
 
 	username, password = Get_User_from_post(self, post)
+	
+	validity = auth_uname_pass_data(username, password)
+	if validity !=True:
+		return self.send_json(validity)
+		
+		
 
 	return self.send_json(user_handler.server_signup(username, password))
 
@@ -305,6 +328,12 @@ def do_verify(self: SH, *args, **kwargs):
 	AUTHORIZE_POST(self, post, 'verify')
 
 	username, uid = Get_User_from_post(self, post, 'uid')
+	# uid (sha1) length is 40
+	
+	validity = auth_uname_pass_data(username, uid, 40)
+	if validity !=True:
+		return self.send_json(validity)
+		
 
 
 	x = resp_json(user_handler.server_verify(username, uid))
