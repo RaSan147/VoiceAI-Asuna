@@ -151,9 +151,8 @@ def wikisearch(uix='', raw='', user: User = None):
 	wolf = wolfram(uix)
 	if wolf:
 		return wolf
-		
-	xprint("\t/c/Searching wiki:/=/", uix)
-	
+	log_xprint("\t/c/Searching wiki:/=//~`", uix, "`~/")
+		 
 	try:
 		_uix = wikix.fix_promt(uix)
 		wiki_search= [i.title for i in wikix.search(_uix, 5)]
@@ -168,8 +167,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			
 		if match_search:
 			uix_ = match_search[0]
-			log_xprint("\t/c/Getting wiki:/=//~`", uix_, "`~/")
-		
+
 			link, response = _wiki(uix_)
 			return {"message": response + f'\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
