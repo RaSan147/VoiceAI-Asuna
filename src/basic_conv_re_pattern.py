@@ -93,6 +93,12 @@ ot.on_whats_up = (
 )
 
 
+ot.no_internet = (
+	"Sorry, server is offline right now.",
+	"Its kinda embarrassing to say, the server is facing internet outage."
+	"Something is wrong with out network. We're working on it."
+)
+
 input_PATTERNS = GETdict({})
 ip = input_PATTERNS
 

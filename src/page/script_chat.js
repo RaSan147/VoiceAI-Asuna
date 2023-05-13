@@ -201,6 +201,7 @@ class ChatHandler{
 		form_.append("message", msg);
 		form_.append("time", tools.c_time());
 		form_.append("tzOffset", tools.time_offset());
+		form_.append("voice", appConfig.enable_voice);
 
 		const request = new XMLHttpRequest()
 		request.open("POST", form.action, true)

@@ -131,12 +131,15 @@
 	max-width: 70%;
 	padding: 7px;
 	border-radius: 10px;
-	margin: 10px 0;
 	/*margin-left: auto; */
 	/*margin-right: 0;*/
 	color: #fff;
-	overflow-wrap: anywhere;
-	word-break: break-all;
+	/*overflow-wrap: break-word;*/
+	word-wrap: break-word;
+	-ms-hyphens: auto;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
 }
 
 .message-text.user {

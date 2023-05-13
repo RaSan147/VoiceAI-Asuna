@@ -14,7 +14,7 @@ if (window.history && "pushState" in history) {
 			return false
 		}
 		if(sidebar_control.is_open("R")){
-			sidebar_control._closeNavR()()
+			sidebar_control._closeNavR()
 			//fake_push()
 			return false
 		}

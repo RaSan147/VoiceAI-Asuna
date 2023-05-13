@@ -98,10 +98,9 @@ def send_favico(self: SH, *args, **kwargs):
 	"""
 	re-direct favicon.ico request to cloud to make server less file bloated
 	"""
-	self.send_response(301)
-	self.send_header('Location','/icons/icon-512x512.png')
-	self.end_headers()
-	return None
+	self.send_redirect('/icons/icon-512x512.png')
+	
+	return
 
 
 
@@ -216,7 +215,10 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=None):
 
 	# START POST DATA READING
 	post.start()
-	post_verify = post.get_part("post-type", post_type, T)
+	form = post.form
+	
+
+	post_verify = form.get_multi_field(verify_name="post-type", verify_msg=post_type, decode=T)
 
 
 	##################################
@@ -229,7 +231,7 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=None):
 	return post_verify[1] # return 1st field value
 
 
-def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password'):
+def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password') -> tuple[str, str]:
 	"""
 	Get username and password from post data
 	READS UPTO LINE 13
@@ -238,12 +240,14 @@ def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password'):
 		post: instance of DealPostData class
 		pass_or_uid: verify using password or uid
 		"""
+	
+	form = post.form
 
-	_, username = post.get_part('username', decode=T) # line 5-8
+	_, username = form.get_multi_field('username', decode=T) # line 5-8
 	username = username
 	
 
-	_, password = post.get_part(pass_or_uid, decode=T) # line 9-12
+	_, password = form.get_multi_field(pass_or_uid, decode=T) # line 9-12
 	password = password
 
 	return username, password
@@ -381,18 +385,19 @@ def chat(self: SH, *args, **kwargs):
 	post = DPD(self)
 
 	AUTHORIZE_POST(self, post)
+	form = post.form
 
 	username, uid = Get_User_from_post(self, post, 'uid')
 
 
 
-	_m, message = post.get_part('message', decode=T)
+	_m, message = form.get_multi_field('message', decode=T)
 	message = message.strip()
 
-	_t, _time = post.get_part('time', decode=T)
+	_t, _time = form.get_multi_field('time', decode=T)
 	_time = _time.strip()
 
-	_tz, _time_offset = post.get_part('tzOffset', decode=T)
+	_tz, _time_offset = form.get_multi_field('tzOffset', decode=T)
 	_time_offset = _time_offset.strip()
 
 	if not _m or not _t:
@@ -441,7 +446,10 @@ def main():
 		pass # now works
 		xprint("/rh/No internet connection!\nPlease connect to the internet and try again.\n\n/=//hu/THIS APP IS HIGHLY DEPENDENT ON INTERNET CONNECTION!/=/")
 		sys.exit(1)
-	run_server(45454, appConfig.ftp_dir, handler=SH)
+	run_server(port= 45454,
+		directory=appConfig.ftp_dir,
+		bind="", # bind to all interfaces
+		handler=SH)
 
 if __name__ == '__main__':
 	main()
