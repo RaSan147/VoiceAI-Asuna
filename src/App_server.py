@@ -144,7 +144,7 @@ def send_homepage(self: SH, *args, **kwargs):
 		return None
 	
 
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-cache")
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
 
 @SH.on_req('GET', '/login')
 def send_login(self: SH, *args, **kwargs):
@@ -157,7 +157,7 @@ def send_login(self: SH, *args, **kwargs):
 	if cookie_check:
 		return None
 
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-cache")
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-store")
 
 @SH.on_req('GET', '/signup')
 def send_signup(self: SH, *args, **kwargs):
@@ -169,7 +169,7 @@ def send_signup(self: SH, *args, **kwargs):
 	if cookie_check:
 		return None
 		
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-cache")
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
 
 
 @SH.on_req('GET')
