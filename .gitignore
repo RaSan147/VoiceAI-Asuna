@@ -3,6 +3,11 @@ src/Asuna_data/*
 **/test**
 .vscode
 **/*.bak.py
+.breakpoints
+.replit
+poetry.lock
+pyproject.toml
+replit.nix
 
 
 
