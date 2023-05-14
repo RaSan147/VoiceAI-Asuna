@@ -151,7 +151,7 @@ class Config:
 		return './'
 
 	def address(self):
-		return "http://%s:%i" % (self.IP, self.port)
+		return f"http://{self.IP}:{self.port}"
 
 	def parse_default_args(self, port=0, directory="", bind=None):
 		if not port:
@@ -467,8 +467,8 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		self.command = ''  # set in case of error on the first line
 		self.request_version = version = self.default_request_version
 		self.close_connection = True
-		self.header_flushed = False
-		self.response_code_sent = False
+		self.header_flushed = False # true when headers are flushed by self.flush_headers()
+		self.response_code_sent = False # true when response code (>=200) is sent by self.send_response()
 
 
 		requestline = str(self.raw_requestline, 'iso-8859-1')
@@ -772,6 +772,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 				'utf-8', 'strict'))
 				
 	def send_header_string(self, lines:str):
+		"""Send a header multiline string to the headers buffer."""
 		for i in lines.split("\r\n"):
 			if not i:
 				continue
@@ -1082,15 +1083,16 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 	def do_HEAD(self):
 		"""Serve a HEAD request."""
+		resp = None
 		try:
 			resp = self.send_head()
 		except Exception as e:
 			traceback.print_exc()
 			self.send_error(500, str(e))
 			return
-
-		if f:
-			resp.close()
+		finally:
+			if resp:
+				resp.close()
 
 	def do_POST(self):
 		"""Serve a POST request."""
@@ -1155,7 +1157,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		box.seek(0)
 
 		self.send_response(code)
-		self.send_header("Content-type", content_type)
+		self.send_header("Content-Type", content_type)
 		self.send_header("Content-Length", str(len(encoded)))
 		self.end_headers()
 		return box
@@ -1191,6 +1193,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		try:
 			ctype = self.guess_type(path)
+			
+			# make sure texts are sent as utf-8
+			if ctype.startswith("text/"):
+				ctype += "; charset=utf-8"
 
 			file = open(path, 'rb')
 			fs = os.fstat(file.fileno())
@@ -1238,7 +1244,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 					return None
 
 				self.send_response(206)
-				self.send_header('Content-Type', ctype)
 				self.send_header('Accept-Ranges', 'bytes')
 
 				response_length = last - first + 1
@@ -1249,7 +1254,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			else:
 				self.send_response(HTTPStatus.OK)
-				self.send_header("Content-Type", ctype)
+				
 				self.send_header("Content-Length", str(file_len))
 				
 			if cache_control:
@@ -1257,6 +1262,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			self.send_header("Last-Modified",
 							 self.date_time_string(fs.st_mtime))
+			self.send_header("Content-Type", ctype)
 			self.send_header("Content-Disposition", is_attachment+' filename="%s"' %
 							 (os.path.basename(path) if filename is None else filename))
 			self.end_headers()
