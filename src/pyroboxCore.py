@@ -468,6 +468,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		self.request_version = version = self.default_request_version
 		self.close_connection = True
 		self.header_flushed = False
+		self.response_code_sent = False
 
 
 		requestline = str(self.raw_requestline, 'iso-8859-1')
@@ -745,6 +746,12 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		version and the current date.
 
 		"""
+		if self.response_code_sent:
+			return
+		
+		if not code//100 ==1: # 1xx - Informational (allowes multiple responses)
+			self.response_code_sent = True
+
 		self.log_request(code)
 		self.send_response_only(code, message)
 		self.send_header('Server', self.version_string())
@@ -803,6 +810,8 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		if hasattr(self, '_headers_buffer'):
 			self.wfile.write(b"".join(self._headers_buffer))
 			self._headers_buffer = []
+
+		self.header_flushed = True
 
 	def log_request(self, code='-', size='-'):
 		"""Log an accepted request.
