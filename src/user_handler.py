@@ -262,33 +262,33 @@ class UserHandler:
 	def server_signup(self, username, password):
 		# check if username is already taken
 		if self.get_user(username, temp=True) is not None:
-			return json.dumps({
+			return {
 				"status": "error",
 				"message": "Username already taken"
-			}, indent=0)
+			}
 
 		# create user
 		id = self.create_user(username, password)
-		return json.dumps({
+		return {
 			"status": "success",
 			"message": "User created",
 			"user_name": username,
 			"user_id": id
-		}, indent=0)
+		}
 
 	def server_login(self, username, password):
 		user = self.get_user(username)
 		if user is None:
-			return json.dumps({
+			return {
 				"status": "error",
 				"message": "User not found"
-			}, indent=0)
+			}
 		hash = hashlib.sha256((username+password).encode('utf-8'))
 		if user["password"] != hash.hexdigest():
-			return json.dumps({
+			return {
 				"status": "error",
 				"message": "Wrong password"
-			}, indent=0)
+			}
 
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 		print("logged in", user)

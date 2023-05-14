@@ -467,6 +467,9 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		self.command = ''  # set in case of error on the first line
 		self.request_version = version = self.default_request_version
 		self.close_connection = True
+		self.header_flushed = False
+
+
 		requestline = str(self.raw_requestline, 'iso-8859-1')
 		requestline = requestline.rstrip('\r\n')
 		self.requestline = requestline
@@ -790,6 +793,13 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self.flush_headers()
 
 	def flush_headers(self):
+		"""Flush the headers buffer."""
+		if self.header_flushed:
+			try:
+				raise RuntimeError("Headers already flushed")
+			except RuntimeError:
+				traceback.print_exc()
+			return
 		if hasattr(self, '_headers_buffer'):
 			self.wfile.write(b"".join(self._headers_buffer))
 			self._headers_buffer = []
@@ -1118,7 +1128,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 	def redirect(self, location):
 		'''redirect to location'''
 		print("REDIRECT ", location)
-		self.send_response(301)
+		self.send_response(302)
 		self.send_header("Location", location)
 		self.end_headers()
 

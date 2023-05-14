@@ -153,7 +153,7 @@ def send_login(self: SH, *args, **kwargs):
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
 	cookie_check = handle_user_cookie(self, on_fail="")
-	print(cookie_check)
+	
 	if cookie_check:
 		return None
 
@@ -314,7 +314,7 @@ def auth_uname_pass_data(uname, pw, max_pw=64):
 	valid_uname_re = re.compile(r"[^a-zA-Z0-9_]")
 	print([uname, pw])
 	if len(uname)==0 or valid_uname_re.search(uname) or len(pw)>max_pw:
-		return resp_json("error", "nice coc i mean nice try")
+		return False
 		
 	return True
 	
@@ -352,7 +352,7 @@ def do_login(self: SH, *args, **kwargs):
 	
 	validity = auth_uname_pass_data(username, password)
 	if validity !=True:
-		return self.send_json(validity)
+		return self.send_json(resp_json(validity))
 		
 	data = user_handler.server_login(username, password)
 	if data["status"] == "success":
@@ -379,11 +379,16 @@ def do_signup(self: SH, *args, **kwargs):
 	
 	validity = auth_uname_pass_data(username, password)
 	if validity !=True:
-		return self.send_json(validity)
+		return self.send_json(resp_json(validity))
 		
+	data = user_handler.server_signup(username, password)
+	if data["status"] == "success":
+		cookie = add_user_cookie(data["user_name"], data["user_id"])
 		
+		self.send_response(200)
+		self.send_header_string(cookie.output())
 
-	return self.send_json(user_handler.server_signup(username, password))
+	return self.send_json(data)
 
 
 @SH.on_req('POST', hasQ='do_verify')
@@ -401,7 +406,7 @@ def do_verify(self: SH, *args, **kwargs):
 	
 	validity = auth_uname_pass_data(username, uid, 40)
 	if validity !=True:
-		return self.send_json(validity)
+		return self.send_json(resp_json(validity))
 
 	x = resp_json(user_handler.server_verify(username, uid))
 	print(x)
