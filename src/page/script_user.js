@@ -13,7 +13,8 @@ class USER{
 		let user_name = localStorage.getItem('uname');
 		let uid = localStorage.getItem('uid');
 		if (user_name===null||uid===null){
-			if(redirect){this.redirect_2_login();
+			if(redirect){
+				this.logout(redirect);
 			}
 			return false;
 	}
@@ -32,10 +33,17 @@ class USER{
 
 	redirect_2_login() {
 		// redirect to login page
-		window.location.href = '/login';
+		if(window.location.href != '/login'){
+			window.location.href = '/login';
+		}
 	}
 
 	verify_login(redirect=false, in_home=false) {
+		if(!in_home){
+		window.location.href = "/";}
+		return true
+		
+		
 		const user = this;
 		if (user.user_name===null||user.user_id===null) return
 
@@ -60,8 +68,8 @@ class USER{
 						if(!in_home) window.location.href = "/";
 					}
 					else{
-						// user.logout(redirect);
-						if(redirect) user.redirect_2_login();
+						user.logout(redirect);
+						//if(redirect) user.redirect_2_login();
 					}
 				}
 			}
@@ -106,6 +114,7 @@ class USER{
 
 	logout(redirect=true) {
 		// logout
+		tools.clear_cookie();
 		localStorage.clear();
 		if(redirect) this.redirect_2_login();
 	}

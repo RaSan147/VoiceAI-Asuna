@@ -5,6 +5,7 @@ import random
 import base64
 import re
 from http import HTTPStatus
+from http.cookies import SimpleCookie
 from functools import partial
 import contextlib
 import urllib.request
@@ -30,7 +31,7 @@ import atexit
 import os
 
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 enc = "utf-8"
 __all__ = [
 	"HTTPServer", "ThreadingHTTPServer", "BaseHTTPRequestHandler",
@@ -550,6 +551,14 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		elif (conntype.lower() == 'keep-alive' and
 			  self.protocol_version >= "HTTP/1.1"):
 			self.close_connection = False
+		
+		# Load cookies from request
+		# Uses standard SimpleCookie
+		# doc: https://docs.python.org/3/library/http.cookies.html
+		self.cookie = SimpleCookie()
+		self.cookie.load(self.headers.get('Cookie', ""))
+		# print(tools.text_box("Cookie: ", self.cookie))
+		
 		# Examine the headers and look for an Expect directive
 		expect = self.headers.get('Expect', "")
 		if (expect.lower() == "100-continue" and
@@ -751,6 +760,14 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self._headers_buffer.append(("%s %d %s\r\n" %
 				(self.protocol_version, code, message)).encode(
 				'utf-8', 'strict'))
+				
+	def send_header_string(self, lines:str):
+		for i in lines.split("\r\n"):
+			if not i:
+				continue
+			tag, _, msg = i.partition(":")
+			self.send_header(tag.strip(), msg.strip())
+			
 
 	def send_header(self, keyword, value):
 		"""Send a MIME header to the headers buffer."""
@@ -1100,7 +1117,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 	def redirect(self, location):
 		'''redirect to location'''
-		self.send_response(HTTPStatus.FOUND)
+		print("REDIRECT ", location)
+		self.send_response(301)
 		self.send_header("Location", location)
 		self.end_headers()
 
@@ -1146,7 +1164,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		self.copyfile(file, self.wfile)
 		file.close()
 
-	def return_file(self, path, filename=None, download=False):
+	def return_file(self, path, filename=None, download=False, cache_control=""):
 		file = None
 		is_attachment = "attachment;" if (self.query("dl") or download) else ""
 
@@ -1214,6 +1232,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 				self.send_response(HTTPStatus.OK)
 				self.send_header("Content-Type", ctype)
 				self.send_header("Content-Length", str(file_len))
+				
+			if cache_control:
+				self.send_header("Cache-Control", cache_control)
 
 			self.send_header("Last-Modified",
 							 self.date_time_string(fs.st_mtime))
@@ -1237,9 +1258,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			# if f and not f.closed(): f.close()
 			raise
 
-	def send_file(self, path, filename=None, download=False):
+	def send_file(self, path, filename=None, download=False, cache_control=''):
 		'''sends the head and file to client'''
-		file = self.return_file(path, filename, download)
+		file = self.return_file(path, filename, download, cache_control)
 		if self.command == "HEAD":
 			return  # to avoid sending file on get request
 		try:
@@ -1247,14 +1268,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		finally:
 			file.close()
 			
-	def send_redirect(self, location):
-		"""Redirect client to new location 
-		"""
-		self.send_response(301)
-		self.send_header('Location', location)
-		self.end_headers()
-		
-		
+	
 	def send_head(self):
 		"""Common code for GET and HEAD commands.
 
@@ -1706,7 +1720,7 @@ class FormData:
 
 		return line
 
-	def get_multi_field(self, verify_name: Union[None, bytes, str] = None, verify_msg: Union[None, bytes, str] = None, decode=F) -> tuple[Union[str,bytes], Union[str,bytes]]:
+	def get_multi_field(self, verify_name: Union[None, bytes, str] = None, verify_msg: Union[None, bytes, str] = None, decode=F):
 		'''read a form field
 		ends at boundary
 		verify_name: name of the field (str|bytes|None)

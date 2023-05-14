@@ -124,7 +124,7 @@ table {
 
 user.get_local_data(false);
 tools.enable_debug()
-user.verify_login();
+//user.verify_login();
 
 function update_note(note='', color="gray"){
 	
@@ -195,7 +195,7 @@ byId("login").onsubmit = (e) => {
 					user.user_name = response.user_name;
 					user.user_id = response.user_id;
 					user.set_local_data();
-					setTimeout(function(){window.location.href = "/";}, 1000);
+					window.location.href = "/";
 				}
 				else{
 					msg = response.message;

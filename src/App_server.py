@@ -15,6 +15,7 @@ import json
 # import traceback
 import importlib
 import re
+from http.cookies import SimpleCookie 
 
 # SELFMADE LIBS
 
@@ -93,12 +94,40 @@ def join_path(*paths):
 
 ######### HANDLE GET REQUEST #########
 
+def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
+	cookie = self.cookie
+	print(cookie)
+	def get(k):
+		x = cookie.get(k)
+		if x is not None:
+			return x.value
+		return ""
+	username = get("uname")
+	uid = get("uid")
+	
+	validity, user = auth_uname_pass_data(username, uid, 40), None
+	if validity == True:
+		user = user_handler.server_verify(username, uid)
+	
+	print([user, validity])
+	if not (user and validity==True):
+		if on_fail:
+			
+			self.redirect(on_fail)
+			return True
+
+	elif on_ok:
+		self.redirect(on_ok)
+		return True
+		
+	return None
+
 @SH.on_req('GET', '/favicon.ico')
 def send_favico(self: SH, *args, **kwargs):
 	"""
 	re-direct favicon.ico request to cloud to make server less file bloated
 	"""
-	self.send_redirect('/icons/icon-512x512.png')
+	self.redirect('/icons/icon-512x512.png')
 	
 	return
 
@@ -109,7 +138,13 @@ def send_homepage(self: SH, *args, **kwargs):
 	"""
 	returns the main page as home
 	"""
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"))
+	cookie_check = handle_user_cookie(self, on_ok="")
+	print(cookie_check)
+	if cookie_check is True:
+		return None
+	
+
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-cache")
 
 @SH.on_req('GET', '/login')
 def send_login(self: SH, *args, **kwargs):
@@ -117,7 +152,12 @@ def send_login(self: SH, *args, **kwargs):
 	returns login.html on login request
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_login.html"))
+	cookie_check = handle_user_cookie(self, on_fail="")
+	print(cookie_check)
+	if cookie_check:
+		return None
+
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-cache")
 
 @SH.on_req('GET', '/signup')
 def send_signup(self: SH, *args, **kwargs):
@@ -125,7 +165,11 @@ def send_signup(self: SH, *args, **kwargs):
 	returns signup.html on signup request
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"))
+	cookie_check = handle_user_cookie(self, on_fail="")
+	if cookie_check:
+		return None
+		
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-cache")
 
 
 @SH.on_req('GET')
@@ -138,7 +182,7 @@ def send_default(self: SH, *args, **kwargs):
 	spathsplit = kwargs.get('spathsplit', '')
 	first = kwargs.get('first', '')
 	last = kwargs.get('last', '')
-
+	
 
 	if os.path.isdir(path):
 		parts = urllib.parse.urlsplit(self.path)
@@ -175,7 +219,7 @@ def send_default(self: SH, *args, **kwargs):
 
 	# else:
 
-	return self.return_file(path)
+	return self.return_file(path, cache_control="no-cache")
 
 
 
@@ -267,12 +311,28 @@ def auth_uname_pass_data(uname, pw, max_pw=64):
 	"""
 	check if username and pass has weird data
 	"""
-	uname_re = re.compile(r"[^a-zA-Z0-9_]")
-	if len(uname)==0 or uname_re.search(uname) or len(pw)>max_pw:
+	valid_uname_re = re.compile(r"[^a-zA-Z0-9_]")
+	print([uname, pw])
+	if len(uname)==0 or valid_uname_re.search(uname) or len(pw)>max_pw:
 		return resp_json("error", "nice coc i mean nice try")
 		
-	return true
+	return True
+	
+	
+def add_user_cookie(user_name, uid):
+	# add cookie with 1 year expire 
+	cookie = SimpleCookie()
+	def x(k, v):
+		nonlocal cookie
+		cookie[k] = v
+		cookie[k]["expires"] = 365*86400
+		cookie[k]["path"] = "/"
 		
+	x("uname", user_name)
+	x("uid", uid)
+	
+
+	return cookie
 
 
 @SH.on_req('POST', hasQ='do_login')
@@ -294,9 +354,14 @@ def do_login(self: SH, *args, **kwargs):
 	if validity !=True:
 		return self.send_json(validity)
 		
+	data = user_handler.server_login(username, password)
+	if data["status"] == "success":
+		cookie = add_user_cookie(data["user_name"], data["user_id"])
+		
+		self.send_response(200)
+		self.send_header_string(cookie.output())
 
-
-	return self.send_json(user_handler.server_login(username, password))
+	return self.send_json(data)
 
 
 
@@ -337,10 +402,9 @@ def do_verify(self: SH, *args, **kwargs):
 	validity = auth_uname_pass_data(username, uid, 40)
 	if validity !=True:
 		return self.send_json(validity)
-		
-
 
 	x = resp_json(user_handler.server_verify(username, uid))
+	print(x)
 	return self.send_json(x)
 
 
