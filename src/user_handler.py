@@ -11,7 +11,7 @@ import net_sys
 import TIME_sys
 
 from CONFIG import appConfig
-from DS import GETdict, Flag, LimitedDict
+from DS import GETdict, Flag
 import live2d_sys
 import CONSTANTS
 
