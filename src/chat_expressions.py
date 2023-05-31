@@ -108,7 +108,7 @@ def patterns(context=Counter(), check_context=null):
 	"you_stupid"
 ],
 [
-	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {___your} ((mo(m|ther|mmy))|sis(ter)?))?"),],
+	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {___youre}( (mo(m|ther|mmy))|sis(ter)?)?"),],
 	# this is terrible, i wish no one use this ever
 	(Rchoice("I don't like you.", 
 		'How rude!', 
@@ -131,7 +131,7 @@ def patterns(context=Counter(), check_context=null):
 	"user_bid_take_care"
 ],
 [
-	[C(rf"(thank|tnx|tnq|thx)s?( {___you}?( a ?lot|very much)?( for .+)?"),
+	[C(rf"(thank|tnx|tnq|thx)s?( {___you})?( a ?lot|very much)?( for .+)?"),
 	C(rf"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
 	],
 	( Rchoice(
@@ -154,7 +154,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[
 		C(r"(give me)?( a)? kiss(e?s+)( me)?"),
-		C(rf"(\*)?kiss(es)?( {___you})?( on (the |{___your} )?)?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
+		C(rf"(\*)?kiss(es)?( {___you})?( on (the |{___your} )?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
 	],
 	(
 		Rchoice(
