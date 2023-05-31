@@ -138,7 +138,7 @@ def send_homepage(self: SH, *args, **kwargs):
 	"""
 	returns the main page as home
 	"""
-	cookie_check = handle_user_cookie(self, on_ok="")
+	cookie_check = handle_user_cookie(self, on_ok="", on_fail="/signup")
 	print(cookie_check)
 	if cookie_check is True:
 		return None

@@ -78,6 +78,9 @@ class WEB_RE:
 
 web_re = WEB_RE()
 
+def _pp(pattern):
+	xprint(f"	/p/Pattern: /=/ {pattern}") 
+
 
 class Tool_belt:
 	def __init__(self):
@@ -94,12 +97,12 @@ class Tool_belt:
 				m = i.match(string)
 
 				if m:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return m.group(0)
 
 			else:
 				if string.startswith(i):
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return i
 
 	def check(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
@@ -112,12 +115,12 @@ class Tool_belt:
 			if isinstance(i, re.Pattern):
 				m = i.search(string)
 				if m:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return m.group(0)
 
 			else:
 				if i in string:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return i
 
 	def is_in(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
@@ -131,12 +134,12 @@ class Tool_belt:
 
 				m = i.fullmatch(string)
 				if m:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return m.group(0)
 
 			else:
 				if string == i:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return i
 
 	def search(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
@@ -150,13 +153,13 @@ class Tool_belt:
 			if isinstance(i, re.Pattern):
 				m = i.search(string)
 				if m:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return m
 
 			else:
 				m = re.search(re.escape(i), string)
 				if m:
-					if PRINT_PATTERN: xprint(f"	/p/Pattern: /=/ {i}")
+					if PRINT_PATTERN: _pp(i)
 					return m
 
 

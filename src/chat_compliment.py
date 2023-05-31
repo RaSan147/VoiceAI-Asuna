@@ -1,13 +1,14 @@
 from collections import Counter
 
 from REGEX_TOOLS import re_check, re_is_in, re_starts
-from basic_conv_re_pattern import C
+from basic_conv_re_pattern import C, ___youre, ___you
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
 
-_beautiful = r"(cool|great|good|nice|awesome|amazing|pretty|beautiful|beauty|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive|smart)"
+___pretty = r"(cool|great|good|nice|awesome|amazing|pretty|cute|beautiful|beauty|wonderful|stunning|hot|sexy|magical|charming|(heart)?warm(ing)?|impressive|smart)"
+
 
 def patterns(context=Counter(), check_context=null):
 	"""
@@ -19,7 +20,7 @@ def patterns(context=Counter(), check_context=null):
 	return [
 [
 
-	[C(rf"^(really )*({_beautiful} ?)+(app|stuff|code)?"),],
+	[C(rf"^(really )*({___pretty} ?)+(app|stuff|code)?"),],
 	# doesn't match if the word "you" is in the sentence
 	( Rchoice("😇", "😁", "😽")+ " " +
 		Rchoice("Hehe", "Yay", "Thanks" + Rchoice("ss", "!!", blank=1))+"!"
@@ -33,7 +34,7 @@ def patterns(context=Counter(), check_context=null):
 [
 
 	[
-		C(rf"(((yo)?u|y(a|o))('| )?(a?re?)? )?(looking )?(really )*(an? )?(very )*{_beautiful}"),
+		C(rf"({___youre} )?(looking )?(really )*(an? )?(very )*{___pretty}"),
 		"i like you"
 	],
 	( Rchoice("😇", "😁", "😽")+ " " +
@@ -47,13 +48,13 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(rf"((yo)?u|y(a|o)) (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*{_beautiful} (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?"),
+		C(rf"{___you} (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*{___pretty} (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?"),
 		# you have amazing body
-		C(rf"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?(re?)?)? {_beautiful}? ?(body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?( so much| a lot)?"),
+		C(rf"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?{___youre}? {___pretty}? ?(body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s?( so much| a lot)?"),
 		# i fell in love with your beautiful body
 		# i love your beautiful body so much
 		# i love the shape of your body
-		C(rf"((yo)?u|y(a|o))(('| )?(re?)?)? (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so |(real|absolute)ly )?(very )*{_beautiful}"),
+		C(rf"{___youre}? (body|teeth|nose|lip|hand|feet|thigh|leg|arm(pit)?|tongue|ear|eyebrow|underwear|bikini)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so |(real|absolute)ly )?(very )*{___pretty}"),
 		# your body is beautiful
 		# your body looks beautiful
 	],
@@ -81,16 +82,16 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(rf"((yo)?u|y(a|o)) (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*{_beautiful} (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?"),
+		C(rf"{___you} (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*{___pretty} (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?"),
 		# you have amazing body
-		C(rf"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?((yo)?u|y(a|o))(('| )?(re?)?)? {_beautiful}? ?(eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?( so much| a lot)?"),
+		C(rf"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?{___youre}? {___pretty}? ?(eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s?( so much| a lot)?"),
 		# i fell in love with your beautiful eyes
 		# i love your beautiful eyes so much
 		# i love the shape of your smile
-		C(rf"((yo)?u|y(a|o))(('| )?(re?)?)? (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so|(real|absolute)ly )?(very )*{_beautiful}"),
+		C(rf"{___youre}? (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so|(real|absolute)ly )?(very )*{___pretty}"),
 		# your eyes are beautiful
 		# your eyes look beautiful
-		C(rf"(what|how) (an? )?{_beautiful} (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? ((yo)?u|y(a|o)) (have|got|have got|have gotten|have gotten)")
+		C(rf"(what|how) (an? )?{___pretty} (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? {___you} (have|got|have got|have gotten|have gotten)")
 		# what amazing eyes you have
 	],
 	( 

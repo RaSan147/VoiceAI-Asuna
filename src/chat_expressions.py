@@ -1,7 +1,7 @@
 from collections import Counter
 
 from REGEX_TOOLS import re_check, re_is_in, re_starts
-from basic_conv_re_pattern import C
+from basic_conv_re_pattern import C, ___you, ___your, ___youre
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -43,7 +43,7 @@ def patterns(context=Counter(), check_context=null):
 	"say_hello"
 ],
 [	
-	[C(r"(i )?(really )?(love|luv|wuv) ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
+	[C(rf"(i )?(really )?(love|luv|wuv) {___you}( (so |very )*much| a lot)?"),],
 	( Rchoice('Love you too','Love you so much','I love you too') + 
 			Rchoice(" dear", " <:u_name>", " babe", blank=2) + 
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
@@ -52,7 +52,7 @@ def patterns(context=Counter(), check_context=null):
 	"love_you"
 ],
 [
-	[C(r"(i )?(really )?like ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
+	[C(rf"(i )?(really )?like {___you}( (so |very )*much| a lot)?"),],
 	( Rchoice("You're really nice, I like you too.",'I like you too') + " " +
 			Rchoice("dear", "<:u_name>", "babe", blank=2) + " " +
 			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
@@ -61,7 +61,7 @@ def patterns(context=Counter(), check_context=null):
 	"like_you"
 ],
 [
-	[C(r"(i )?(really )?miss(ed|d|) ((yo)?u|y(a|o))( (so |very )*much| a lot)?"),],
+	[C(rf"(i )?(really )?miss(ed|d|) {___you}( (so |very )*much| a lot)?"),],
 	(
 		Rchoice("Aww~!", "Really?", "Seriously!!", "uwu...", blank=2) + " " +
 			Rchoice("Thankss... ", blank=2) +
@@ -73,7 +73,7 @@ def patterns(context=Counter(), check_context=null):
 	"miss_you"
 ],
 [
-	[C(r"(i )?(really )?(hate|don('| )t like) ((yo)?u|y(a|o))"),],
+	[C(rf"(i )?(really )?(hate|don('| )t like) {___you}"),],
 	( Rchoice(Rchoice("I hate you too", "I hate you so much", "I hate you"),
 			(
 				Rchoice("I'm sorry. ", 'Sorry to dissapoint you. ',"Please forgive me. ")+
@@ -90,7 +90,7 @@ def patterns(context=Counter(), check_context=null):
 	"hate_you"
 ],
 [
-	[C(r"((a?re?)? ?)((yo)?u|y(a|o)) ((a?re?)? ?)(mad|crazy|stupid|psycho|baka)"),],
+	[C(rf"((a?re?) )?{___you} ((a?re?) )?(mad|crazy|stupid|psycho|baka)"),],
 	(
 		Rchoice("You meani...", "You baka...", "Huh..", "Whatt!!", blank=1) + "\n" +
 			Rchoice(
@@ -108,7 +108,7 @@ def patterns(context=Counter(), check_context=null):
 	"you_stupid"
 ],
 [
-	[C(r"(i('| | wi)ll )?(fuckh?|rape|torture|kill) ((yo)?u|y(a|o))(('| )?(re?)? ((mo(m|ther|mmy))|sis(ter)?))?"),],
+	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {___your} ((mo(m|ther|mmy))|sis(ter)?))?"),],
 	# this is terrible, i wish no one use this ever
 	(Rchoice("I don't like you.", 
 		'How rude!', 
@@ -131,8 +131,8 @@ def patterns(context=Counter(), check_context=null):
 	"user_bid_take_care"
 ],
 [
-	[C(r"(thank|tnx|tnq|thx)s?( ((yo)?u|y(a|o)))?( a ?lot|very much)?( for .+)?"),
-	C(r"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
+	[C(rf"(thank|tnx|tnq|thx)s?( {___you}?( a ?lot|very much)?( for .+)?"),
+	C(rf"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
 	],
 	( Rchoice(
 		Rchoice("You're welcome", "Anything for you", "You're most welcome")+
@@ -154,7 +154,7 @@ def patterns(context=Counter(), check_context=null):
 [
 	[
 		C(r"(give me)?( a)? kiss(e?s+)( me)?"),
-		C(r"(\*)?kiss(es)?( ((yo)?u|y(a|o)))?( on (the |((yo)?u|y(a|o))(('| )?(re?)? )?)?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
+		C(rf"(\*)?kiss(es)?( {___you})?( on (the |{___your} )?)?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
 	],
 	(
 		Rchoice(

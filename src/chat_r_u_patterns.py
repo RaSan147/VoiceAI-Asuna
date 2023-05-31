@@ -14,11 +14,13 @@ def patterns(context=Counter(), check_context=null):
 
 
 	"""
+
+	___an = r"(an? )?"
 	return [
 
 [
 	[
-		C(r"(an? )?ai|(ro)?bot|chat( |-)?(bot|gpt)"),
+		C(rf"{___an}ai|(ro)?bot|chat( |-)?(bot|gpt)"),
 	], # hiiii/heey there Asuna
 	(
 		Rchoice(
@@ -56,12 +58,12 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(an? )?boy( or g[iu]rl)?"),
-		C(r"(an? )?g[iu]rl( or boy)?"),
-		C(r"(an? )?m[ae]n( or wom[ae]n)?"),
-		C(r"(an? )?wom|ae]n( or m[ae]n)?"),
-		C(r"(an? )?male( or female)?"),
-		C(r"(an? )?female( or male)?"),
+		C(rf"{___an}boy( or g[iu]rl)?"),
+		C(rf"{___an}g[iu]rl( or boy)?"),
+		C(rf"{___an}m[ae]n( or wom[ae]n)?"),
+		C(rf"{___an}wom|ae]n( or m[ae]n)?"),
+		C(rf"{___an}male( or female)?"),
+		C(rf"{___an}female( or male)?"),
 		
 	], # hiiii/heey there Asuna
 	(
@@ -76,9 +78,9 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"(an? )?(gay|geh|gah)" + eos),
-		C(r"(an? )?lesb(o|ian)?"),
-		C(r"(an? )?straight"),
+		C(rf"{___an}(gay|geh|gah)" + eos),
+		C(rf"{___an}lesb(o|ian)?"),
+		C(rf"{___an}straight"),
 	
 		
 	], # hiiii/heey there Asuna
