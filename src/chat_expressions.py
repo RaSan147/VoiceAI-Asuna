@@ -1,7 +1,7 @@
 from collections import Counter
 
 from REGEX_TOOLS import re_check, re_is_in, re_starts
-from basic_conv_re_pattern import C, ___you, ___your, ___youre
+from basic_conv_re_pattern import C, ___auxV, ___you, ___your, ___youre
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -20,8 +20,8 @@ def patterns(context=Counter(), check_context=null):
 	[C(r"^h(i+|e+y+)( there)?"),], # hiiii/heey there Asuna
 	( Rchoice('Hello', 'Hey', 'Hey','Hello') +
 				Rchoice(" there", blank=2)+
-				Rchoice(' <:u_name>', blank=1)+ 
-				Rchoice('.', '...', '!',  '~', blank=1)+ 
+				Rchoice(' <:u_name>', blank=1)+
+				Rchoice('.', '...', '!',  '~', blank=1)+
 				Rchoice("👋", blank=2)
 	) if context["say_hi"]<3 else
 	('Hello','Yeah!','Yes?','Yeah, need something?'),
@@ -32,20 +32,20 @@ def patterns(context=Counter(), check_context=null):
 	[
 		C(r"^h(e|a)l+o+( there)?"),# hiiii/heey there Asuna
 		C(r"^yo( |$)")
-	], 
+	],
 	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
-				Rchoice(' <:u_name>', blank=1)+ 
-				Rchoice('.', '...', '!', '~', blank=2)+ 
+				Rchoice(' <:u_name>', blank=1)+
+				Rchoice('.', '...', '!', '~', blank=2)+
 				Rchoice("👋", blank=1)
 	) if context["say_hello"]<3 else
 	('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
 
 	"say_hello"
 ],
-[	
+[
 	[C(rf"(i )?(really )?(love|luv|wuv) {___you}( (so |very )*much| a lot)?"),],
-	( Rchoice('Love you too','Love you so much','I love you too') + 
-			Rchoice(" dear", " <:u_name>", " babe", blank=2) + 
+	( Rchoice('Love you too','Love you so much','I love you too') +
+			Rchoice(" dear", " <:u_name>", " babe", blank=2) +
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
 	),
 
@@ -110,13 +110,13 @@ def patterns(context=Counter(), check_context=null):
 [
 	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {___youre}( (mo(m|ther|mmy))|sis(ter)?)?"),],
 	# this is terrible, i wish no one use this ever
-	(Rchoice("I don't like you.", 
-		'How rude!', 
-		"You're mean!", 
-		"You're rude", 
-		"Please refrain from using such terms", 
-		"You're horrible", 
-		"I don't want to talk to you", 
+	(Rchoice("I don't like you.",
+		'How rude!',
+		"You're mean!",
+		"You're rude",
+		"Please refrain from using such terms",
+		"You're horrible",
+		"I don't want to talk to you",
 		"You're disgusting") +
 	Rchoice(" 😞", " 😭", " 🥺", " 😢", " 😡", " 😠", blank=2)
 	),
@@ -145,10 +145,10 @@ def patterns(context=Counter(), check_context=null):
 		"It was my pleasure",
 		"It was the least I could do",
 		"Glad to help",
-	) + Rchoice(".", "!") + 
+	) + Rchoice(".", "!") +
 	Rchoice("😇", "😁", "😽",  "🥰", "☺️", "❤️", blank=2)
 	),
-	
+
 	"thank_you_ai"
 ],
 [
@@ -186,10 +186,10 @@ def patterns(context=Counter(), check_context=null):
 		"be mine"
 	],
 	(
-		"I'm already " + 
+		"I'm already " +
 		Rchoice("your girlfriend", "your woman", "your gf", "your girl",  "yours") +
 		Rchoice(" <:u_name>", " dear", " my love", " and your ONLY", blank=1) + " " +
-		Rchoice("😊", "😌", "😉", "😍", "😘", "😗", "😙", 
+		Rchoice("😊", "😌", "😉", "😍", "😘", "😗", "😙",
 				"😚", "😜", "😝", "😛", "😋", "🫶", "🤗",
 				"🤭", "🤫", "😻", "😽", "💝", "💖", "💗",
 				"💓", "💞", "💕", "💘", "💟", "💌", "💋",
@@ -197,6 +197,26 @@ def patterns(context=Counter(), check_context=null):
 	),
 
 	"be_my_gf"
+],
+[
+	[
+		C(rf"(I{___auxV}? |^)(feel(ing)? )?a?lone(ly)?"),
+	],
+	(
+		Rchoice(
+			"Don't be sad, ",
+			"It's okayyy, ",
+			"Hey don't be sad, "
+		) + Rchoice(
+			"I'm here for you",
+			"I am with you"
+		) + Rchoice(
+			" now",
+			blank=2
+		)
+	),
+
+	"feeling_lonely"
 ]
 
 

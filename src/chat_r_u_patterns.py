@@ -64,14 +64,14 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"{___an}wom|ae]n( or m[ae]n)?"),
 		C(rf"{___an}male( or female)?"),
 		C(rf"{___an}female( or male)?"),
-		
+
 	], # hiiii/heey there Asuna
 	(
 		Rchoice(
 			"Well, of course I am girl. 🤨",
 			"As you can see, I am a woman.",
 			"I am a girl and you clearly know that. 😬",
-		) 
+		)
 	),
 
 	"are_you_boy"
@@ -81,8 +81,8 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"{___an}(gay|geh|gah)" + eos),
 		C(rf"{___an}lesb(o|ian)?"),
 		C(rf"{___an}straight"),
-	
-		
+
+
 	], # hiiii/heey there Asuna
 	(
 		Rchoice(
@@ -93,7 +93,7 @@ def patterns(context=Counter(), check_context=null):
 	),
 
 	"are_you_lesb"
-], 
+],
 
 
 

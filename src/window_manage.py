@@ -186,7 +186,7 @@ while __name__=='__main__':
 
 	winlist = []
 
-	
+
 
 	window= input('Enter the window name: ')
 

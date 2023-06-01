@@ -10,7 +10,7 @@ def patterns(context=Counter(), check_context=null):
 	context: Counter object to keep track of previous message intents
 	check_context: function to check if someting is in the prev msg intent (context)
 	"""
-	
+
 	return [
 [
 	[
@@ -51,6 +51,27 @@ def patterns(context=Counter(), check_context=null):
 	),
 	"can_you_speak"
 ],
+[
+	[
+		C(r"be my friend"),
+		C(r"we be friends?")
+	],
+	(
+		Rchoice("Of course", "Sure") + ", " +
+		Rchoice(
+			"we can be friends",
+			"I'll be your friend",
+			"I'll be your best friend"
+		) + Rchoice(
+		". You're my partner after all",
+		"😊", "😌", "😉", "😍", "😘", "😗",
+		blank=2
+		)
+	),
+
+	"can_you_be_friend"
+
+]
 
 
 

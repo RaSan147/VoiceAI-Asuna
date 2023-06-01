@@ -10,7 +10,7 @@ def patterns(context=Counter(), check_context=null):
 	context: Counter object to keep track of previous message intents
 	check_context: function to check if someting is in the prev msg intent (context)
 	"""
-	
+
 	return [
 [
 	[

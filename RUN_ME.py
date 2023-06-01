@@ -17,9 +17,9 @@ def start(mainpyfile):
 	tmp=__main__.__builtins__
 	__main__.__dict__.clear()
 	__main__.__dict__.update({"__name__"    : "__main__",
-					  "__file__"    : mainpyfile,
-					  "__builtins__": tmp,
-					 })
+							"__file__"    : mainpyfile,
+							"__builtins__": tmp,
+					})
 	exec(open(mainpyfile).read(),  __main__.__dict__)
 		
 start(mainpyfile)

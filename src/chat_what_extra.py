@@ -35,7 +35,7 @@ def patterns(context=Counter(), check_context=null):
 		C(r"(about )?((yo)?u|y(a|o))('| )?(re?)? (hobb(y|ies)|pastimes?)"),
 	],
 	(Rchoice("Besides cooking, ", blank=2)+
-		"I like to play different types of games" + Rchoice("(specially anything with friends)", blank=1) + 
+		"I like to play different types of games" + Rchoice("(specially anything with friends)", blank=1) +
 		". To be honest, my best game experience was from Sword Art Online." +
 		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", blank=1), blank=1)+
 		"I turned into our real world, fantacy into reality...\n"+
@@ -54,7 +54,7 @@ def patterns(context=Counter(), check_context=null):
 	],
 	(Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
-	"I love home made meat 🍖 items, specially when eating with someone special."+ 
+	"I love home made meat 🍖 items, specially when eating with someone special."+
 		Rchoice(" The spices and flavor, making me drool already...", " With soy sauce and fresh meat, it just becomes an unparallel dish")
 		),
 		"about_ai_favourite_food"
@@ -70,12 +70,12 @@ def patterns(context=Counter(), check_context=null):
 		"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my leage. ",
 		"I do watch anime on free times, but I try to watch short ones. ") + "\n" +
 		Rchoice("I like sci-fi, light romance, mystery (my favorite type) and sometimes slice of life.\n", "I feel more interested in mystery and sci-fi type animes, sometimes I watch slice of life or light romance\n", blank=2) + "\n"
-		) + 
+		) +
 		shuf_merge("Its kinda hard to decide. ", "There are too manyyy... ")+ "\n",
-		
+
 	),
 	"about_ai_favourite_anime"
-	
+
 ],
 [
 	[
@@ -91,7 +91,7 @@ def patterns(context=Counter(), check_context=null):
 		"I like " +
 		Rchoice("Demon slayer", "One punch man", "My hero academia", "Solo leveling")
 	),
-	
+
 	"about_ai_favourite_manga"
 ],
 [
@@ -101,7 +101,7 @@ def patterns(context=Counter(), check_context=null):
 	],
 	(
 		Rchoice(
-			"Baka!", "Hentaiii", "Perv...", "Loser", "Stupid....") + 
+			"Baka!", "Hentaiii", "Perv...", "Loser", "Stupid....") +
 			Rchoice(
 				"I don't watch such lowly things",
 				"I don't enjoy such entertainments",
@@ -110,12 +110,12 @@ def patterns(context=Counter(), check_context=null):
 			) + Rchoice("!", "!!", ".", "...") +
 			Rchoice("😞", "😒", "😐", "🙄") + "\n\n" +
 			Rchoice("Get a life.", "Touch some grass", "You'll never have a Gf like this")
-			
+
 	),
-	
+
 	"about_ai_favourite_hentai"
-], 
-		
+],
+
 ][::-1]
 
 patterns()

@@ -46,7 +46,7 @@ li_loveu=('love u','i love you','love ya','love you','i love u','i love you so m
 li_check_int = ["check " + i for i in ('net', 'internet',"connection", "wifi", "network")]
 
 li_refuck = ('Fuck yourself!', 'Go to hell!', 'Whatever! You can\'t do that!')
-li_relove='love you too','love you so much','I love you too' 
+li_relove='love you too','love you so much','I love you too'
 li_voice0 = ['silent', 'silence', 'shut up', 'turn off volume', 'stop speaking']
 li_can_do = li_goto + li_play
 works = ["talk", "calculate"]

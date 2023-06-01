@@ -555,14 +555,14 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		elif (conntype.lower() == 'keep-alive' and
 			  self.protocol_version >= "HTTP/1.1"):
 			self.close_connection = False
-		
+
 		# Load cookies from request
 		# Uses standard SimpleCookie
 		# doc: https://docs.python.org/3/library/http.cookies.html
 		self.cookie = SimpleCookie()
 		self.cookie.load(self.headers.get('Cookie', ""))
 		# print(tools.text_box("Cookie: ", self.cookie))
-		
+
 		# Examine the headers and look for an Expect directive
 		expect = self.headers.get('Expect', "")
 		if (expect.lower() == "100-continue" and
@@ -654,7 +654,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			logger.info('-'*w + f' {self.req_hash} ' + '-'*w + '\n' +
 						'#'*_w
 						)
-			
+
 			# actually send the response if not already done.
 			self.wfile.flush()
 
@@ -748,7 +748,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		"""
 		if self.response_code_sent:
 			return
-		
+
 		if not code//100 ==1: # 1xx - Informational (allowes multiple responses)
 			self.response_code_sent = True
 
@@ -770,7 +770,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self._headers_buffer.append(("%s %d %s\r\n" %
 				(self.protocol_version, code, message)).encode(
 				'utf-8', 'strict'))
-				
+
 	def send_header_string(self, lines:str):
 		"""Send a header multiline string to the headers buffer."""
 		for i in lines.split("\r\n"):
@@ -778,7 +778,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 				continue
 			tag, _, msg = i.partition(":")
 			self.send_header(tag.strip(), msg.strip())
-			
+
 
 	def send_header(self, keyword, value):
 		"""Send a MIME header to the headers buffer."""
@@ -1193,7 +1193,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		try:
 			ctype = self.guess_type(path)
-			
+
 			# make sure texts are sent as utf-8
 			if ctype.startswith("text/"):
 				ctype += "; charset=utf-8"
@@ -1254,9 +1254,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			else:
 				self.send_response(HTTPStatus.OK)
-				
+
 				self.send_header("Content-Length", str(file_len))
-				
+
 			if cache_control:
 				self.send_header("Cache-Control", cache_control)
 
@@ -1292,8 +1292,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			self.copyfile(file, self.wfile)
 		finally:
 			file.close()
-			
-	
+
+
 	def send_head(self):
 		"""Common code for GET and HEAD commands.
 

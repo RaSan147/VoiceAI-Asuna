@@ -38,7 +38,7 @@ def attack():
 				failed["signup"] += 1
 		except Exception:
 			exceptions["signup"] += 1
-			
+
 			continue
 
 		# print(r.text)

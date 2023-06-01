@@ -15,7 +15,7 @@ import json
 # import traceback
 import importlib
 import re
-from http.cookies import SimpleCookie 
+from http.cookies import SimpleCookie
 
 # SELFMADE LIBS
 
@@ -104,22 +104,22 @@ def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
 		return ""
 	username = get("uname")
 	uid = get("uid")
-	
+
 	validity, user = auth_uname_pass_data(username, uid, 40), None
 	if validity == True:
 		user = user_handler.server_verify(username, uid)
-	
+
 	print([user, validity])
 	if not (user and validity==True):
 		if on_fail:
-			
+
 			self.redirect(on_fail)
 			return True
 
 	elif on_ok:
 		self.redirect(on_ok)
 		return True
-		
+
 	return None
 
 @SH.on_req('GET', '/favicon.ico')
@@ -128,7 +128,7 @@ def send_favico(self: SH, *args, **kwargs):
 	re-direct favicon.ico request to cloud to make server less file bloated
 	"""
 	self.redirect('/icons/icon-512x512.png')
-	
+
 	return
 
 
@@ -142,7 +142,7 @@ def send_homepage(self: SH, *args, **kwargs):
 	print(cookie_check)
 	if cookie_check is True:
 		return None
-	
+
 
 	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
 
@@ -153,7 +153,7 @@ def send_login(self: SH, *args, **kwargs):
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
 	cookie_check = handle_user_cookie(self, on_fail="")
-	
+
 	if cookie_check:
 		return None
 
@@ -168,7 +168,7 @@ def send_signup(self: SH, *args, **kwargs):
 	cookie_check = handle_user_cookie(self, on_fail="")
 	if cookie_check:
 		return None
-		
+
 	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
 
 
@@ -182,7 +182,7 @@ def send_default(self: SH, *args, **kwargs):
 	spathsplit = kwargs.get('spathsplit', '')
 	first = kwargs.get('first', '')
 	last = kwargs.get('last', '')
-	
+
 
 	if os.path.isdir(path):
 		parts = urllib.parse.urlsplit(self.path)
@@ -260,7 +260,7 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=None):
 	# START POST DATA READING
 	post.start()
 	form = post.form
-	
+
 
 	post_verify = form.get_multi_field(verify_name="post-type", verify_msg=post_type, decode=T)
 
@@ -284,12 +284,12 @@ def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password') -> tuple[str,
 		post: instance of DealPostData class
 		pass_or_uid: verify using password or uid
 		"""
-	
+
 	form = post.form
 
 	_, username = form.get_multi_field('username', decode=T) # line 5-8
 	username = username
-	
+
 
 	_, password = form.get_multi_field(pass_or_uid, decode=T) # line 9-12
 	password = password
@@ -306,7 +306,7 @@ def resp_json(success, message='', **kwargs):
 	out = {"status": success, "message": message}
 	out.update(kwargs)
 	return json.dumps(out)
-	
+
 def auth_uname_pass_data(uname, pw, max_pw=64):
 	"""
 	check if username and pass has weird data
@@ -315,28 +315,28 @@ def auth_uname_pass_data(uname, pw, max_pw=64):
 	print([uname, pw])
 	if len(uname)==0 or valid_uname_re.search(uname) or len(pw)>max_pw:
 		return False
-		
+
 	return True
-	
-	
+
+
 def add_user_cookie(user_name, uid):
-	# add cookie with 1 year expire 
+	# add cookie with 1 year expire
 	cookie = SimpleCookie()
 	def x(k, v):
 		nonlocal cookie
 		cookie[k] = v
 		cookie[k]["expires"] = 365*86400
 		cookie[k]["path"] = "/"
-		
+
 	x("uname", user_name)
 	x("uid", uid)
-	
+
 
 	return cookie
 
 
 @SH.on_req('POST', hasQ='do_login')
-def do_login(self: SH, *args, **kwargs):	
+def do_login(self: SH, *args, **kwargs):
 	"""
 	handle log in post request.
 	1st validate post
@@ -349,15 +349,15 @@ def do_login(self: SH, *args, **kwargs):
 	AUTHORIZE_POST(self, post, 'login')
 
 	username, password = Get_User_from_post(self, post)
-	
+
 	validity = auth_uname_pass_data(username, password)
 	if validity !=True:
 		return self.send_json(resp_json(validity))
-		
+
 	data = user_handler.server_login(username, password)
 	if data["status"] == "success":
 		cookie = add_user_cookie(data["user_name"], data["user_id"])
-		
+
 		self.send_response(200)
 		self.send_header_string(cookie.output())
 
@@ -376,15 +376,15 @@ def do_signup(self: SH, *args, **kwargs):
 	AUTHORIZE_POST(self, post, 'signup')
 
 	username, password = Get_User_from_post(self, post)
-	
+
 	validity = auth_uname_pass_data(username, password)
 	if validity !=True:
 		return self.send_json(resp_json(validity))
-		
+
 	data = user_handler.server_signup(username, password)
 	if data["status"] == "success":
 		cookie = add_user_cookie(data["user_name"], data["user_id"])
-		
+
 		self.send_response(200)
 		self.send_header_string(cookie.output())
 
@@ -403,7 +403,7 @@ def do_verify(self: SH, *args, **kwargs):
 
 	username, uid = Get_User_from_post(self, post, 'uid')
 	# uid (sha1) length is 40
-	
+
 	validity = auth_uname_pass_data(username, uid, 40)
 	if validity !=True:
 		return self.send_json(resp_json(validity))
@@ -418,15 +418,15 @@ def do_verify(self: SH, *args, **kwargs):
 def bot_manager(self: SH, *args, **kwargs):
 	"""
 	handles user based varius bot queries like bot background, skin texture url etc.
-	
-	
+
+
 	"""
 	post = DPD(self)
 
 	request  = AUTHORIZE_POST(self, post)
 
 	username, uid = Get_User_from_post(self, post, 'uid')
-	
+
 
 
 	if request == 'get_skin_link':
@@ -447,7 +447,7 @@ def bot_manager(self: SH, *args, **kwargs):
 def chat(self: SH, *args, **kwargs):
 	"""
 	handles messaging to bot.
-	
+
 	gets message and sent time from post
 	and send it to message handlerq
 	"""
@@ -497,7 +497,7 @@ def chat(self: SH, *args, **kwargs):
 
 	# TODO: REMOVE THIS IN PRODUCTION
 	importlib.reload(Chat_raw2)
-	
+
 	Chat_raw2.LOG_DEBUG = True
 
 	reply = Chat_raw2.basic_output(message, user)
@@ -522,4 +522,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
-	
+

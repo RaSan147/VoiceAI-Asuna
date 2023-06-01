@@ -15,7 +15,7 @@ def get_sep(path):  # fc=0601
 	"""returns the separator of the path"""
 	if '/' in path:
 		return '/'
-	
+
 	if '\\' in path:
 		return '\\'
 	#else:
@@ -31,7 +31,7 @@ def loc(path, _os_name='Linux'):  # fc=0602 v
 
 	if _os_name == 'Windows':
 		return path.replace('/', '\\')
-		
+
 	#else:
 	return path.replace('\\', '/')
 
@@ -119,13 +119,13 @@ def get_dir(directory, mode='dir'):  # fc=0605 v
 		directory = Datasys.trans_str(urllib.parse.unquote(html_unescape(dirs[-1])), {'/\\|:*><?': '-', '"': "'"})
 
 		return directory
-		
+
 	if mode == 'dir':
 		if os.path.basename(directory) == '':
 			return os.path.basename(os.path.dirname(directory))
 		#else:
 		return os.path.basename(directory)
-		
+
 	#else:
 	raise ValueError
 
@@ -145,10 +145,10 @@ def go_prev_dir(directory, preserve_sep=False):  # fc=0606 v
 
 	if directory.endswith(sep):
 		return sep.join(directory[:-1].split(sep)[:-2]) + sep
-		
+
 	#else:
 	return sep.join(directory.split(sep)[:-2]) + sep
-	
+
 from collections import deque
 from DS import Callable_dict
 BUSY_FS = Callable_dict()
@@ -179,23 +179,23 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 
 	else:
 		read_mode = 'r'
-		
+
 	location = loc(direc)
 
 	if not os.path.isfile(location):
 		if not ignore_missing_log:
 			print(location, 'NOT found to read. Error code: 0607x1')
 		return on_missing
-		
-	
+
+
 	waited = 0
 	token = (time.time(), random())
 	if not BUSY_FS(location):
 		BUSY_FS[location] = deque()
-	
+
 	BUSY_FS[location].append(token)
-	
-		
+
+
 	while 1:
 		if token==BUSY_FS[location][0]:
 			break
@@ -206,7 +206,7 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 		time.sleep(.01)
 		waited +=.01
 
-		
+
 	#BUSY_FS.add(location)
 
 	try:
@@ -247,7 +247,7 @@ def reader(direc, read_mode='r', ignore_error=False, output=None,
 def writer(fname, mode, data, direc="", f_code='????',
 			encoding='utf-8', timeout=3):  # fc=0608 v
 	"""Writing on a file
-	
+
 	why this monster?
 	> to avoid race condition, folder not found etc
 
@@ -279,7 +279,7 @@ def writer(fname, mode, data, direc="", f_code='????',
 		xprint("/rh/Invalid data type./yh/ Data must be a string or binary data/=/")
 		raise TypeError
 	mode = mode.replace('+', '').replace('r', 'w')
-	
+
 	_direc, fname = os.path.split(fname)
 	direc = os.path.join(direc, _direc)
 
@@ -288,7 +288,7 @@ def writer(fname, mode, data, direc="", f_code='????',
 		fname = Datasys.trans_str(fname, {'/\\|:*><?': '-', '"': "'"})
 
 	direc = loc(direc, 'Linux')
-	
+
 	# directory and file names are auto stripped by OS
 	# or else shitty problems occurs
 
@@ -297,23 +297,23 @@ def writer(fname, mode, data, direc="", f_code='????',
 		direc+="/"
 
 	fname = fname.strip()
-	
+
 
 	location = loc(direc + fname)
-	
+
 	"""
 	if any(i in location for i in ('\\|:*"><?')):
 		location = Datasys.trans_str(location, {'\\|:*><?': '-', '"': "'"})
 	"""
-	
+
 	waited = 0
 	token = (time.time(), random())
 	if not BUSY_FS(location):
 		BUSY_FS[location] = deque()
-	
+
 	BUSY_FS[location].append(token)
-	
-		
+
+
 	while 1:
 		if token==BUSY_FS[location][0]:
 			break
@@ -324,9 +324,9 @@ def writer(fname, mode, data, direc="", f_code='????',
 		time.sleep(.01)
 		waited +=.01
 
-	
-	
-	
+
+
+
 	# creates the directory, then write the file
 	try:
 		os_makedirs(direc, exist_ok=True)
@@ -337,7 +337,7 @@ def writer(fname, mode, data, direc="", f_code='????',
 			_temp3 = 0
 			for _temp3 in range(len(_temp2)):
 				_temp += _temp2[_temp3] + '/'
-				if not os.path.isdir(_temp): 
+				if not os.path.isdir(_temp):
 					break
 			raise PermissionError(_temp) from e
 
@@ -350,7 +350,7 @@ def writer(fname, mode, data, direc="", f_code='????',
 		raise e
 	finally:
 		BUSY_FS[location].popleft()
-	
+
 def get_dir_size(start_path = '.', limit=None, return_list= False, full_dir=True):
 	"""
 	Get the size of a directory and all its subdirectories.
@@ -360,14 +360,14 @@ def get_dir_size(start_path = '.', limit=None, return_list= False, full_dir=True
 	return_list (bool): if True returns a tuple of (total folder size, list of contents)
 	full_dir (bool): if True returns a full path, else relative path
 	"""
-	r=[] # if return_list: 
+	r=[] # if return_list:
 	total_size = 0
 	start_path = os.path.normpath(start_path)
 
 	for dirpath, dirnames, filenames in os_walk(start_path, onerror= print):
 		for f in filenames:
 			fp = os.path.join(dirpath, f)
-			if return_list: 
+			if return_list:
 				r.append(fp if full_dir else fp.replace(start_path, "", 1))
 
 			if not os.path.islink(fp):

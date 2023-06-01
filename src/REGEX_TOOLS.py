@@ -79,7 +79,7 @@ class WEB_RE:
 web_re = WEB_RE()
 
 def _pp(pattern):
-	xprint(f"	/p/Pattern: /=/ {pattern}") 
+	xprint(f"	/p/Pattern: /=/ {pattern}")
 
 
 class Tool_belt:

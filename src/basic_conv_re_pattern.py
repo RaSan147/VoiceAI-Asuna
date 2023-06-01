@@ -55,9 +55,9 @@ def remove_suffix(string):
 
 
 
-___auxV = r"(s|re|is|are|r|was|were|am|will|will be)"
+___auxV = r"([' ]?(m|s|re|is|are|r|was|were|am|will|ll|will be|ll be))"
 
-___change = r"(change|swap|switch)" 
+___change = r"(change|swap|switch)"
 
 ___you = r"((yo)?u|y[ao])"
 ___your = r"((yo)?u|y(a|o))(( |')?r)"
@@ -271,15 +271,15 @@ ip.tell_latest_news = ip.latest_news + [
 "change Anime dress"
 
 ip.change_cloth = [
-	'change', 
+	'change',
 	C(rf"{___change} (((yo)?u|y(a|o))('| )?(re?)? )?{___dress}"),
-	C(rf"wear (a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{___dress}"), 
+	C(rf"wear (a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{___dress}"),
 ]
 
 "change Anime room"
 
 ip.change_room = [
-	C(rf"({___change}|move) (to )?(a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{___room}"), 
+	C(rf"({___change}|move) (to )?(a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{___room}"),
 ]
 
 
@@ -392,12 +392,12 @@ set_timer_pattern = "set ?a? timer of (.*)"
 # db = generate_list('li_')
 
 ip.bye = [
-	"exit", "close", 
-	C(r"(shut|turn) ?(down|off)"), 
+	"exit", "close",
+	C(r"(shut|turn) ?(down|off)"),
 	"quit",
-	C(r"(good )?(bye+ ?)+"), 
-	C(r"esc(ape)?"), 
-	C(r"ta( |-)?ta"), 
+	C(r"(good )?(bye+ ?)+"),
+	C(r"esc(ape)?"),
+	C(r"ta( |-)?ta"),
 	C(r"see ((yo)?u|y(a|o))"),
 ]
 #li_bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."

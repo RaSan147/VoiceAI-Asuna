@@ -41,7 +41,7 @@ li_where = tuple()
 li_whats += tuple(s + 'what' + x + t for x in _li_extra for s in li_do_u_know for t in (' the', ''))
 li_who += tuple(s + 'who' + x + t for x in _li_extra for s in li_do_u_know for t in (' the', ''))
 li_where += tuple(s + 'where' + x + t for x in _li_extra for s in li_do_u_know for t in (' the', ''))
-			
+
 
 li_what_is = tuple('what' + x + t for x in ('s', ' is') for t in (' the', ''))
 
@@ -143,7 +143,7 @@ li_where_r_u_frm = 'you from',
 li_AamI = 'I am an AI. My name is %s & I am your voice assistant.', 'My name is %s. I am an AI voice assistant.'
 li_WmyName = 'my name',
 li_AmyName = 'Your name is ',
-			
+
 # print(li_whats)
 
 

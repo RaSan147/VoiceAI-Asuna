@@ -10,14 +10,14 @@ class OnLine:
 		self.cached_characters = {}
 
 	def get_characters(self):
-		r = net_sys.get_page(self.latest_link + "/characters.json", 
+		r = net_sys.get_page(self.latest_link + "/characters.json",
 							cache=True,
 							do_not_cache=False,
 							cache_priority=True)
 		return json.loads(r.content)
 
 	def get_latest_commit(self):
-		r = net_sys.get_page("https://api.github.com/repos/RaSan147/voiceAI-skins/commits/main", 
+		r = net_sys.get_page("https://api.github.com/repos/RaSan147/voiceAI-skins/commits/main",
 							cache=True,
 							do_not_cache=False,
 							cache_priority=True)
@@ -30,7 +30,7 @@ class OnLine:
 			return self.cached_characters[name]
 		folder = c['folder']
 		link = self.latest_link + "/" + folder + "/skins.json"
-		r = net_sys.get_page(link, 
+		r = net_sys.get_page(link,
 							cache=True,
 							do_not_cache=False,
 							cache_priority=True)

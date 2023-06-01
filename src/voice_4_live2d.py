@@ -20,7 +20,7 @@ async def _main(TEXT, VOICE, OUTPUT_FILE, print_sub=False) -> None:
 			elif chunk["type"] == "WordBoundary":
 				if print_sub:
 					print(f"WordBoundary: {chunk}")
-				
+
 def get_audio(text, voice=VOICE):
 	text = remove_emoji(TEXT)
 	hashed = sha1()

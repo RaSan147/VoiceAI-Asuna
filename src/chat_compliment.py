@@ -68,7 +68,7 @@ def patterns(context=Counter(), check_context=null):
 				"You need to learn how to compliment a girl",
 				"You'll never get a girlfriend if you keep saying this"
 		) + '. ' +
-		Rchoice("But thanks for the compliment", 
+		Rchoice("But thanks for the compliment",
 				"But thanks",
 				"But I appreciate it",
 				"But I'm flattered",
@@ -94,8 +94,8 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"(what|how) (an? )?{___pretty} (eye|hair|eyelashe?|voice|smile|face|(style|fashion)( sense)?|dresse?|shoe|costume|clothe?|outfit|hat|sword|repier|personality|behavior|mind|soul)s? {___you} (have|got|have got|have gotten|have gotten)")
 		# what amazing eyes you have
 	],
-	( 
-		Rchoice("😊", "😌", "😉", "😍", "😘", "😗", "😙", 
+	(
+		Rchoice("😊", "😌", "😉", "😍", "😘", "😗", "😙",
 				"😚", "😜", "😝", "😛", "😋", "🫶", "🤗",
 				"🤭", "🤫", "😻", "😽", "💝", "💖", "💗",
 				"💓", "💞", "💕", "💘", "💟", "💌", "💋",

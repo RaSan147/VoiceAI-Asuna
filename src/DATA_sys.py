@@ -84,7 +84,7 @@ def is_json(data, raise_=False): # fc=xxxx
 	io.RawIOBase,
 	io.IOBase)):
 		func = json.load
-	elif isinstance(data, (str, bytes)): 
+	elif isinstance(data, (str, bytes)):
 		func = json.loads
 	else:
 		return False
@@ -104,10 +104,10 @@ def call_or_return(arg, *i_args):
 	"""
 	if isinstance(arg, FunctionType):
 		return arg(*i_args)
-	
+
 	return arg
-		
-	
+
+
 
 
 

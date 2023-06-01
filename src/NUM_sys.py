@@ -91,10 +91,10 @@ base_li0= {'0':0,
 base_li= "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/"
 
 def dec2base(n,base):
-	
+
 
 	out=''
-	
+
 	if n == "": # IPv6 :: patch
 		return out
 	n = int(n)
@@ -120,16 +120,16 @@ def base2dec(n, base, _type:type=int):
 		out+=base_li0[n[i]]*(base**(i))
 
 	return _type(out)
-	
+
 def base2base(n, ibase, obase):
 	if n == "":
 		return ""
-		
+
 	dec = base2dec(n, ibase)
 	return dec2base(dec, obase)
 
 def dt_():
-	"""returns time in GMT+6 
+	"""returns time in GMT+6
 	"""
 	return str(datetime.now()+ timedelta(hours=6))
 
@@ -146,13 +146,13 @@ cdt_ = compressed_dt
 def compressed_ip(ip):
 	if isinstance(ip, dict):
 		ip = ip['ip']
-		
+
 	# if IPv4
-	joint = "~" 
+	joint = "~"
 	junk = [randint(0,255) for i in range(4)]
 	if ":" in ip: # IPv6
 		ip_now= ip.split(':')
-		
+
 		for n, i in enumerate(ip_now):
 			if i:
 				ip_now[n] = int(i, 16)
@@ -162,13 +162,13 @@ def compressed_ip(ip):
 		ip_now= ip.split('.')
 	new_dec2base = partial(dec2base, base=63)
 
-	
+
 	return joint.join(map(new_dec2base,  junk[:2]+ip_now+junk[2:]))
 
 def dec_ip(ip):
 	if not isinstance(ip, str):
 		return '127.0.0.1'
-	
+
 	sep = "~"
 	joint = "."
 	converter = partial(base2dec, base=63, _type=str)
@@ -176,13 +176,13 @@ def dec_ip(ip):
 		sep = "#"
 		joint = ":"
 		converter = partial(base2base, ibase=63, obase=16)
-		
-	ip_now= ip.split(sep)[2:-2]
-	
 
-	return joint.join(map(converter, ip_now))	
-	
-	
+	ip_now= ip.split(sep)[2:-2]
+
+
+	return joint.join(map(converter, ip_now))
+
+
 #print(compressed_ip("2001:db8::1"))
 #print(dec_ip(compressed_ip("2001:db8::1")))
 
@@ -220,8 +220,8 @@ def flatten_array(out, output_type = list):
 	if not isinstance(out, output_type):
 		out= output_type(out)
 	return out
-	
-	
+
+
 def hash_bin64(data):
 	try:
 		import xxhash
@@ -230,7 +230,7 @@ def hash_bin64(data):
 
 	if isinstance(data, int):
 		data = data.to_bytes((data.bit_length() + 7) // 8, byteorder="big")  # Here's where the magic happens
-	
+
 	x = xxhash.xxh3_64_digest(data)
 	return b85encode(x)
 

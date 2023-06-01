@@ -2,12 +2,12 @@
 import webbrowser
 import re
 def generate_list(x):
-    l = [globals()[name] for name in globals().keys() if name.startswith(x)]
-    return [item for sublist in l for item in sublist]
+	l = [globals()[name] for name in globals().keys() if name.startswith(x)]
+	return [item for sublist in l for item in sublist]
 
 def gen_list(x):
-    l = [globals()[name] for name in globals().keys() if name.startswith(x)]
-    return [sublist for sublist in l]
+	l = [globals()[name] for name in globals().keys() if name.startswith(x)]
+	return [sublist for sublist in l]
 
 
 url_google=('https://www.google.com','google','gogle','gooogle')

@@ -19,7 +19,7 @@ if os_name == 'nt':
 
 	# TODO: detect errors in all mci calls
 	class _PlatformSpecificAudioClip(object):
-		
+
 		def directsend(self, command):
 			buf = c_buffer(255)
 			command = ''.join(command).encode(getfilesystemencoding())
@@ -44,7 +44,7 @@ if os_name == 'nt':
 
 			self.directsend('open "'+filename+'" alias ' +self._alias )
 			self.directsend('set %s time format milliseconds' % self._alias)
-			
+
 			self._length_ms = int(self.directsend('status %s length' % self._alias).decode())
 			#print(self._length_ms)
 			#self.directsend('play %s from %d to %d'% (self._alias, 0, self._length_ms) )
@@ -54,7 +54,7 @@ if os_name == 'nt':
 			self.directsend('setaudio %s volume to %d' %
 					(self._alias, level * 10) )
 		def isvolume(self):
-			return self.directsend('status %s volume' % self._alias) 
+			return self.directsend('status %s volume' % self._alias)
 
 		def play(self, start_ms=None, end_ms=None):
 			start_ms = 0 if not start_ms else start_ms
@@ -66,11 +66,11 @@ if os_name == 'nt':
 		def _mode(self):
 			# returns binary
 			#print(self.directsend('status %s mode' % self._alias))
-			return self.directsend('status %s mode' % self._alias) 
-		
+			return self.directsend('status %s mode' % self._alias)
+
 		def isrunning(self):
 			return self._mode() == b'playing' or self._mode() == b'paused'
-			
+
 		def isplaying(self):
 			return self._mode() == b'playing'
 
@@ -178,13 +178,13 @@ class AudioClip:
 	def is_volume(self):
 		return self._clip.isvolume()
 
-	
+
 def load(filename, error="all"):
 	"""Return an AudioClip for the given filename."""
 	return AudioClip(filename, error)
 
 if __name__=='__main__':
-        x= load('songs/Date.m4a')
-        x.play()
-        print(x.is_volume())
+		x= load('songs/Date.m4a')
+		x.play()
+		print(x.is_volume())
 

@@ -65,7 +65,7 @@ class BBC_News:
 		news_list = []
 		report += '\nThis are the latest News at the BBC:\n(updated on:%s)\n' % lastupdate
 		news_list.append(report)
-		
+
 		for i in tree.iter('item'):
 			title = i.find('title')
 			description = i.find('description')

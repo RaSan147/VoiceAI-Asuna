@@ -35,8 +35,8 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"how do {___you} do")
 	],
 	( Rchoice("I'm fine!", "I'm doing great.")),
-	
-	
+
+
 	"'how_are_you'"
 ],
 [
@@ -51,7 +51,7 @@ def patterns(context=Counter(), check_context=null):
 		"It was a bit hectic, but overall good.",
 		"It was fantastic, thanks for asking!")
 	),
-	
+
 	"how_was_day"
 ],
 [
@@ -59,11 +59,11 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"how old ?a?re? {___you}( now)?"),
 		C(rf"{___youre} age"),
 	],
-	( Rchoice("I'm 17", 
+	( Rchoice("I'm 17",
 		"I'm 17 this year.",
 		)),
-	
-	
+
+
 	"'how_are_you'"
 ],
 
@@ -72,16 +72,16 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"about {___youre}( ?self)?( \<\:ai_name\>)?$"),
 	],
 	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki." +
-		Rchoice(" I'm 17 this year.",blank=2) + 
+		Rchoice(" I'm 17 this year.",blank=2) +
 		Rchoice(" I continue my education from SAO Survivor School.", blank=1)+
 		" I love to study and play video games with friends."+
-		shuf_merge(Rchoice(" I often go to the pool or beach for swimming.", blank=1), 
+		shuf_merge(Rchoice(" I often go to the pool or beach for swimming.", blank=1),
 			" I like to go shopping too!") +
 		Rchoice(" I also "+Rchoice("like ", "love ")+Rchoice("talking ", "being ", "staying ", "chatting ")+"with you.",
 			" I also love too cook.", blank=1)+
 		Rchoice("😁", " 😄", " 😇", " 😊", " ~", "...", blank=1)
 	),
-	
+
 	"about_ai"
 ],
 [
@@ -90,7 +90,7 @@ def patterns(context=Counter(), check_context=null):
 		C(rf"(about )?{___your} (hobb(y|ies)|pastimes?)"),
 	],
 	( Rchoice("Besides cooking, ", blank=1)+
-		"I like to play different types of games" + Rchoice(" (specially anything with friends)", blank=1) + 
+		"I like to play different types of games" + Rchoice(" (specially anything with friends)", blank=1) +
 		". To be honest, my best game experience was from Sword Art Online." +
 		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", blank=1), blank=1)+
 		"I turned into our real world, fantacy into reality...\n"+
@@ -109,7 +109,7 @@ def patterns(context=Counter(), check_context=null):
 	],
 	( Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
-	"I love home made meat 🍖 items, specially when eating with someone special."+ 
+	"I love home made meat 🍖 items, specially when eating with someone special."+
 		Rchoice(" The spices and flavor, making me drool already...", " With soy sauce and fresh meat, it just becomes an unparallel dish")
 		),
 		"about_ai_favourite_food"
@@ -125,12 +125,12 @@ def patterns(context=Counter(), check_context=null):
 			"I do watch anime on free times, but I try to watch short ones. ") + "\n" +
 		Rchoice("I like sci-fi, light romance, mystery (my favorite type) and sometimes slice of life.\n", "I feel more interested in mystery and sci-fi type animes, sometimes I watch slice of life or light romance\n", blank=2) + "\n"
 		) if not check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"])
-		else "") + 
+		else "") +
 		shuf_merge("Its kinda hard to decide. ", "There are too manyyy... ")+ "\n",
-		
+
 	),
 	"about_ai_favourite_anime"
-	
+
 ],
 [
 	[
@@ -146,7 +146,7 @@ def patterns(context=Counter(), check_context=null):
 		"I like " +
 		Rchoice("Demon slayer", "One punch man", "My hero academia", "Solo leveling")
 	),
-	
+
 	"about_ai_favourite_manga"
 ],
 [
@@ -156,7 +156,7 @@ def patterns(context=Counter(), check_context=null):
 	],
 	(
 		Rchoice(
-			"Baka!", "Hentaiii", "Perv...", "Loser", "Stupid....") + 
+			"Baka!", "Hentaiii", "Perv...", "Loser", "Stupid....") +
 			Rchoice(
 				"I don't watch such lowly things",
 				"I don't enjoy such entertainments",
@@ -165,20 +165,20 @@ def patterns(context=Counter(), check_context=null):
 			) + Rchoice("!", "!!", ".", "...") +
 			Rchoice("😞", "😒", "😐", "🙄") + "\n\n" +
 			Rchoice("Get a life.", "Touch some grass", "You'll never have a Gf like this")
-			
+
 	),
-	
+
 	"about_ai_favourite_hentai"
 ],
 [
 	[
 		C(rf"a?re? {___you} (fine|ok((a|e)y)?|well|alright)"),
 	],
-	( Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") + 
-			Rchoice(" Thanks", blank=1)  + 
+	( Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") +
+			Rchoice(" Thanks", blank=1)  +
 			Rchoice("🥰", "😇", blank=1)
 	),
-		
+
 	"are_you_ok"
 ],
 [
@@ -189,12 +189,12 @@ def patterns(context=Counter(), check_context=null):
 		"No, not at all",
 		"Of course not... I'm happy to see you ",
 		"Nope... maybe i was just spacing out ."),
-		
+
 	"r_u_sad"
 ]
 
 
-		
-][::-1] # smaller ones should be checked first 
+
+][::-1] # smaller ones should be checked first
 
 patterns()
