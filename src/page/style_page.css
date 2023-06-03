@@ -377,12 +377,14 @@ a {
 	font-family: sans-serif;
 }
 
-
+:root {
+	--sb-width: 300px;
+}
 .sidebar {
 	display: block;
 	opacity: 0.8;
 	height: 100%;
-	width: 300px;
+	width: var(--sb-width);
 	position: fixed;
 	z-index: 5;
 	top: 0;
@@ -411,7 +413,7 @@ a {
 }
 
 .sidebarR {
-	right: -300px;
+	right: calc(var(--sb-width) * -1);;
 }
 
 
@@ -472,14 +474,17 @@ a {
 
 /* change value on media size */
 @media screen and (max-width: 450px) {
-	.sidebar {
-		width: 80%;
+	:root {
+		--sb-width: 80%;
 	}
 }
 
 @media screen and (max-width: 340px) {
+	:root {
+		--sb-width: 100vw;
+	}
+
 	.sidebar {
-		width: 100vw;
 		overflow: auto;
 	}
 }
