@@ -10,8 +10,8 @@ class USER{
 
 	get_local_data(redirect=true) {
 		// get userdata from localstorage
-		let user_name = localStorage.getItem('uname');
-		let uid = localStorage.getItem('uid');
+		let user_name = localStorage.getItem('uname')||tools.getCookie ("uname");
+		let uid = localStorage.getItem('uid')||tools.getCookie ("uid");
 		if (user_name===null||uid===null){
 			if(redirect){
 				this.logout(redirect);

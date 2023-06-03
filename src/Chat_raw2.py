@@ -6,14 +6,18 @@ from typing import Union
 import traceback
 from time import time
 
+import re
+re._MAXCACHE = 1024  # increase regex cache size
+
+
 import TIME_sys
 
-from basic_conv_re_pattern import ip, ot, it, remove_suffix, ___you
+from basic_conv_re_pattern import ip, ot, it, remove_suffix, ___you, preprocess, pre_rem_bot_call, post_rem_can_you
+
 from basic_conv_pattern import *
 from CONFIG import appConfig
 from user_handler import User, user_handler
 # from DS import str2
-
 
 # PIP PACKAGES
 
@@ -43,8 +47,6 @@ from chat_about_bot import patterns as about_bot_patterns
 from chat_compliment import patterns as compliments_patterns
 from chat_r_u_patterns import patterns as r_u_sub_patterns
 
-import re
-re._MAXCACHE = 1024  # increase regex cache size
 
 
 
@@ -239,53 +241,6 @@ def parsed_names_back(ui, user: User):
 	"""Replace constant strings with variable nicknames"""
 	ui = ui.replace("<:ai_name>", user.ai_name)
 	ui = ui.replace("<:u_name>", user.nickname)
-
-	return ui
-
-
-def preprocess(in_dat):
-	""" replace . , " ' ? ! with space """
-	# in_dat = in_dat.replace("'", " ")
-	in_dat = in_dat.replace("?", " ")
-	in_dat = in_dat.replace("!", " ")
-	in_dat = in_dat.replace(",", " ")
-	in_dat = in_dat.strip()
-	in_dat = re.sub(r'\s{2,}', ' ', in_dat)
-	# in_dat = in_dat.replace(" us ", " me")
-	# in_dat = in_dat.replace(" him", " me")
-	# in_dat = in_dat.replace(" her", " me")
-	# in_dat = in_dat.replace(" them", " me")
-
-	return in_dat
-
-
-def pre_rem_bot_call(ui):
-	"""
-		* remove *hey* whats ....
-		* remove *hey Asuna* whats ....
-
-	"""
-	nick = "<:ai_name>"
-	ui = re.sub(
-		rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})? ', '', ui, flags=re.IGNORECASE)
-
-	ui = re.sub(r'^(please|plz) ', '', ui, flags=re.IGNORECASE)
-
-	return ui
-
-
-def post_rem_can_you(ui):
-	"""
-		0. remove `*can you* ....`
-		1. remove `*will you* ....`
-		2. remove `*do you know* ....`
-
-		3. replace `*tell me* ....` with `....`
-		4. remove `*tell me regarding* ....` with `*about* ....`
-	"""
-	ui = re.sub(rf'^((can|will|do|did) {___you})?( please| plz)?( even)? ?(know|tell|remember|speak|say)?( to)?( me)? (?P<msg>.+)',
-				r'\g<msg>', ui, flags=re.IGNORECASE)
-	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 
 	return ui
 

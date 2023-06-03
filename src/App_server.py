@@ -96,7 +96,7 @@ def join_path(*paths):
 
 def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
 	cookie = self.cookie
-	print(cookie)
+	#print(cookie)
 	def get(k):
 		x = cookie.get(k)
 		if x is not None:
@@ -139,7 +139,7 @@ def send_homepage(self: SH, *args, **kwargs):
 	returns the main page as home
 	"""
 	cookie_check = handle_user_cookie(self, on_ok="", on_fail="/signup")
-	print(cookie_check)
+	#print(cookie_check)
 	if cookie_check is True:
 		return None
 
@@ -170,6 +170,33 @@ def send_signup(self: SH, *args, **kwargs):
 		return None
 
 	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+
+
+@SH.on_req('GET', '/test')
+def send_test_page(self: SH, *args, **kwargs):
+	"""
+	returns signup.html on signup request
+	js will redirect here or to home based on wheather user is logged in or not
+	"""
+	cookie_check = handle_user_cookie(self, on_ok="/", on_fail=None)
+	if cookie_check:
+		return None
+		
+	
+	
+	user_handler.server_signup("Test_user", "TEST")
+
+	# ACCESS THE USER
+	user = user_handler.get_user("Test_user")
+	print(user)
+	cookie = add_user_cookie(user.username, user.id)
+
+	self.send_response(200)
+	self.send_header_string(cookie.output())
+
+	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
+
+	#return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
 
 
 @SH.on_req('GET')

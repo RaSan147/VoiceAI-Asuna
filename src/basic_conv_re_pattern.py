@@ -6,6 +6,7 @@ import traceback
 from REGEX_TOOLS import re_starts, re_check, re_is_in, re_search, eos
 from DS import GETdict
 
+from CHAT_TOOLS import merge
 
 def generate_list(prefix):
 	# l = [globals()[name] for name in globals().keys() if name.startswith(prefix)]
@@ -14,13 +15,8 @@ def generate_list(prefix):
 	return tuple(item for sublist in [globals()[name] for name in globals().keys() if name.startswith(prefix)] for item in sublist)
 
 
-def merge(*args):
-	txt = ' '.join(args)
-	txt = re.sub(r'\s+', ' ', txt)
-	return txt.strip()
 
-
-def check_context(context=[], contextsss=[]):
+def check_context(context=(), contextsss=()):
 	for i in context:
 		if i in contextsss:
 			return True
@@ -32,7 +28,7 @@ def C(pattern):
 	"""
 	try:
 		return compile(rf"{pattern}", flags=re.IGNORECASE)
-	except:
+	except re.error:
 		print("FAILED TO COMPILE:")
 		print(pattern)
 		print("\n")
@@ -97,7 +93,7 @@ no+=tuple('actually ' + i for i in no1)"""
 output_TEXTS = GETdict()
 ot = output_TEXTS
 
-ot.yes = ("Yeah!", "Sure...", "Sure!!" "Okkay~", "Okie~", "Okay!")
+ot.yes = ("Yeah!", "Sure...", "Sure!!", "Okkay~", "Okie~", "Okay!")
 ot.no = ("No", "Sorry but nope")
 ot.tell_time = ('The time is ', "It's ")
 
@@ -118,7 +114,7 @@ ot.on_whats_up = (
 	"Nothing much, just chilling.",
 	"Nothing much, just hanging around.",
 	"All good here!",
-	"I’m doing well.",
+	"I'm doing well.",
 	"Nothing much, just doing my thing.",
 )
 
@@ -457,3 +453,55 @@ links_li = tuple(v for k, v in links_dict.items())
 # googles_li = gen_list('goog_')
 
 # print(*links, sep='\n')
+
+
+
+
+
+
+def preprocess(in_dat):
+	""" replace . , " ' ? ! with space """
+	# in_dat = in_dat.replace("'", " ")
+	in_dat = re.sub(r'[\?\!\,]|\s{2,}', ' ', in_dat)
+	#in_dat = in_dat.replace("?", " ")
+#	in_dat = in_dat.replace("!", " ")
+#	in_dat = in_dat.replace(",", " ")
+	in_dat = in_dat.strip()
+#	in_dat = re.sub(r'\s{2,}', ' ', in_dat)
+	# in_dat = in_dat.replace(" us ", " me")
+	# in_dat = in_dat.replace(" him", " me")
+	# in_dat = in_dat.replace(" her", " me")
+	# in_dat = in_dat.replace(" them", " me")
+
+	return in_dat
+
+
+def pre_rem_bot_call(ui):
+	"""
+		* remove *hey* whats ....
+		* remove *hey Asuna* whats ....
+
+	"""
+	nick = "<:ai_name>"
+	ui = re.sub(
+		rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})? ', '', ui, flags=re.IGNORECASE)
+
+	ui = re.sub(r'^(please|plz) ', '', ui, flags=re.IGNORECASE)
+
+	return ui
+
+
+def post_rem_can_you(ui):
+	"""
+		0. remove `*can you* ....`
+		1. remove `*will you* ....`
+		2. remove `*do you know* ....`
+
+		3. replace `*tell me* ....` with `....`
+		4. remove `*tell me regarding* ....` with `*about* ....`
+	"""
+	ui = re.sub(rf'^((can|will|do|did) {___you})?( please| plz)?( even)? ?(know|tell|remember|speak|say)?( to)?( me)? (?P<msg>.+)',
+				r'\g<msg>', ui, flags=re.IGNORECASE)
+	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
+
+	return ui
