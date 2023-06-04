@@ -199,6 +199,25 @@ def send_test_page(self: SH, *args, **kwargs):
 	#return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
 
 
+@SH.on_req('GET', '/voice')
+def send_voice(self: SH, *args, **kwargs):
+	cookie_check = handle_user_cookie(self, on_fail="/signup", on_ok="")
+	if cookie_check:
+		return None
+	
+	print(self.query)
+	voice = self.query.get("voice", None)
+	if voice is None:
+		return None
+	
+	voice = voice[0]
+
+	path = join_path(appConfig.temp_file, "audio/", voice)
+	print(path)
+
+
+	return self.return_file(path)
+
 @SH.on_req('GET')
 def send_default(self: SH, *args, **kwargs):
 	"""

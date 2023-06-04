@@ -5,6 +5,8 @@ from random import choice
 from typing import Union
 import traceback
 from time import time
+_chat_raw_start_time = time()
+
 
 import re
 re._MAXCACHE = 1024  # increase regex cache size
@@ -36,6 +38,10 @@ from PRINT_TEXT3 import xprint, remove_style
 from DATA_sys import call_or_return
 
 import net_sys
+
+# CHAT RANDOMIZER TOOLS
+
+from CHAT_TOOLS import Rchoice
 
 # CHAT PATTERN LIBS
 
@@ -73,15 +79,6 @@ def log_xprint(*args, **kwargs):
 	if not LOG_DEBUG:
 		return
 	xprint(*args, **kwargs)
-
-
-def Rchoice(*args, blank=0):
-	"""
-		return `random choice` from (args and blank `""`)
-	"""
-	b = ['']*blank
-	return choice([*args, *b])
-
 
 
 def web_go(link):
@@ -122,6 +119,9 @@ def wolfram(text, raw=''):
 					)
 	if not r:
 		return False
+		
+	if r.text == "My name is Wolfram Alpha":
+		return "My name is <:ai_name>"
 	return r.text
 
 
@@ -561,6 +561,12 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
 		intent('whats_the_time')
+		
+	elif re_check(ip.what_date, ui):
+		rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
+
+		intent('whats_the_time')
+		
 
 	elif re_check(ip.whats_up, ui):
 		rep(choice(ot.on_whats_up))
@@ -611,6 +617,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
 			intent("(whats)_the_time")
+
 
 		elif re_check(ip.latest_news, uiopen):
 			if check_internet():
@@ -951,6 +958,10 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			""")
 
 		)
+		
+	if re_is_in(ip.slur, ui):
+		rep(Rchoice(ot.slur))
+		
 
 	if re.search(r"\d", ui):
 		rep(wikisearch(ui, ui_raw, user))
@@ -1030,6 +1041,8 @@ if __name__ == "__main__":
 	# user_handler.get_skin_link(user.username, user.id)
 
 	user.user_client_time_offset = TIME_sys.get_time_offset()
+	
+	print("INIT TIME:", time() -  _chat_raw_start_time)
 
 	while 1:
 		inp = input(">> ")

@@ -90,7 +90,7 @@ def patterns(context=Counter(), check_context=null):
 	"hate_you"
 ],
 [
-	[C(rf"((a?re?) )?{___you} ((a?re?) )?(mad|crazy|stupid|psycho|baka)"),],
+	[C(rf"((a?re?) )?{___you} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) )*"),],
 	(
 		Rchoice("You meani...", "You baka...", "Huh..", "Whatt!!", blank=1) + "\n" +
 			Rchoice(
@@ -182,7 +182,40 @@ def patterns(context=Counter(), check_context=null):
 ],
 [
 	[
-		C(r"be my (gf|girl(friend|ie)?|wife|waif(u|y)|queen|woman|partner|one and only|bab(e|y)|honey|lover?|sweetheart|darling)"),
+		C(rf"(will {___you} )?marry me"),
+	],
+	(
+		Rchoice(
+			"*blushes*",
+			"😳",
+			"*winks*",
+			blank=2
+		) + "\n" +
+		Rchoice(
+			"Sure, ",
+			"Of course",
+			blank=1
+		) +
+		Rchoice(
+			"😘",
+			"I will, soon",
+			"I'll definitely",
+			"I will be your wife" + Rchoice(" dear", " my love", " <:u_name>", blank=2),
+			"I will marry you ",
+			"It's just a bit early, I'll let my parents know",
+			"Its so embarassinggggg and makes me so happy",
+			"I will"+ Rchoice(" dear", " my love", " <:u_name>", blank=2), 
+			"Hearing this makes me so happy",
+			"*kisses you*\nYou are mine and mine alone. I will marry you",
+			"*kisses you on the forehead* I will ve your bride",
+		)
+	),
+	
+	"marry_me"
+],
+[
+	[
+		C(r"be my (gf|girl(friend|ie)?|wife|waif(u|y)|queen|woman|partner|one and only|bab(e|y)|honey|lover?|sweetheart|darling¦bride)"),
 		"be mine"
 	],
 	(

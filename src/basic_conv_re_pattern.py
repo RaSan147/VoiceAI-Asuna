@@ -96,6 +96,7 @@ ot = output_TEXTS
 ot.yes = ("Yeah!", "Sure...", "Sure!!", "Okkay~", "Okie~", "Okay!")
 ot.no = ("No", "Sorry but nope")
 ot.tell_time = ('The time is ', "It's ")
+ot.tell_date = ("Today is", "It's")
 
 ot.happy_emj = ("(◕‿◕)💞", "😄",
 				"😇", "😊", "~", "...", "", "")
@@ -219,6 +220,12 @@ ip.what_to_call_you = [
 ip.what_time = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
 	C(r"(what('| )?{___auxV}? )?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?(please|plz)?"),
+	'clock',
+]
+
+ip.what_date = [
+	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
+	C(r"(what('| )?{___auxV}? )?(the )?(current )?date((?!s)| |$)(is|it)* ?(now)? ?(please|plz)?"),
 	'clock',
 ]
 
@@ -407,6 +414,21 @@ ip.take_care = [
 ip.help = [
 	C(r"[/\\]?(show(-| )?)?(help|commands?|menu)"),
 ]
+
+ip.slur = [
+	"fuck", "shit", "damn", 
+	C(r"bull.?shit"),
+	"wtf", "tf",
+	"suck",
+]
+
+ot.slur = (
+	"What?! something wrong?",
+	"Did I say something weird..."
+	"Did I do something wrong...",
+	#"I'm not that smart, if you have any problem please say, I'll try to fix myself.",
+	"Something bad happened?"
+)
 
 
 m_comm = generate_list('mc_')
