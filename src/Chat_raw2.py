@@ -649,7 +649,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		return flush()
 
-	if re_check(ip.change_cloth, ui):
+	if re_is_in(ip.change_room, ui):
+		bg = user_handler.room_bg(user=user, command="change")
+
+		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"),
+			script=f"anime.set_bg('{bg}')" )
+
+		intent('change_room_bg')
+
+	elif re_check(ip.change_cloth, ui):
 
 		total_skins = len(user.skins)
 		#user.bot_skin = (user.bot_skin + 1) % total_skins
@@ -661,15 +669,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		intent('change_cloth')
 
-	elif re_check(ip.change_room, ui):
-		bg = user_handler.room_bg(user=user, command="change")
-
-		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"),
-			script=f"anime.set_bg('{bg}')" )
-
-		intent('change_room_bg')
-
-	elif re_check(ip.r_u_ok, ui):
+	elif re_is_in(ip.r_u_ok, ui):
 		rep(Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") +
 			Rchoice(" Thanks", blank=1) +
 			Rchoice("🥰", "😇", blank=1)
