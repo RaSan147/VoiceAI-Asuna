@@ -71,10 +71,15 @@
 			<a id='app_name'></a> <span id="app_status"> &bull; </span>
 		</span>
 	</div>
+	
 
-	<button class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span><span
-
-			class='nav-btn-text'>Menu</span> <span class="fa fa-thin fa-ellipsis-stroke-vertical">&vellip;</span></span></button>
+	<button class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span>
+		<span class='nav-btn-text'>Menu</span> <span class="fa fa-thin fa-ellipsis-stroke-vertical">&vellip;</span></span>
+		</button>
+		
+		<button class="open-sidebar-btn" onclick="chat.minimize()" style='float: right;'>
+		<span class="fa fa-solid fa-window-maximize fa-rotate-180"><b>_</b></span >
+	</button>
 
 </div>
 
@@ -106,8 +111,10 @@
 
 		<canvas id="canvas" class="charecter" style="height: 75%;width: auto;"></canvas>
 	</div>
+	
 	<buttom id="to-chat" class="disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-light fa-paper-plane">&#9010;</span> Chat</buttom>
 	
+	<buttom id="maximize-page" class="invisible disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-regular fa-arrows-maximize">&#x26F6;</span></buttom>
 	
 		<buttom id="to-install" class="disable_selection home-btns"><span class="fa fa-light fa-disc-drive">&#9019;</span> Install</buttom>
 		
@@ -140,7 +147,7 @@
 				</li> <li>  <span>Whats the latest news</span> / <span>news highlights</span>
 				</li> <li>  <span>Tell me about yourself</span> / <span>... your hobby/favorite game/anime</span>
 				</li> <li>  <span>Love ya</span>
-				</li> <li>  <span>Repeat after me</span> -> will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
+				</li> <li>  <span>Repeat after me</span> → will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
 				</li> <li>  <span>change dress</span> to change costumes and <span>change room</span> to switch background 
 				</li> <li>  <b>many more...</b> and tons of updates coming every day (if if she doesn't understand, she'll soon. So keep speaking)
 				</li> <li>  <b>To recheck, go to MENU &vellip; > Sample message</b>
@@ -170,7 +177,7 @@
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script> -->
 <!-- <script src="/live2d_test.js"></script> -->
-<script src="https://cdn.jsdelivr.net/gh/RaSan147/pixi-live2d-display@4f1f7f8040a13544064495734ab94dbb25e619df/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/RaSan147/pixi-live2d-display@v1.0.2/dist/index.min.js"></script>
 
 <script src="./script_bot.js"></script>
 <script src="./script_chat.js"></script>

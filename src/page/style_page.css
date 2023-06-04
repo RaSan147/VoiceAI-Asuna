@@ -19,6 +19,14 @@
 }
 
 
+.invisible {
+	opacity: 0;
+	touch-action: none;
+	pointer-events: none;
+	transition: opacity 0.5s;
+}
+
+
 body {
 	/* position: relative; */
 	/* height: auto; */
@@ -50,13 +58,11 @@ button {
 
 
 /* ++ patch to make things neat (remove I cursor) ++ */
-p,
-span {
+p, span {
 	cursor: default;
 }
 
-button,
-button * {
+button, button * {
 	cursor: pointer !important;
 }
 

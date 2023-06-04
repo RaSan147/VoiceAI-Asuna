@@ -14,7 +14,25 @@ class Bot_{
 		// "https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json"
 		// "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json";
 		
-	  
+		this.motions = {
+			"idle": ["idle",undefined],
+			"happy": ["", 0],
+			"happy_s": ["", 1],
+			"happy_l": ["", 2],
+			"sad": ["", 3],
+			"sad_s": ["", 4],
+			"sad_l": ["", 5],
+			"sneeze": ["", 6],
+			"surprised": ["", 7],
+			"surprise": ["", 7],
+			"surprised_s": ["", 8],
+			"surprise_s": ["", 8],
+			"surprised_l": ["", 9],
+			"surprise_ld": ["", 9],
+			"angry": ["", 10],
+			"angry_s": ["", 11],
+			"angry_l": ["", 12]
+		}
 		
 		top_bar.set_title(this.AI_NAME);
 		top_bar.set_profile_pic(this.avatar);
@@ -129,6 +147,15 @@ class Bot_{
 		// times = (max_x-min_x)
 		// x = per*times+min_x;
 		return x;
+	}
+
+	speak_mtn(mtn, audio){
+		let [type, mtn_id] = this.motions[mtn]
+		this.model4.motion(type, mtn_id, 3, audio)
+	}
+	
+	speak(audio_file){
+		this.speak_mtn("idle", audio_file)
 	}
 
 }

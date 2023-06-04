@@ -15,11 +15,13 @@ class ChatHandler{
 
 	constructor(){
 		let that = this;
+		this.minimized = false; //minimized mode, when both chat and see
 		this.current_msg  = 0; // current chat id
 		this.cache_id = 0; // message not sent
 		this.chats = byId("chats");
 		this.page = byId("chat-page");
 		this.chat_input = byId("chat_input");
+		this.maximize_btn = byId("maximize-page") 
 		this.chat_input.onkeydown = e => {
 			if(e.key == "Enter"){
 				if(e.shiftKey){
@@ -166,6 +168,16 @@ class ChatHandler{
 			script.innerText = json.script;
 			// script.setAttribute("async", true);
 			document.body.appendChild(script);
+		}
+		var sound=null, mtn="idle";
+		if (json.sound && this.minimized) {
+				sound = json.sound;
+		}
+		if (json.mtn) {
+			mtn = json.mtn
+		}
+		if (sound) {
+			bot.speak_mtn(mtn, sound)
 		}
 
 		return msg_ele
@@ -320,15 +332,62 @@ class ChatHandler{
 		top_bar.hide()
 		await tools.sleep(500);
 		this.page.classList.add('inactive');
+		
+		//alert("shit")
 		// loading_popup()
 	}
 
 	show_page(){
 		this.page.classList.remove('hidden');
+		
 		this.page.classList.remove('inactive');
-
 		top_bar.show()
 	}
+	
+	show_max_btn(display=true){
+		if(display){
+			this.maximize_btn.classList.remove("invisible")
+		} else {
+			this.maximize_btn.classList.add("invisible")
+			
+		}
+		
+	}
+	
+	
+	async minimize(){
+		var that = this;
+		this.minimized = true;
+		
+		pages.to_anime()
+		
+		// to_anime() takes 500ms to take action. So wait for 550ms
+		await tools.sleep(550)
+		this.show_page();
+		this.page.classList.add("minimized")
+		this.go_to_bottom()
+		top_bar.hide();
+		this.show_max_btn()
+		
+		this.maximize_btn.onclick = () => {
+			that.maximize()
+		}
+		byId("to-chat").classList.add("invisible")
+	}
+	
+	async maximize() {
+		this.hide_page()
+		this.show_max_btn(false)
+		
+		// fix animation bug
+		await tools.sleep(500);
+		
+		this.page.classList.remove("minimized")
+		byId("to-chat").classList.remove("invisible")
+		this.minimized = false;
+		
+	}
+	
 
 
 

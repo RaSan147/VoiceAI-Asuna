@@ -44,7 +44,7 @@
 	/* margin-left: -100px; */
 }
 
-#to-chat, #to-install, #to-open-pwa {
+#to-chat, #to-install, #to-open-pwa , #maximize-page {
 	position: absolute;
 	/* justify-content: center; */
 	bottom: 0;
@@ -61,7 +61,7 @@
 	z-index: 10;
 }
 
-#to-install, #to-open-pwa {
+#to-install, #to-open-pwa, #maximize-page {
 	display: none;
 	
 	top: 0;
@@ -70,3 +70,11 @@
 	
 }
 
+
+#maximize-page {
+	display: block;
+	left: 0;
+	right: auto;
+	width: minimum-content;
+	transition: all 0.5s;
+}
