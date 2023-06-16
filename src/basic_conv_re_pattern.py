@@ -89,9 +89,18 @@ no2 = no1 = no
 no+=tuple('well ' + j for j in no2)
 no+=tuple('actually ' + i for i in no1)"""
 
+class atdict(dict):
+    __getattr__= dict.__getitem__
+    __setattr__= dict.__setitem__
+    __delattr__= dict.__delitem__
 
-output_TEXTS = GETdict()
-ot = output_TEXTS
+
+ot = atdict()
+
+ip = atdict()
+
+it = atdict()
+
 
 ot.yes = ("Yeah!", "Sure...", "Sure!!", "Okkay~", "Okie~", "Okay!")
 ot.no = ("No", "Sorry but nope")
@@ -126,11 +135,12 @@ ot.no_internet = (
 	"Something is wrong with out network. We're working on it."
 )
 
-input_PATTERNS = GETdict({})
-ip = input_PATTERNS
-
-input_text = GETdict()
-it = input_text
+ot.internet_ok = (
+	"Internet connection is available",
+	"You're online",
+	"The network is stable",
+	"Your network is online"
+)
 
 ip.logout = [
 	C(r"(log|sign)o? ?(out|off)"),
@@ -357,8 +367,9 @@ ip.whats_up = [
 ]
 
 
-li_check_int = [
-	"check " + i for i in ('net', 'internet', "connection", "wifi", "network")
+ip.check_net = [
+	C("check (wifi )?(inter)?net(work)?"), 
+	C("check ((wifi )?(inter)?net(work)? )?connection")
 ]
 
 
@@ -390,7 +401,7 @@ li_window_manage = ("forcemin",
 condERR = "Sorry,  I can't understand what you are saying. Just type yes or no.   "
 nameGlad = "Ok. Glad to hear that you like my name."
 
-set_timer_pattern = "set ?a? timer of (.*)"
+ip.set_timer_pattern = "set ?a? timer of (.*)"
 
 # db = generate_list('li_')
 
@@ -403,7 +414,8 @@ ip.bye = [
 	C(r"ta( |-)?ta"),
 	C(r"see ((yo)?u|y(a|o))"),
 ]
-#li_bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."
+
+ot.bye = "Bye", "See ya", "Take care", "See you later", "Good bye", "Good bye!", "Good bye..."
 
 ip.take_care = [
 	C(r"take( |-)?care"),
@@ -449,6 +461,10 @@ ip.stop_parrot = [
 	C(r"(stop|cancel)( (it|mimicing|repeating|parrot))?"),
 	C(r"(turn )?((parrot|it) )?of+"),
 ]
+
+ot.created_by = ('I was %s by Ratul Hasan.', 
+		'Ratul Hasan %s me.', 
+		"I was %s by Rasan147 (Ratul Hasan)")
 
 
 links_dict = {

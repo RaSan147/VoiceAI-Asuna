@@ -97,13 +97,13 @@ def is_json(data, raise_=False): # fc=xxxx
 		return False
 
 
-def call_or_return(arg, *i_args):
+def call_or_return(arg, *i_args, **i_kwargs):
 	"""
 	if `arg` is callable it will call it with `i_args` and return
 	else it will return it as what it is
 	"""
 	if isinstance(arg, FunctionType):
-		return arg(*i_args)
+		return arg(*i_args, **i_kwargs)
 
 	return arg
 

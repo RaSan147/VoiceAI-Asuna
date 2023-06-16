@@ -2,8 +2,12 @@ from random import choice, shuffle
 import re
 
 def if_list(obj):
+	if isinstance(obj, str):
+		# fix list("ab") = ["a", "b"]
+		obj = [obj]
 	if len(obj)==1 and not isinstance(obj[0], str):
 		obj = obj[0]
+	
 		
 	return list(obj)
 

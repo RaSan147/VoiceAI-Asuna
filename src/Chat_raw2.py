@@ -1,4 +1,3 @@
-from collections import Counter
 import urllib.parse
 import webbrowser
 from random import choice
@@ -12,15 +11,6 @@ import re
 re._MAXCACHE = 1024  # increase regex cache size
 
 
-import TIME_sys
-
-from basic_conv_re_pattern import ip, ot, it, remove_suffix, ___you, preprocess, pre_rem_bot_call, post_rem_can_you
-
-from basic_conv_pattern import *
-from CONFIG import appConfig
-from user_handler import User, user_handler
-# from DS import str2
-
 # PIP PACKAGES
 
 import requests
@@ -29,6 +19,11 @@ from unidecode import unidecode
 import wikix
 
 # SELFMADE LIBS
+
+import TIME_sys
+
+from CONFIG import appConfig
+from user_handler import User, user_handler 
 
 from bbc_news import bbc_news
 import F_sys
@@ -39,11 +34,20 @@ from DATA_sys import call_or_return
 
 import net_sys
 
+# MESSAGE CLASS
+from msg_class import MessageObj
+
+
+
 # CHAT RANDOMIZER TOOLS
 
 from CHAT_TOOLS import Rchoice
 
 # CHAT PATTERN LIBS
+
+from basic_conv_re_pattern import ip, ot, it, remove_suffix, ___you, preprocess, pre_rem_bot_call, post_rem_can_you
+
+from basic_conv_pattern import *
 
 from chat_can_you import patterns as can_you_patterns
 from chat_can_i import patterns as can_i_patterns
@@ -65,6 +69,10 @@ LOG_DEBUG = True
 
 wikipedia = wikipediaapi.Wikipedia('en')
 bbc_topic = 'Asia_url'
+
+
+def null(*args, **kwargs):
+	pass
 
 
 def log_unknown(*args, **kwargs):
@@ -112,11 +120,11 @@ def wolfram(text, raw=''):
 	raw: the untouched user input for logging
 	"""
 	r = requests.get("http://api.wolframalpha.com/v1/spoken",
-					 params={
-						 "i": text,
-						 "appid": "L32A8W-J8X5U6KG26"
-					 }
-					)
+					params={
+						"i": text,
+						"appid": "L32A8W-J8X5U6KG26"
+					}
+				)
 	if not r:
 		return False
 		
@@ -140,6 +148,7 @@ def _wiki(uix):
 	s = re.sub("</?br>", " <br>", s)
 	s = re.sub("( ){2,}", " ", s)
 	s = (". ").join(ny.summary.split(". ")[:4]) + "." # should end with a fullstop as well
+
 
 	return link, s
 
@@ -183,6 +192,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			return {"message": response + f'\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
 				}
+				
 
 		if wiki_search:
 			uix_ = wiki_search[0]
@@ -196,7 +206,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			user.flags.ask_yes = user.msg_id
 
 			link, response = _wiki(uix_)
-			user.flags.on_yes = {"message": response + 'f\n\n<a href={link}">Read More</a>',
+			user.flags.on_yes = {"message": response + f'\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
 			}
 			return out
@@ -246,13 +256,6 @@ def parsed_names_back(ui, user: User):
 
 
 
-# default message dict
-message_dict = {
-	"message": "",
-	"render": "innerText",
-	"script": ""
-}
-
 
 def basic_output(INPUT, user: User = None, username: str = ""):
 	"""
@@ -282,8 +285,11 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	# mid = message id
 
 	log_xprint(f"\t/c/`{user.username}` msg id: /=/", mid)
-	msg = message_dict.copy()
+	
 	out, intent, on_context, ui, ui_raw = _basic_output(INPUT, user, _ui, _ui_raw, mid)
+	
+	msg = MessageObj(user, ui, ui_raw, mid)
+	
 	user.chat.intent.append(intent)
 
 	xprint(f"\t/i/intent:/=/ {intent}")
@@ -321,6 +327,9 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 
 	print(f"\tRESP time: {time()-receive_time}s")
 	return msg
+	
+	
+
 
 
 def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
@@ -330,93 +339,32 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		ui_raw: (cleaned) user input
 		ui:     (cleaned lower case) user input
 		mid:     msg id
+		
+		
+		NOTE: Regex check callback(user, match, uiPart, otpt, msgObj, options)
 	"""
 	# out = str2()
 	# out = str()
-	out = message_dict.copy()
+	msg = MessageObj(user, ui, ui_raw, mid)
 
-	_intent = []  # intent of the current message
-	# intent of the previous message
-	prev_intent = user.chat.intent[-1] if user.chat.intent else []
-	# context [[...],...] is the intent of the previous message
-	_context = Counter([j for i in user.chat.intent for j in i])
-	# intent of the current message that is based on the previous message intent (context)
-	on_context = []
 
-	# print("context: ", _context)
-
-	def intent(i):
-		nonlocal _intent
-
-		_intent.append(i)
-
-	def add_context(i: str):
-		"""
-		if bot replies based on previous message intent (context),
-		then the bot will add the intent to the context list
-		"""
-		nonlocal on_context
-
-		on_context.append(i)
-
-	def check_context(context=()):
-		"""
-		check if any of the context list is in previous msg intent
-		"""
-		for i in context:
-			if i in prev_intent:
-				return True
-
-	def clean():
-		"""
-		forgot what it is
-		"""
-		nonlocal out
-		out = message_dict.copy()
-
-	def rep(msg_txt, script="", render=""):
-		"""add message to the output"""
-		nonlocal out
-
-		if isinstance(msg_txt, dict):
-			_msg_txt = msg_txt["message"]
-			script = msg_txt.get("script", "")
-			render = msg_txt.get("render", "")
-			msg_txt = _msg_txt
-
-		out["message"] += "\n\n" + str(msg_txt)
-
-		if render:
-			out["render"] = str(render)
-
-		if script:
-			out["script"] += "\n\n" + str(script)
-
-		return out
-
-	def flush():
-		"""flush the output, intent and context"""
-		return out, _intent, on_context, ui, ui_raw
-
-	def rand_out(outputs: Union[list, tuple, str]):
-		"""
-		randomly send a string from a list
-		"""
-		if isinstance(outputs, str):
-			return outputs
-		return choice(outputs)
-
-	def check_patterns(patterns, _ui=None, _ui_raw=None, action=None, split=None):
+	def check_patterns(patterns:list, _ui=None, _ui_raw=None, action=None, split=None, callback=None, expression=None):
 		"""
 		check for pattern match in list of patterns,
 		if match add the reply in out and intent,
 		if matched part needs to be removed, thats also done here,
 		if input needs to be split before checking for multiple query (based of different type , like sentence , and etc), using split that is done
+		
+		
+		NOTE: Regex check callback(user, match, uiPart, otpt, msgObj, options)
 		"""
 		if _ui is None:
 			_ui = ui
 		if _ui_raw is None:
 			_ui_raw = ui_raw
+			
+		uiParts = [] # splitting parts of ui
+		uiRParts = [] # splitting parts of ui_raw
 
 		found = False
 		if split=="AND":
@@ -435,23 +383,34 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		to_del = []
 
-		for ptrn, otpt, intnt in patterns:
-			for n, i in enumerate(uiParts):
-				m = re_search(ptrn, i, PRINT_PATTERN=LOG_DEBUG)
-				if m:
-					rep(rand_out(otpt))
-					intent(intnt)
+		for n, uiPart in enumerate(uiParts):
+			for options in patterns:
+				ptrn, otpt, intnt = options[:3]
+				# 1st 3 are mandatory
+
+				match = re_search(ptrn, uiPart, PRINT_PATTERN=LOG_DEBUG)
+				if match:
+					others = options[3] if len(options) > 3 else {}
+					expression = expression or others.get("expression")
+					render = others.get("render", "")
+
+					callback = callback or others.get("callback")
+					call_or_return(callback, user, match, uiPart, otpt, msg, options)
+					
+					msg.rep(Rchoice(otpt), render=render, expression=expression)
+					msg.add_intent(intnt)
 
 					if action == "remove":
 						# uiParts[n] = re.sub(m.Pattern, '', i)
 						# uiParts[n] = uiParts[n].replace(m.group(0), "")
 						to_del.append(n)
 					if action == "remove_match":
-						uiParts[n] = re.sub(m.re.pattern, '', i).strip()
+						uiParts[n] = re.sub(match.re.pattern, '', uiPart).strip()
 						uiRParts[n] = re.sub(
-							m.re.pattern, '', uiRParts[n]).strip()
+							match.re.pattern, '', uiRParts[n]).strip()
 
 					found = True
+
 					# tell me about yourself *and* your favourite hobby
 					continue  # so that same question won't give repeated answers
 
@@ -468,48 +427,46 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	if user.flags.parrot:
 		if re_is_in(ip.stop_parrot, ui):
 			user.flags.parrot = False
-			rep(
+			msg.rep(
 				Rchoice("Okay!", "Alright!", "Alright, I'll stop.", "Okay, I'll stop.")
 			)
-			intent('stop_parrot')
+			msg.add_intent('stop_parrot')
 		else:
-			rep(INPUT)
-			add_context('parrot_say')
-		return flush()
+			msg.rep(INPUT)
+			msg.add_context('parrot_say')
+		return msg.flush()
 
 	if re_is_in(ip.logout, ui):
-		rep("Logging out...",
+		msg.rep("Logging out...",
 			script="""
 				await tools.sleep(1000);
 				user.logout()
 				"""
 			)
-		intent('logout')
-		return flush()
+		msg.add_intent('logout')
+		return msg.flush()
 
 
 	if user.flags.ask_yes and (user.flags.ask_yes > user.msg_id-3):
 		if re_is_in(ip.yeses, ui):
+			msg.rep(call_or_return(user.flags.on_yes))
 
-			if user.flags.on_yes:
-				rep(call_or_return(user.flags.on_yes))
-
-			intent("accept_yes_no")
+			msg.add_intent("accept_yes_no")
 		elif re_is_in(ip.no, ui):
 			if user.flags.on_no:
-				rep(call_or_return(user.flags.on_no))
+				msg.rep(call_or_return(user.flags.on_no))
 
 			else:
-				rep("Got it!")
+				msg.rep("Got it!")
 
-			intent("decline_yes_no")
+			msg.add_intent("decline_yes_no")
 
 		user.flags.ask_yes = user.flags.on_yes = None
 
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		can_you_patterns(context=_context, check_context=check_context),
+		can_you_patterns(context=msg.context_count, check_context=msg.check_context),
 		action="remove_match",
 		split="AND")
 
@@ -519,59 +476,59 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		compliments_patterns(context=_context, check_context=check_context),
+		compliments_patterns(context=msg.context_count, check_context=msg.check_context),
 		action="remove_match")
 
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns(
-			context=_context, check_context=check_context),
+			context=msg.context_count, check_context=msg.check_context),
 			action="remove_match")
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
-		can_i_patterns(context=_context, check_context=check_context),
+		can_i_patterns(context=msg.context_count, check_context=msg.check_context),
 		action="remove_match")
 
 
 # if re_check(ip.how_are_you, ui):
-# rep( Rchoice("I'm fine!", "I'm doing great."))
+# msg.rep( Rchoice("I'm fine!", "I'm doing great."))
 
-# intent('how_are_you')
+# msg.add_intent('how_are_you')
 
 
 	if re_starts(ip.r_u, ui):
 		_msg_is_expression, ui, ui_raw = check_patterns(
-			r_u_sub_patterns(context=_context, check_context=check_context),
+			r_u_sub_patterns(context=msg.context_count, check_context=msg.check_context),
 			_ui=ui,
 			_ui_raw=ui_raw,
 			action="remove")
 
 
 	if re_check(ip.whats_your_name, ui):
-		rep(choice(ot.my_name_is) + user.ai_name)
+		msg.rep(choice(ot.my_name_is) + user.ai_name)
 
-		intent('whats_your_name')
+		msg.add_intent('whats_your_name')
 
 	elif re_check(ip.what_to_call_you, ui):
-		rep(choice(ot.call_me) + user.ai_name + choice(ot.happy_emj))
+		msg.rep(choice(ot.call_me) + user.ai_name + choice(ot.happy_emj))
 
-		intent('what_to_call_you')
+		msg.add_intent('what_to_call_you')
 
 	elif re_check(ip.what_time, ui):
-		rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
+		msg.rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
-		intent('whats_the_time')
+		msg.add_intent('whats_the_time')
 		
 	elif re_check(ip.what_date, ui):
-		rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
+		msg.rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
-		intent('whats_the_time')
+		msg.add_intent('whats_the_time')
 		
 
 	elif re_check(ip.whats_up, ui):
-		rep(choice(ot.on_whats_up))
+		msg.rep(choice(ot.on_whats_up))
 
-		intent("whats_up")
+		msg.add_intent("whats_up")
 
 	elif re_check(ip.whats_, ui_raw):
 		_what = re_search(ip.whats_, ui)
@@ -583,58 +540,58 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
-			rep(choice(ot.about_self),
+			msg.rep(choice(ot.about_self),
 				render="innerHTML")
 
-			intent('what are you')
-			return flush()
+			msg.add_intent('what are you')
+			return msg.flush()
 
 		if uiopen in it.my_name:
-			rep(Rchoice("Your name is ", "You are ", "You're ") +
+			msg.rep(Rchoice("Your name is ", "You are ", "You're ") +
 				user.nickname +
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
 
-			intent("(whats)_my_name")
+			msg.add_intent("(whats)_my_name")
 
 		elif re_is_in(ip.my_self, uiopen):
-			rep(Rchoice("Your are ", "You are ", "You're ") +
+			msg.rep(Rchoice("Your are ", "You are ", "You're ") +
 				Rchoice("my beloved ", "my sweetheart ", "my master ", "my dear ", blank=2) +
 				user.nickname +
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
 
-			intent("(what)_my_self")
+			msg.add_intent("(what)_my_self")
 
 		elif re_is_in(ip.your_bday, uiopen):
-			rep(
+			msg.rep(
 				Rchoice("It's", "My birthday is") + " " +
 				Rchoice("on ", blank=1) + "September 30th" +
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
 			)
 
-			intent("(what)_my_bday")
+			msg.add_intent("(what)_my_bday")
 
 		elif re.match("(current )?time( is| it)*( now)?", uiopen):
-			rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
+			msg.rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
 
-			intent("(whats)_the_time")
+			msg.add_intent("(whats)_the_time")
 
 
 		elif re_check(ip.latest_news, uiopen):
 			if check_internet():
 				news = bbc_news.task(bbc_topic)
 				if news is None:
-					rep("No news available")
+					msg.rep("No news available")
 				else:
-					rep("".join(news[:5]))
+					msg.rep("".join(news[:5]))
 					# asker("Do you want to hear the rest?", true_func=read_rest_news)
 
 			else:
-				rep(choice(ot.no_internet))
+				msg.rep(choice(ot.no_internet))
 
-			intent("(whats)_the_news")
+			msg.add_intent("(whats)_the_news")
 
 		elif check_patterns(
-				what_extra_patterns(context=_context, check_context=check_context),
+				what_extra_patterns(context=msg.context_count, check_context=msg.check_context),
 				_ui=uiopen,
 				_ui_raw=uiopen_raw,
 				action="remove",
@@ -643,39 +600,40 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			pass
 
 		else:
-			rep(wikisearch(uiopen_raw, raw=ui, user=user))
+			msg.rep(wikisearch(uiopen_raw, raw=ui, user=user))
 
-			intent("(whats)_something")
+			msg.add_intent("(whats)_something")
 
-		return flush()
+		return msg.flush()
 
 	if re_is_in(ip.change_room, ui):
 		bg = user_handler.room_bg(user=user, command="change")
 
-		rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"),
+		msg.rep(Rchoice("Sure!", "Okay", "Okay, wait a sec!"),
 			script=f"anime.set_bg('{bg}')" )
 
-		intent('change_room_bg')
+		msg.add_intent('change_room_bg')
 
 	elif re_check(ip.change_cloth, ui):
 
-		total_skins = len(user.skins)
+		#total_skins = len(user.skins)
 		#user.bot_skin = (user.bot_skin + 1) % total_skins
 		_skin = user_handler.use_next_skin(user.username, user.id)
 
-		rep(Rchoice("Sure!", "Okay", "Okay, let me change my clothes",
+		msg.rep(Rchoice("Sure!", "Okay", "Okay, lets see what's in the closet",
 			"Hey, don't peek!", "Okk tell me how I look..."),
-			script="(async ()=> {await tools.sleep(2000); bot.get_user_pref_skin('"+_skin+"')})() ")
+			script="(async ()=> {await tools.sleep(2000);" +
+					"bot.get_user_pref_skin('"+_skin+"')})() ")
 
-		intent('change_cloth')
+		msg.add_intent('change_cloth')
 
 	elif re_is_in(ip.r_u_ok, ui):
-		rep(Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") +
+		msg.rep(Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") +
 			Rchoice(" Thanks", blank=1) +
 			Rchoice("🥰", "😇", blank=1)
 			)
 
-		intent("are_you_ok")
+		msg.add_intent("are_you_ok")
 
 		# if user.flags.what_u_name_bit == 1:
 		# 	outtxt += "\nIf you want, you can change my name."
@@ -769,7 +727,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		link = re_search(ip.goto, ui)['query']
 		_url = linker(link)
 		if _url:
-			rep(Rchoice('Opening ' + link,
+			msg.rep(Rchoice('Opening ' + link,
 						"Opening " + link + " for you",
 											"Here you go",
 											"There you go"
@@ -777,16 +735,16 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				script = f"window.open('{_url}', '_blank')"
 				)
 		else:
-			rep("Couldn't find the link. Here's a google search for it instead. \n")
-			rep(searcher(link))
+			msg.rep("Couldn't find the link. Here's a google search for it instead. \n")
+			msg.rep(searcher(link))
 
-		intent("goto")
+		msg.add_intent("goto")
 
 	elif re_starts(ip.search, ui):
 		query = re_check(ip.search, ui)
 		searcher(query)
 
-		intent("search")
+		msg.add_intent("search")
 	# elif ui.startswith(li_can_do):
 	# 	log_type(11)
 	# 	if ui.startswith(li_goto):
@@ -812,24 +770,24 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	# 	log_type("li_AmyName")
 	# 	out = (choice(li_AmyName) + user.nickname + '.')
 
-	elif ui in start_parrot:
-		rep('Parrot mode activated.')
+	elif ui in ip.start_parrot:
+		msg.rep('Parrot mode activated.')
 		user.flags.parrot = True
 
-		intent("parrot_on")
+		msg.add_intent("parrot_on")
 
 	elif re_check(ip.tell_latest_news, ui):
 		if check_internet():
 			news = bbc_news.task(bbc_topic)
 			if news is None:
-				rep('No news available')
+				msg.rep('No news available')
 			else:
-				rep("".join(news[:5]))
+				msg.rep("".join(news[:5]))
 				# asker("Do you want to read more?", true_func=lambda: out = (*news[5:15]))
 		else:
-			rep(choice(ot.no_internet))
+			msg.rep(choice(ot.no_internet))
 
-		intent("whats_the_news")
+		msg.add_intent("whats_the_news")
 
 	elif re_starts(ip.whens_, ui):
 		_when = re_search(ip.whens_, ui)
@@ -841,22 +799,22 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 
 		if re_is_in(ip.your_bday, uiopen):
-			rep(
+			msg.rep(
 				Rchoice("It's", "My birthday is") + " " +
 				Rchoice("on ", blank=1) + "September 30th" +
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
 			)
 
-			intent("(what)_my_bday")
+			msg.add_intent("(what)_my_bday")
 
 		else:
 			x = wikisearch(uiopen, uiopen_raw, user)
 			if x:
-				rep(x)
+				msg.rep(x)
 			else:
-				rep(find_person(uiopen_raw))
+				msg.rep(find_person(uiopen_raw))
 
-			intent("(when)_something")
+			msg.add_intent("(when)_something")
 
 
 	elif re_starts(ip.whos_, ui):
@@ -868,20 +826,20 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
 		if re_is_in(ip.you_self, uiopen):
-			rep(choice(ot.about_self),
+			msg.rep(choice(ot.about_self),
 				render="innerHTML")
 
-			intent('(who) are you')
+			msg.add_intent('(who) are you')
 
-			return flush()
+			return msg.flush()
 
 		if re_is_in(ip.my_self, uiopen):
-			rep(Rchoice("Your are ", "You are ", "You're ") +
+			msg.rep(Rchoice("Your are ", "You are ", "You're ") +
 				Rchoice("my beloved ", "my sweetheart ", "my master ", "my dear ", blank=2) +
 				user.nickname +
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
 
-			intent("(who)_my_self")
+			msg.add_intent("(who)_my_self")
 
 		elif re_check(ip.created_program, uiopen):
 			act = re_search(ip.created_program, uiopen).group("action")
@@ -889,62 +847,64 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				act = "made"
 			elif not act.endswith('ed'):
 				act += 'ed'
-			rep(choice(li_Acreator) % act)
+			msg.rep(choice(ot.created_by) % act)
 		else:
 			x = wikisearch(uiopen, uiopen_raw, user)
 			if x:
-				rep(x)
+				msg.rep(x)
 			else:
-				rep(find_person(uiopen_raw))
+				msg.rep(find_person(uiopen_raw))
 
-			intent("(who)_something")
+			msg.add_intent("(who)_something")
 
-	elif ui in li_check_int:
-		if check_internet() == False:
-			rep(choice(ot.no_internet))
+	elif re_is_in(ip.check_net, ui):
+		if check_internet() is False:
+			msg.rep(choice(ot.no_internet))
 		else:
-			rep("Internet connection available.")
+			msg.rep(choice(ot.internet_ok) +
+				choice(".", "!", "👌", "👍")
+				)
 
-		intent("check_internet")
+		msg.add_intent("check_internet")
 
-	elif re.search(set_timer_pattern, ui):
-		x = re.match(set_timer_pattern, ui).group(1)
-		rep("Timer not supported yet.")
+	elif re.search(ip.set_timer_pattern, ui):
+		x = re.match(ip.set_timer_pattern, ui).group(1)
+		msg.rep("Timer not supported yet.")
 		# set_timer(x)
 
-		intent("set_timer")
+		msg.add_intent("set_timer")
 
 	elif re_starts(ip.bye, ui):
-		intent("exit")
+		msg.add_intent("exit")
 
-		out = (choice(li_bye) +
+		msg.rep(choice(ot.bye) +
 				Rchoice(f" {user.nickname}", blank=1) +
 				Rchoice('!', '.', blank=1) +
 				Rchoice('👋😄', blank=1))
 
-		return flush()
+		return msg.flush()
 
 	elif re_check(ip.take_care, ui):
 
-		intent("take_care")
+		msg.add_intent("take_care")
 
-		out = (Rchoice("You too", "Same to you") + " " +
+		msg.rep(Rchoice("You too", "Same to you") + " " +
 				Rchoice(f" {user.nickname}", blank=1) +
 				Rchoice('!', '.', blank=1) +
 				Rchoice('👋😄', "😘", blank=1))
 
-		return flush()
+		return msg.flush()
 
 	# WHY [-2:-2]? => if len < 2, it will return empty list instead of error
-	# print(user.chat.intent)
+	
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
-		about_bot_patterns(context=_context, check_context=check_context),
+		about_bot_patterns(context=msg.context_count, check_context=msg.check_context),
 		action="remove",
 		split="AND")
 
 
 	if re_check(ip.help, ui):
-		rep(
+		msg.rep(
 			Rchoice(
 				"I'm not a discord bot or something.",
 				"It's not like I'm a discord bot or something.",
@@ -960,21 +920,21 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		)
 		
 	if re_is_in(ip.slur, ui):
-		rep(Rchoice(ot.slur))
+		msg.rep(Rchoice(ot.slur))
 		
 
 	if re.search(r"\d", ui):
-		rep(wikisearch(ui, ui_raw, user))
+		msg.rep(wikisearch(ui, ui_raw, user))
 
 
 
-	if (not ui) and out:
+	if (not ui) and msg:
 
-		return flush()
+		return msg.flush()
 
-	if out["message"] == '':
+	if msg["message"] == '':
 		log_unknown(ui_raw, INPUT)
-		out = (
+		msg.rep(
 			Rchoice("Sorry,", "My apologies.", "I'm sorry...") + " I " +
 			Rchoice(
 				(Rchoice("don't", "can't") + " " +
@@ -999,13 +959,13 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			)
 		)
 
-		intent("unknown")
+		msg.add_intent("unknown")
 
 	if ui not in li_redo:
 		#TODO: add redo
 		pass
 
-	return flush()
+	return msg.flush()
 # tnt('/<style=a>/===hell===o')
 
 
