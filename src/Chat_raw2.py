@@ -770,7 +770,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	# 	log_type("li_AmyName")
 	# 	out = (choice(li_AmyName) + user.nickname + '.')
 
-	elif ui in ip.start_parrot:
+	elif re_check(ip.start_parrot, ui):
 		msg.rep('Parrot mode activated.')
 		user.flags.parrot = True
 

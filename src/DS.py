@@ -21,10 +21,8 @@ class GETdict(Callable_dict):
 		super().__init__(*args, **kwargs)
 		self.__dict__ = self
 
-
-	def __setitem__(self, key, value):
-		super().__setitem__(key, value)
-
+	__setitem__ = Callable_dict.__setitem__
+	
 	def __setattr__(self, key, value):
 		if self(key):
 			self.__setitem__(key, value)
@@ -37,23 +35,15 @@ class GETdict(Callable_dict):
 		return super().__getattribute__(__name)
 
 
-	# def __getitem__(self, __key):
-	# 	return super().__getitem__(__key)
 
 class Flag(GETdict):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.__dict__ = self
 
-	def __getitem__(self, __key):
-		return super().get(__key, None)
+	__getitem__ = GETdict.get
+	__getattr__ = GETdict.get
 
-	def  __getattr__(self, __name: str):
-		return super().get(__name, None)
-		# try:
-		# 	return super().__getitem__(__name)
-		# except Exception:
-		# 	return None
 
 
 class LimitedDict(OrderedDict):
