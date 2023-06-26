@@ -260,7 +260,50 @@ a {
 }
 
 
+.toast-box {
+    z-index: 99;
+    position: fixed;
+    display: flex;
+    top: 0;
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+    align-items: center;
 
+	pointer-events: none;
+}
+
+
+
+.toast-body {
+	max-height: 100px;
+	width: max-content;
+	max-width: 90%;
+
+	overflow-y: auto;
+	margin: 7px;
+	padding: 10px;
+	opacity: 0;
+	overflow-wrap: anywhere;
+	transform: translateY(100%);
+	
+	font-size: 1em;
+	color: #fff;
+	background-color: #005165ed;
+	
+	border-radius: 4px;
+	transition:
+		opacity 500ms,
+		transform 500ms;
+}
+
+.toast-body.visible {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+
+/* 
 .toast-box {
 	z-index: 8;
 	display: flex;
@@ -294,7 +337,7 @@ a {
 	color: #fff;
 
 	border-radius: 4px;
-}
+} */
 
 
 

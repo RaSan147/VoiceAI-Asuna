@@ -205,8 +205,8 @@ def send_voice(self: SH, *args, **kwargs):
 	if cookie_check:
 		return None
 	
-	print(self.query)
-	voice = self.query.get("voice", None)
+	# print(self.query)
+	voice = self.query.get("id", None)
 	if voice is None:
 		return None
 	

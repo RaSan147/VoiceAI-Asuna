@@ -43,7 +43,6 @@ class Config {
 		this.popup_msg_open = false;
 		this.allow_Debugging = true
 		this.Debugging = false;
-		this.Hammered_modal = 0;
 		this.is_touch_device = 'ontouchstart' in document.documentElement;
 
 
@@ -149,15 +148,18 @@ class Tools {
 			document.body.classList.toggle('overflowHidden');
 		}
 	}
-	download(dataurl, filename = null) {
+	download(dataurl, filename = null, new_tab=false) {
 		const link = createElement("a");
 		link.href = dataurl;
 		link.download = filename;
+		if(new_tab){
+			link.target = "_blank";
+		}
 		link.click();
 	}
 	
 	fake_push(){
-		history.pushState({}, "AI Asuna", ".")
+		history.pushState({}, document.title, ".")
 	}
 
 	full_path(rel_path){
@@ -252,19 +254,19 @@ class Tools {
 	}
 	
 	getCookie(cname) {
-	  let name = cname + "=";
-	  let decodedCookie = decodeURIComponent(document.cookie);
-	  let ca = decodedCookie.split(';');
-	  for(let i = 0; i <ca.length; i++) {
-	    let c = ca[i];
-	    while (c.charAt(0) == ' ') {
-	      c = c.substring(1);
-	    }
-	    if (c.indexOf(name) == 0) {
-	      return c.substring(name.length, c.length);
-	    }
-	  }
-	  return "";
+		let name = cname + "=";
+		let decodedCookie = decodeURIComponent(document.cookie);
+		let ca = decodedCookie.split(';');
+		for(let i = 0; i <ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+		}
+		return "";
 	}
 	
 	clear_cookie() {
@@ -292,8 +294,13 @@ class Popup_Msg {
 		this.create()
 		this.opened = 0;
 	}
+
+	clean() {
+		tools.del_child(this.header);
+		tools.del_child(this.content);
+	}
+
 	init() {
-		log("Initializing popup message")
 		this.onclose = null_func;
 		this.scroll_disabled = false;
 
@@ -386,11 +393,13 @@ opacity: 1;
 			document.body.appendChild(style);
 		}
 	}
+
 	create() {
 		var that = this;
 		let popup_id, popup_obj, popup_bg, close_btn, popup_box;
 
 		popup_id = config.total_popup;
+		config.total_popup += 1;
 
 
 
@@ -416,25 +425,27 @@ opacity: 1;
 		popup_box.classList.add("popup-box")
 
 		close_btn = createElement("div");
-		close_btn.classList.add("popup-close-btn")
+		close_btn.className = "popup-btn disable_selection popup-close-btn"
 		close_btn.onclick = function() {
-			popup_msg.close()
+			that.close()
 		}
 		close_btn.innerHTML = "&times;";
 		popup_box.appendChild(close_btn)
+
 		this.header = createElement("h1")
 		this.header.id = "popup-header-" + popup_id;
 		popup_box.appendChild(this.header)
+
 		this.hr = createElement("popup-hr-" + popup_id);
 		this.hr.style.width = "95%"
 		popup_box.appendChild(this.hr)
+
 		this.content = createElement("div")
 		this.content.id = "popup-content-" + popup_id;
 		popup_box.appendChild(this.content)
 		this.popup_obj.appendChild(popup_box)
 
 		byId("popup-container").appendChild(this.popup_obj)
-		config.total_popup += 1;
 	}
 	close() {
 		this.onclose()
@@ -477,8 +488,10 @@ opacity: 1;
 		this.open_popup(allow_scroll)
 	}
 
-	async createPopup(header = "", content = "", hr = true) {
+	async createPopup(header = "", content = "", hr = true, onclose = null_func) {
 		this.init()
+		this.clean()
+		this.onclose = onclose;
 		this.made_popup = true;
 		if (typeof header === 'string' || header instanceof String) {
 			this.header.innerHTML = header;
@@ -504,35 +517,44 @@ class Toaster {
 	constructor() {
 		this.container = createElement("div")
 		this.container.classList.add("toast-box")
-		this.toaster = createElement("div")
-		this.toaster.classList.add("toast-body")
-
-		this.container.appendChild(this.toaster)
 		document.body.appendChild(this.container)
 
-		this.BUSY = 0;
+		this.default_bg = "#005165ed";
+
+		this.queue = [];
 	}
 
 
-	async toast(msg,time) {
+	async toast(msg, time, bgcolor='') {
 		// toaster is not safe as popup by design
 		// time is in ms, 0 means no auto close
 		var sleep = 3000;
 
-		this.BUSY = 1;
-		this.toaster.innerText = msg;
-		this.container.classList.add("visible")
-		if(tools.is_defined(time)) {
-			if(time==0) return
-			sleep = time;
+		while (this.queue.length > 2) {
+			await tools.sleep(100)
 		}
-		await tools.sleep(sleep)
-		this.close()
-	}
+		this.queue.push(1)
 
-	close() {
-		this.container.classList.remove("visible")
-		this.BUSY = 0
+		let toaste = createElement("div")
+		toaste.classList.add("toast-body")
+		
+		this.container.appendChild(toaste)
+
+		await tools.sleep(50) // wait for dom to update
+		
+		// SET BG COLOR
+		toaste.style.backgroundColor = bgcolor || this.default_bg;
+
+		toaste.innerText = msg;
+		toaste.classList.add("visible")
+		if(tools.is_defined(time)) sleep = time;
+		await tools.sleep(sleep)
+		toaste.classList.remove("visible")
+		await tools.sleep(500)
+		toaste.remove()
+
+		this.queue.pop()
+
 	}
 }
 
