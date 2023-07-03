@@ -9,11 +9,10 @@ class Bot_{
 		this.canvas = byId("canvas");
 		this.canvas.style.height = "auto";	
 		this.app = null;
-		this.cubism4Model = 
-		`/live2d.bak/asuna/asuna_${user.bot_skin}/asuna_${user.bot_skin}.model.json`
+		this.cubism4Model = `/live2d.bak/asuna/asuna_${user.bot_skin}/asuna_${user.bot_skin}.model.json`
 		// "https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json"
 		// "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json";
-		
+
 		this.motions = {
 			"idle": ["idle",undefined],
 			"happy": ["", 0],
