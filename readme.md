@@ -36,8 +36,8 @@ Welcome to project Asuna.
 - [ ] Add more Commands
 - [ ] Add voice recognition
 - [ ] Add voice output
-- [ ] Add anime live2D animations
-- [ ] Improve sidebars
+- [x] Add anime live2D animations
+- [x] Improve sidebars
 - [ ] Allow bot send pictures
 - [ ] Allow bot send audio
 - [ ] Allow bot send video
