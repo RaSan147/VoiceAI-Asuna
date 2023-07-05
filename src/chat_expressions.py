@@ -1,13 +1,16 @@
-from collections import Counter
 
-from REGEX_TOOLS import re_check, re_is_in, re_starts
+from REGEX_TOOLS import re_check, re_fullmatch, re_starts
 from basic_conv_re_pattern import C, ___auxV, ___you, ___your, ___youre
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
 
-def patterns(context=Counter(), check_context=null):
+
+from user_handler import User
+from msg_class import MessageObj
+
+def patterns(user:User, msg=MessageObj):
 	"""
 	context: Counter object to keep track of previous message intents
 	check_context: function to check if someting is in the prev msg intent (context)
@@ -23,7 +26,7 @@ def patterns(context=Counter(), check_context=null):
 				Rchoice(' <:u_name>', blank=1)+
 				Rchoice('.', '...', '!',  '~', blank=1)+
 				Rchoice("👋", blank=2)
-	) if context["say_hi"]<3 else
+	) if msg.context_count["say_hi"]<3 else
 	('Hello','Yeah!','Yes?','Yeah, need something?'),
 
 	"say_hi"
@@ -37,7 +40,7 @@ def patterns(context=Counter(), check_context=null):
 				Rchoice(' <:u_name>', blank=1)+
 				Rchoice('.', '...', '!', '~', blank=2)+
 				Rchoice("👋", blank=1)
-	) if context["say_hello"]<3 else
+	) if msg.context_count["say_hello"]<3 else
 	('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
 
 	"say_hello"
@@ -90,7 +93,20 @@ def patterns(context=Counter(), check_context=null):
 	"hate_you"
 ],
 [
-	[C(rf"((a?re?) )?{___you} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) )*"),],
+	[
+		C(rf"{___you} {___auxV}? ?(rude|mean)"),
+		C(rf"{___you} hurt me"),
+	],
+	(
+		Rchoice("I'm sorry. ", 'Sorry to disappoint you. ',"Please forgive me. ")+
+		Rchoice("I didn't mean to hurt you",
+				"I'll try my best to help you",	
+		) + "."
+	),
+	"you_are_rude"
+],
+[
+	[C(rf"((a?re?) )?{___you} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) ?)+"),],
 	(
 		Rchoice("You meani...", "You baka...", "Huh..", "Whatt!!", blank=1) + "\n" +
 			Rchoice(
@@ -274,4 +290,3 @@ def patterns(context=Counter(), check_context=null):
 
 ]
 
-patterns()

@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 #pylint:disable=C0413
 
-__version__ = "0.2"
+__version__ = "0.3"
 
 import os
 import sys
 import shutil
+from typing import Dict, Tuple, List, Union, Any, Callable
 import urllib.parse
 import urllib.request
 # import time
@@ -36,8 +37,9 @@ from pyroboxCore import PostError
 # CHAT LIB
 
 import Chat_raw2
-
-
+from CHAT_TOOLS import for_voice
+from voice_4_live2d import get_audio
+from msg_class import MessageObj
 
 pyrobox_config.log_location = appConfig.log_location
 true = T = True
@@ -321,7 +323,7 @@ def AUTHORIZE_POST(req: SH, post:DPD, post_type=None):
 	return post_verify[1] # return 1st field value
 
 
-def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password') -> tuple[str, str]:
+def Get_User_from_post(self: SH, post:DPD, pass_or_uid='password') -> Tuple[str, str]:
 	"""
 	Get username and password from post data
 	READS UPTO LINE 13
@@ -515,6 +517,10 @@ def chat(self: SH, *args, **kwargs):
 	_tz, _time_offset = form.get_multi_field('tzOffset', decode=T)
 	_time_offset = _time_offset.strip()
 
+	_v, _voice = form.get_multi_field('voice', decode=T)
+	_voice = json.loads(_voice) # bool
+
+
 	if not _m or not _t:
 		raise PostError("Invalid post data")
 
@@ -542,16 +548,30 @@ def chat(self: SH, *args, **kwargs):
 	user.user_client_time = int(_time)/1000
 
 	# TODO: REMOVE THIS IN PRODUCTION
-	importlib.reload(Chat_raw2)
+	# importlib.reload(Chat_raw2)
 
 	Chat_raw2.LOG_DEBUG = True
 
 	reply = Chat_raw2.basic_output(message, user)
 
-	if isinstance(reply, dict):
+	if isinstance(reply, MessageObj):
+		if "unknown" in reply.intents:
+			_voice = False
+
+		reply = reply.trimmed() # remove unnecessary objects
 		out.update(reply)
+		
 	else:
 		out["message"] = reply
+
+	if _voice:
+		voice = for_voice(out["message"])
+		voice_file = get_audio(voice, output_dir= appConfig.audio_file)
+		# get file name from voice file
+		voice_file = os.path.basename(voice_file)
+
+		out["voice"] = f"/voice?id={voice_file}"
+
 
 	return self.send_json(out)
 

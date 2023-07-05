@@ -1,15 +1,18 @@
-from REGEX_TOOLS import re_check, re_is_in, re_starts
+from REGEX_TOOLS import re_check, re_fullmatch, re_starts
 from basic_conv_re_pattern import C, ___you, ___your, ___youre, ___auxV
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 
 from OS_sys import null
 
-from collections import Counter
-def patterns(context=Counter(), check_context=null):
+
+from user_handler import User
+from msg_class import MessageObj
+
+def patterns(user:User, msg=MessageObj):
 	"""
 	context: Counter object to keep track of previous message intents
-	check_context: function to check if someting is in the prev msg intent (context)
+	check_context: function to check if something is in the prev msg intent (context)
 
 
 	"""
@@ -21,13 +24,27 @@ def patterns(context=Counter(), check_context=null):
 	(
 		Rchoice(
 			"Well, I am not an smart AI yet, but I'm learning to be one",
-			"I'm your chat partner, but I'm not that much knowledgable yet",
+			"I'm your chat partner, but I'm not that much knowledgeable yet",
 			"I am trained on small dataset, so I can't call myself an smart AI yet",
 			"I don't have the ability of an Chat GPT like AI yet, but I'm trying",
 		) +  '.'
 	),
 
 	"are_you_ai"
+],
+[
+	[
+		C(rf"what programming language {___auxV}? {___you} (made|written|coded|created)"),
+	],
+	(
+		Rchoice(
+			"I'm written in Python",
+			"My logic is written in Python",
+			"My brain is written in Python",
+			"I'm written in Python, but I'm not that much smart yet",
+		) +  '.'
+	),
+	"what_lang"
 ],
 [
 	[
@@ -71,14 +88,14 @@ def patterns(context=Counter(), check_context=null):
 	[
 		C(rf"about {___youre}( ?self)?( \<\:ai_name\>)?$"),
 	],
-	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki." +
-		Rchoice(" I'm 17 this year.",blank=2) +
-		Rchoice(" I continue my education from SAO Survivor School.", blank=1)+
-		" I love to study and play video games with friends."+
-		shuf_merge(Rchoice(" I often go to the pool or beach for swimming.", blank=1),
-			" I like to go shopping too!") +
-		Rchoice(" I also "+Rchoice("like ", "love ")+Rchoice("talking ", "being ", "staying ", "chatting ")+"with you.",
-			" I also love too cook.", blank=1)+
+	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki. " +
+		Rchoice("I'm 17 this year. ",blank=2) +
+		Rchoice("I continue my education from SAO Survivor School. ", blank=1)+
+		" I love to study and play video games with friends. "+
+		shuf_merge(Rchoice("I often go to the pool or beach for swimming.", blank=1),
+			"I like to go shopping too! ") +
+		Rchoice(" I also "+Rchoice("like ", "love ")+Rchoice("talking", "being", "staying", "chatting")+" with you.",
+			" I also love to cook. ", blank=1)+
 		Rchoice("😁", " 😄", " 😇", " 😊", " ~", "...", blank=1)
 	),
 
@@ -91,10 +108,10 @@ def patterns(context=Counter(), check_context=null):
 	],
 	( Rchoice("Besides cooking, ", blank=1)+
 		"I like to play different types of games" + Rchoice(" (specially anything with friends)", blank=1) +
-		". To be honest, my best game experience was from Sword Art Online." +
-		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", blank=1), blank=1)+
+		". To be honest, my best game experience was from Sword Art Online. " +
+		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", ". "), blank=1)+
 		"I turned into our real world, fantacy into reality...\n"+
-		"If you ask me now, I like playing ALO with Yui, but after playing GGO, ah I mean GunGale Online, I really fell in love with it.\n\n"+
+		"If you ask me now, I like playing ALO with Yui, but after playing GGO, ah~ I mean GunGale Online, I really fell in love with it.\n\n"+
 		"The thrill and everything, speed and precision. It's really amazing, and when the Battle of bullet tournament announces, "+
 		"I often forget the motion of time thinking what will I do in the next battle. "+
 		Rchoice("This is getting embarassing 🥶", blank=1)+
@@ -109,8 +126,8 @@ def patterns(context=Counter(), check_context=null):
 	],
 	( Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
-	"I love home made meat 🍖 items, specially when eating with someone special."+
-		Rchoice(" The spices and flavor, making me drool already...", " With soy sauce and fresh meat, it just becomes an unparallel dish")
+	"I love home made meat 🍖 items, specially when eating with someone special"+
+		Rchoice(". The spices and flavor, making me drool already...", ". With soy sauce and fresh meat, it just becomes an unparallel dish")
 		),
 		"about_ai_favourite_food"
 ],
@@ -123,8 +140,10 @@ def patterns(context=Counter(), check_context=null):
 		((Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
 			"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my leage. ",
 			"I do watch anime on free times, but I try to watch short ones. ") + "\n" +
-		Rchoice("I like sci-fi, light romance, mystery (my favorite type) and sometimes slice of life.\n", "I feel more interested in mystery and sci-fi type animes, sometimes I watch slice of life or light romance\n", blank=2) + "\n"
-		) if not check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"])
+		Rchoice("I like sci-fi, light romance, mystery (my favorite type) and sometimes slice of life.\n",
+				"I feel more interested in mystery and sci-fi type animes, sometimes I watch slice of life or light romance\n", 
+				blank=2) + "\n"
+		) if not msg.check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"])
 		else "") +
 		shuf_merge("Its kinda hard to decide. ", "There are too manyyy... ")+ "\n",
 
@@ -197,4 +216,3 @@ def patterns(context=Counter(), check_context=null):
 
 ][::-1] # smaller ones should be checked first
 
-patterns()

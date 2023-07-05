@@ -135,8 +135,8 @@ class Bot_{
 
 	get_y(scale){
 		var min_w, max_w, min_x, max_x, per, times, x, scaled;
-		min_h = 300; // y = 170
-		max_h = 1080;  // x = 250
+		min_w = 300; // y = 170
+		max_w = 1080;  // x = 250
 
 		times = (vw-min_w)/(max_w-min_w)
 		var x_change = (250-(-150));
@@ -148,13 +148,20 @@ class Bot_{
 		return x;
 	}
 
-	speak_mtn(mtn, audio){
+	speak_mtn(mtn, audio=null, volume=1, expression=null){
 		let [type, mtn_id] = this.motions[mtn]
-		this.model4.motion(type, mtn_id, 3, audio)
+		// var category_name||type = "Idle" // name of the morion category
+		// var animation_index||mtn_id = 0 // index of animation under that motion category
+		var priority_number = 3 // if you want to keep the current animation going or move to new animation by force
+		// var audio_link = "https://cdn.jsdelivr.net/gh/RaSan147/pixi-live2d-display@v1.0.3/playground/test.mp3" //[Optional arg, can be null or empty] [relative or full url path] [mp3 or wav file]
+		// var volume = 1; //[Optional arg, can be null or empty] [0.0 - 1.0]
+		// var expression = 4; //[Optional arg, can be null or empty] [index|name of expression]
+
+		this.model4.motion(type, mtn_id, priority_number, audio, volume, expression)
 	}
 	
-	speak(audio_file){
-		this.speak_mtn("idle", audio_file)
+	speak(audio_file, volume=1, expression=null){
+		this.model4.speak(audio_file, volume, expression)
 	}
 
 }

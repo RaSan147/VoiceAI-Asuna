@@ -3,7 +3,7 @@ from re import compile
 import traceback
 
 
-from REGEX_TOOLS import re_starts, re_check, re_is_in, re_search, eos
+from REGEX_TOOLS import re_starts, re_check, re_fullmatch, re_search, eos
 from DS import GETdict
 
 from CHAT_TOOLS import merge
@@ -13,13 +13,6 @@ def generate_list(prefix):
 	# return (item for sublist in l for item in sublist)
 
 	return tuple(item for sublist in [globals()[name] for name in globals().keys() if name.startswith(prefix)] for item in sublist)
-
-
-
-def check_context(context=(), contextsss=()):
-	for i in context:
-		if i in contextsss:
-			return True
 
 
 def C(pattern):
@@ -90,9 +83,9 @@ no+=tuple('well ' + j for j in no2)
 no+=tuple('actually ' + i for i in no1)"""
 
 class atdict(dict):
-    __getattr__= dict.__getitem__
-    __setattr__= dict.__setitem__
-    __delattr__= dict.__delitem__
+	__getattr__= dict.__getitem__
+	__setattr__= dict.__setitem__
+	__delattr__= dict.__delitem__
 
 
 ot = atdict()
@@ -172,7 +165,7 @@ ip.no = [
 
 
 # print(ip["no"][0].match("well nope"))
-# print(is_in(ip["no"], "well nope"))
+# print(fullmatch(ip["no"], "well nope"))
 
 li_QyuiName = "can i change your name", 'i want to change your name'
 li_QyuiNamePre = "can i call you ", 'may i call you'
@@ -214,6 +207,10 @@ ip.whos_ = [
 
 ip.whens_ = [
 	C(rf"when('| )?{___auxV}? (the )?(?P<query>.*)"),
+]
+
+ip.hows_ = [
+	C(rf"how('| )?{___auxV}? (the )?(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [

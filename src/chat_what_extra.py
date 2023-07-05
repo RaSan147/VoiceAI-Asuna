@@ -1,6 +1,6 @@
 from random import choice, shuffle
 import re
-from REGEX_TOOLS import re_check, re_is_in, re_starts
+from REGEX_TOOLS import re_check, re_fullmatch, re_starts
 from basic_conv_re_pattern import C
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
@@ -8,8 +8,11 @@ from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
 
-from collections import Counter
-def patterns(context=Counter(), check_context=null):
+
+from user_handler import User
+from msg_class import MessageObj
+
+def patterns(user:User, msg=MessageObj):
 	"""
 	context: Counter object to keep track of previous message intents
 	check_context: function to check if someting is in the prev msg intent (context)
@@ -65,7 +68,7 @@ def patterns(context=Counter(), check_context=null):
 		C(r"(about )?((yo)?u|y(a|o))('| )?(re?)? fav(ou?rite)? anime( shows?)?( most|(a )?lot)?"),
 	],
 	(
-		("" if check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
+		("" if msg.check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
 		Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
 		"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my leage. ",
 		"I do watch anime on free times, but I try to watch short ones. ") + "\n" +
@@ -118,4 +121,3 @@ def patterns(context=Counter(), check_context=null):
 
 ][::-1]
 
-patterns()

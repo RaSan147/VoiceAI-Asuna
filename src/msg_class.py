@@ -1,5 +1,5 @@
 from collections import Counter
-
+import re
 from user_handler import User
 
 
@@ -9,6 +9,12 @@ message_dict = {
 	"render": "innerText",
 	"script": ""
 }
+
+def strip_msg(msg:dict):
+	for i in msg:
+		if isinstance(msg[i], str):
+			msg[i] = re.sub(r'[ \t]{2,}', ' ', msg[i].strip())
+	return msg
 
 
 
@@ -35,6 +41,25 @@ class MessageObj(dict):
 
 #	def __getitem__(self, __key):
 #	 	return self.msg.__getitem__(__key)
+
+	def trimmed(self):
+		out = {}
+		items = [
+			"message",
+			"script",
+			"render",
+			"expression",
+			"motion",
+			"delay",
+			
+			"mid",
+			"rid",
+			
+		]
+		for i in items:
+			out[i] = self.get(i)
+
+		return out
 		
 	def add_intent(self, intent: str):
 		"""Add message intent in list"""
@@ -66,14 +91,15 @@ class MessageObj(dict):
 
 	def rep(self, msg_txt, script="", render="", expression=""):
 		"""add message to the output"""
-
 		if isinstance(msg_txt, dict):
-			script = msg_txt.get("script", "")
+			script = msg_txt.get("script", "") + "\n\n" + str(script)
 			render = msg_txt.get("render", "")
-			msg_txt = msg_txt["message"]
+			message = msg_txt["message"]
 			expression = expression or msg_txt.get("expression", "")
+		else:
+			message = msg_txt
 
-		self["message"] += "\n\n" + str(msg_txt)
+		self["message"] += "\n\n" + str(message)
 
 		if render:
 			self["render"] = str(render)
@@ -84,7 +110,7 @@ class MessageObj(dict):
 		if expression:
 			self["expression"] = str(expression)
 
-		return self
+		return strip_msg(self)
 
 	def flush(self):
 		"""flush the output, intent and context"""

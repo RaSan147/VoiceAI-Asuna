@@ -3,7 +3,7 @@ class AppConfig {
 
 	constructor() {
 		this.location = window.location;
-		this.enable_voice = false;
+		this.enable_voice = true;
 	}
 	
 	show_author_note() {

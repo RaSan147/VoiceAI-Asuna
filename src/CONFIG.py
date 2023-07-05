@@ -11,6 +11,7 @@ class Config:
 		self.log_unknown = os.path.join(self.file_dir, "Asuna_data/server/unknown query.txt")
 		self.log_location = os.path.join(self.file_dir, "Asuna_data/server/")  # fallback log_location = "./"
 		self.temp_file = os.path.join(self.file_dir, "Asuna_data/temp/")
+		self.audio_file = os.path.join(self.temp_file, "audio/")
 
 		self.cached_webpages_dir = self.temp_file + "cached_webpages/"
 

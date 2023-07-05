@@ -43,7 +43,7 @@ def search(SEARCHPAGE:str, max=10):
 #if DATA['query']['search'][0]['title'] == SEARCHPAGE:
 #    print("Your search page '" + SEARCHPAGE + "' exists on English Wikipedia")
 
-def fix_promt(ui):
+def fix_prompt(ui):
 	ui = ui.lower()
 	if ui == "asuna":
 		ui="Asuna Yuuki"

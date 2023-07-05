@@ -1,3 +1,4 @@
+from typing import List
 from random import choice, shuffle
 import re
 
@@ -13,7 +14,7 @@ def if_list(obj):
 
 def Rchoice(*args, blank=0):
 	"""
-		return `random choice` from (args and blank `""`)
+		return `random.choice` from (args and blank `""`)
 	"""
 	args = if_list(args)
 	b = ['']*blank
@@ -26,7 +27,7 @@ def Rshuffle(*args):
 	
 
 
-def list_merge(li:list):
+def list_merge(li:List):
 	txt = ' '.join(li)
 	txt = re.sub(r'\s{2,}', ' ', txt)
 
@@ -44,7 +45,11 @@ def shuf_merge(*args):
 
 
 
+def for_voice(text):
+	text = re.sub(r'\*[a-zA-Z\s]+\*', '', text)
+	text = text.encode('ascii', 'ignore').decode('ascii')
 
+	return text
 
 
 

@@ -89,41 +89,39 @@ class Tool_belt:
 	def starts(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns string if it **starts with** any of the patterns in the given patterns list
 		"""
+		
+		m = None
 		if isinstance(patterns, (re.Pattern, str)):
 			patterns = [patterns,]
 
-		for i in patterns:
-			if isinstance(i, re.Pattern):
-				m = i.match(string)
+		for ptrn in patterns:
+			if isinstance(ptrn, str):
+				ptrn = re_compile(f"^{re.escape(ptrn)}", re.IGNORECASE)
 
-				if m:
-					if PRINT_PATTERN: _pp(i)
-					return m.group(0)
-
-			else:
-				if string.startswith(i):
-					if PRINT_PATTERN: _pp(i)
-					return i
+			m = ptrn.search(string)
+			if m and m.start() == 0:
+				if PRINT_PATTERN: _pp(ptrn)
+				return m.group(0)
+			
 
 	def check(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns string if it **has** any of the patterns in the given patterns list
 		"""
+		m = None
 		if isinstance(patterns, (re.Pattern, str)):
 			patterns = [patterns,]
 
-		for i in patterns:
-			if isinstance(i, re.Pattern):
-				m = i.search(string)
-				if m:
-					if PRINT_PATTERN: _pp(i)
-					return m.group(0)
+		for ptrn in patterns:
+			if isinstance(ptrn, str):
+				ptrn = re_compile(re.escape(ptrn), re.IGNORECASE)
 
-			else:
-				if i in string:
-					if PRINT_PATTERN: _pp(i)
-					return i
+			m = ptrn.search(string)
+			if m:
+				if PRINT_PATTERN: _pp(ptrn)
+				return m.group(0)
+			
 
-	def is_in(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
+	def fullmatch(self, patterns: Union[list, str, re.Pattern], string: str, PRINT_PATTERN=False):
 		"""checks and returns string if it **full match** with any of the patterns in the given patterns list
 		"""
 		if isinstance(patterns, (re.Pattern, str)):
@@ -149,26 +147,22 @@ class Tool_belt:
 		if isinstance(patterns, (re.Pattern, str)):
 			patterns = [patterns,]
 
-		for i in patterns:
-			if isinstance(i, re.Pattern):
-				m = i.search(string)
-				if m:
-					if PRINT_PATTERN: _pp(i)
-					return m
+		for ptrn in patterns:
+			if isinstance(ptrn, str):
+				ptrn = re_compile(ptrn, re.IGNORECASE)
 
-			else:
-				m = re.search(re.escape(i), string)
-				if m:
-					if PRINT_PATTERN: _pp(i)
-					return m
-
+			m = ptrn.search(string)
+			if m:
+				if PRINT_PATTERN: _pp(ptrn)
+				return m
+			
 
 
 re_tools = Tool_belt()
 
 re_starts = re_tools.starts
 re_check = re_tools.check
-re_is_in = re_tools.is_in
+re_fullmatch = re_tools.fullmatch
 re_search = re_tools.search
 
 eos = r"(?:\s|$)"

@@ -1,14 +1,17 @@
-from REGEX_TOOLS import re_check, re_is_in, re_starts
+from REGEX_TOOLS import re_check, re_fullmatch, re_starts
 from basic_conv_re_pattern import C
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
-from collections import Counter
-def patterns(context=Counter(), check_context=null):
+
+from user_handler import User
+from msg_class import MessageObj
+
+def patterns(user:User, msg=MessageObj):
 	"""
 	context: Counter object to keep track of previous message intents
-	check_context: function to check if someting is in the prev msg intent (context)
+	check_context: function to check if something is in the prev msg intent (context)
 	"""
 
 	return [
@@ -77,4 +80,3 @@ def patterns(context=Counter(), check_context=null):
 
 ]
 
-patterns()

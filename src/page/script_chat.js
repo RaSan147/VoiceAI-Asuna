@@ -156,8 +156,8 @@ class ChatHandler{
 		theme_controller.del_fa_alt(tick)
 	}
 
-	replied_msg(json){
-		const that = this;
+	async replied_msg(json){
+		let that = this;
 		const msg = json.message;
 		var render = "innerText";
 		if (json.render == "innerHTML") render = "innerHTML";
@@ -169,15 +169,29 @@ class ChatHandler{
 			// script.setAttribute("async", true);
 			document.body.appendChild(script);
 		}
-		var sound=null, mtn="idle";
-		if (json.sound && this.minimized) {
-				sound = json.sound;
+		var voice=null, motion="idle", expression=null, volume=1;
+		if (json.voice) {
+				voice = json.voice;
+				// alert(voice)
 		}
-		if (json.mtn) {
-			mtn = json.mtn
+		if (json.motion) {
+			motion = json.motion
 		}
-		if (sound) {
-			bot.speak_mtn(mtn, sound)
+		if (json.expression) {
+			expression = json.expression
+		}
+		if (json.volume) {
+			volume = json.volume
+		}
+		
+		if (json.delay) {
+			// set a timer of 5 min
+			await tools.sleep(json.delay * 1000)
+		}
+
+
+		if (voice) {
+			bot.speak(voice, volume, expression)
 		}
 
 		return msg_ele
@@ -213,7 +227,7 @@ class ChatHandler{
 		form_.append("message", msg);
 		form_.append("time", tools.c_time());
 		form_.append("tzOffset", tools.time_offset());
-		form_.append("voice", appConfig.enable_voice);
+		form_.append("voice", appConfig.enable_voice && pages.current_page=="home");
 
 		const request = new XMLHttpRequest()
 		request.open("POST", form.action, true)
