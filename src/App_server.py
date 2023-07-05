@@ -4,6 +4,7 @@
 
 __version__ = "0.3"
 
+import logging
 import os
 import sys
 import shutil
@@ -47,6 +48,10 @@ false = F = False
 null = N = None
 
 
+Chat_raw2.LOG_DEBUG = False
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 
 
 
@@ -550,7 +555,7 @@ def chat(self: SH, *args, **kwargs):
 	# TODO: REMOVE THIS IN PRODUCTION
 	# importlib.reload(Chat_raw2)
 
-	Chat_raw2.LOG_DEBUG = True
+	Chat_raw2.LOG_DEBUG = False
 
 	reply = Chat_raw2.basic_output(message, user)
 
