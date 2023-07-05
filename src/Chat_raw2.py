@@ -508,8 +508,6 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	ui_raw = post_rem_can_you(ui_raw)
 	ui = ui_raw.lower()  # convert to lower case
 
-	print("ui_raw:", ui_raw)
-	print("ui:", ui)
 
 
 

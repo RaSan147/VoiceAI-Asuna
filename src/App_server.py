@@ -111,7 +111,7 @@ def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
 	if validity == True:
 		user = user_handler.server_verify(username, uid)
 
-	print([user, validity])
+	# print([user, validity])
 	if not (user and validity==True):
 		if on_fail:
 
@@ -190,7 +190,7 @@ def send_test_page(self: SH, *args, **kwargs):
 
 	# ACCESS THE USER
 	user = user_handler.get_user("Test_user")
-	print(user)
+	# print(user)
 	cookie = add_user_cookie(user.username, user.id)
 
 	self.send_response(200)
@@ -215,7 +215,7 @@ def send_voice(self: SH, *args, **kwargs):
 	voice = voice[0]
 
 	path = join_path(appConfig.temp_file, "audio/", voice)
-	print(path)
+	# print(path)
 
 
 	return self.return_file(path)
@@ -360,7 +360,7 @@ def auth_uname_pass_data(uname, pw, max_pw=64):
 	check if username and pass has weird data
 	"""
 	valid_uname_re = re.compile(r"[^a-zA-Z0-9_]")
-	print([uname, pw])
+	# print([uname, pw])
 	if len(uname)==0 or valid_uname_re.search(uname) or len(pw)>max_pw:
 		return False
 
@@ -457,7 +457,7 @@ def do_verify(self: SH, *args, **kwargs):
 		return self.send_json(resp_json(validity))
 
 	x = resp_json(user_handler.server_verify(username, uid))
-	print(x)
+	# print(x)
 	return self.send_json(x)
 
 

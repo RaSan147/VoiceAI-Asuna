@@ -173,7 +173,6 @@ li_time+= li_time2
 li_time+= li_time3
 
 li_time = tuple(set(li_time))
-print(tuple(set(li_time)))
 #############################################################
 
 
