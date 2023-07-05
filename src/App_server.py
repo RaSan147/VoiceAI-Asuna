@@ -33,7 +33,9 @@ from pyroboxCore import run as run_server
 from pyroboxCore import config as pyrobox_config
 from pyroboxCore import DealPostData as DPD
 from pyroboxCore import PostError
-
+from pyroboxCore import logger
+logger.setLevel(logging.WARNING)
+logging.getLogger().setLevel(logging.WARNING)
 
 # CHAT LIB
 
@@ -50,8 +52,7 @@ null = N = None
 
 Chat_raw2.LOG_DEBUG = False
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+
 
 
 

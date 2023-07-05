@@ -361,7 +361,7 @@ class UserHandler:
 			try:
 				_skin = self.online_avatar.get_skin_link(charecter, skin)
 				user.skins = self.online_avatar.get_skins(charecter)
-				print("SKINS LOADED")
+				# print("SKINS LOADED")
 				user.c_skin_mode = mode
 				user.loaded_skin = skin
 				return _skin
