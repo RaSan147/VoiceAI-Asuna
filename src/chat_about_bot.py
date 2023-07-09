@@ -54,7 +54,7 @@ def patterns(user:User, msg=MessageObj):
 	( Rchoice("I'm fine!", "I'm doing great.")),
 
 
-	"'how_are_you'"
+	"how_are_you"
 ],
 [
 	[
@@ -81,7 +81,7 @@ def patterns(user:User, msg=MessageObj):
 		)),
 
 
-	"'how_are_you'"
+	"how_old_are_you"
 ],
 
 [
