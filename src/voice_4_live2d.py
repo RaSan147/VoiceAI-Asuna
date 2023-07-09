@@ -35,11 +35,14 @@ async def _main(TEXT, VOICE, OUTPUT_FILE) -> None:
 def get_audio(text, voice=VOICE, output_dir='./'):
 	text = remove_emoji(text)
 	hashed = sha1()
-	hashed.update(text.encode())
+	hashed.update((text+voice).encode())
 	hashed_text = hashed.hexdigest()
 	
 	
 	f_name = os.path.join(output_dir, f"{hashed_text}.mp3")
+	
+	if os.path.isfile(f_name):
+		return f_name
 	
 	writer(f"init.txt", "w", "", direc=output_dir)
 	
