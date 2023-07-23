@@ -7,6 +7,9 @@ Welcome to project Asuna.
 ## Live Demo: https://aigirl.repl.co
 *(voice unavailable)*
 
+## Feel Free to Support Me:
+<a href="https://www.buymeacoffee.com/RaSan147" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 
 # Description:
 * **This is not a ChatGPT or full blown all knowing AI**
