@@ -186,7 +186,7 @@ class UserHandler:
 			"bot": None, # user preferred bot name
 			"id": "default", #
 			"ai_name": "Asuna", # user preferred ai name
-			"bot_charecter": "Asuna", # user preferred ai avatar
+			"bot_character": "Asuna", # user preferred ai avatar
 			"bot_skin": 0,
 			"skin_mode": 1, # 0 = offline, 1 = online
 			"room": 0,
@@ -230,7 +230,7 @@ class UserHandler:
 			"bot": None, # user preferred bot name
 			"id": id, #
 			"ai_name": "Asuna", # user preferred ai name
-			"bot_charecter": "Asuna", # user preferred ai avatar
+			"bot_character": "Asuna", # user preferred ai avatar
 			"bot_skin": 0,
 			"skin_mode": 1, # 0 = offline, 1 = online
 			"room": 0,
@@ -345,7 +345,7 @@ class UserHandler:
 		if not user:
 			print("USER NOT FOUND")
 			return None
-		charecter = user["bot_charecter"]
+		character = user.get("bot_character") or user.get("bot_charecter") # typo
 		skin = user["bot_skin"]
 		mode = user["skin_mode"]
 		# print(user.loaded_skin)
@@ -359,8 +359,8 @@ class UserHandler:
 			return 0
 		elif mode == 1:
 			try:
-				_skin = self.online_avatar.get_skin_link(charecter, skin)
-				user.skins = self.online_avatar.get_skins(charecter)
+				_skin = self.online_avatar.get_skin_link(character, skin)
+				user.skins = self.online_avatar.get_skins(character)
 				print("SKINS LOADED")
 				user.c_skin_mode = mode
 				user.loaded_skin = skin
@@ -372,7 +372,7 @@ class UserHandler:
 				traceback.print_exc()
 				if retry: return None
 
-				user["bot_charecter"] = self.default_user["bot_charecter"]
+				user["bot_character"] = self.default_user["bot_character"]
 				user["bot_skin"] = self.default_user["bot_skin"]
 				user["skin_mode"] = self.default_user["skin_mode"]
 

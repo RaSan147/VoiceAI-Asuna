@@ -31,7 +31,7 @@
 	pointer-events: none;
 }
 
-.charecter {
+.character {
 	position: absolute;
 	height: 90%;
 	bottom: 0;
@@ -39,7 +39,7 @@
 	/* transform: translateX(50%); */
 }
 
-.charecter#canvas {
+.character#canvas {
 	position: absolute;
 	/* margin-left: -100px; */
 }
