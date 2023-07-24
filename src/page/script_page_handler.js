@@ -21,7 +21,7 @@ class PAGES{
 	
 	async _to_anime(){
 		await this.chat_page_handler.hide_page()
-		// location.reload(); // following code makes the charecter to invisible. so simply just reloading
+		// location.reload(); // following code makes the character to invisible. so simply just reloading
 		this.anime_page_handler.show_page()
 		
 	}
