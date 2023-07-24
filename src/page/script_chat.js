@@ -236,6 +236,7 @@ class ChatHandler{
 			if (request.readyState === XMLHttpRequest.DONE) {
 				
 				if (request.status === 204 || request.status === 200){
+					// use tools.safeJSONParse
 					var response = JSON.parse(request.responseText);
 					if (typing) that.chats.removeChild(typing);
 					if (response.status){
@@ -323,6 +324,7 @@ class ChatHandler{
 		}
 		
 		bot.set_status(true);
+		// use tools.safeJSONParse
 		index = JSON.parse(index);
 		if(index.status == "ok"){
 			chat.verify_index(index)
@@ -335,6 +337,7 @@ class ChatHandler{
 
 		var msg = request("/get_msg?id="+id)
 		if (msg==null) return false
+		// use tools.safeJSONParse
 		msg = JSON.parse(msg)
 		this.add_chat(this.make_message(msg.text, msg.from));
 

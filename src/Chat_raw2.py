@@ -440,7 +440,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 					found = True
 
-					# tell me about yourself *and* your favourite hobby
+					# tell me about yourself *and* your favorite hobby
 					break  # so that same question won't give repeated answers
 
 		for index in sorted(to_del, reverse=True):

@@ -63,6 +63,7 @@ class USER{
 		request.onreadystatechange = () => {
 			if (request.readyState === XMLHttpRequest.DONE) {
 				if (request.status === 204 || request.status === 200){
+					// use tools.safeJSONParse
 					var response = JSON.parse(request.responseText);
 					if (response.status){
 						if(!in_home) window.location.href = "/";
@@ -95,6 +96,7 @@ class USER{
 		request.onreadystatechange = () => {
 			if (request.readyState === XMLHttpRequest.DONE) {
 				if (request.status === 204 || request.status === 200){
+					// use tools.safeJSONParse
 					var response = JSON.parse(request.responseText);
 					if (response.status){
 						console.log("Loading Avatar")
