@@ -272,7 +272,7 @@ class Local_Data_Manager {
 	get_global_data() {
 		var data = this.get_or_set("config", true);
 
-
+    // use tools.safeJSONParse
 		data = JSON.parse(data);
 
 		datas.allow_preload = data["preload"]
@@ -285,7 +285,8 @@ class Local_Data_Manager {
 		const that = this;
 		function read_chapter_data() {
 			var data = that.get_or_set(datas.proj_name)
-
+			
+			// use tools.safeJSONParse
 			data = JSON.parse(data);
 
 			datas.last_opened = data[0];
@@ -336,6 +337,7 @@ class Local_Data_Manager {
 	}
 
 	get_last_pointer() {
+		// use tools.safeJSONParse
 		datas.last_opened_manga = JSON.parse(
 			localStorage.getItem("$last_open")
 		);

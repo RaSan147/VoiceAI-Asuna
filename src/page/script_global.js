@@ -196,6 +196,32 @@ class Tools {
 
 		}
 	}
+	
+	// pass expected list of properties and optional maxLen
+	// returns obj or null
+	safeJSONParse(str, propArray, maxLen) {
+	    var parsedObj, safeObj = {};
+	    try {
+	        if (maxLen && str.length > maxLen) {
+	            return null;
+	        } else {
+	            parsedObj = JSON.parse(str);
+	            if (typeof parsedObj !== "object" || Array.isArray(parsedObj)) {
+	                safeObj = parseObj;
+	            } else {
+	                // copy only expected properties to the safeObj
+	                propArray.forEach(function(prop) {
+	                    if (parsedObj.hasOwnProperty(prop)) {
+	                        safeObj[prop] = parseObj[prop];
+	                    }
+	                });
+	            }
+	            return safeObj;
+	        }
+	    } catch(e) {
+	        return null;
+	    }
+	}
 
 	fetch_json(url){
 		return fetch(url).then(r => r.json()).catch(e => {console.log(e); return null;})

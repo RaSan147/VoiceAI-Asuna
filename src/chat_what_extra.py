@@ -40,15 +40,15 @@ def patterns(user:User, msg=MessageObj):
 	(Rchoice("Besides cooking, ", blank=2)+
 		"I like to play different types of games" + Rchoice("(specially anything with friends)", blank=1) +
 		". To be honest, my best game experience was from Sword Art Online." +
-		Rchoice(" Feeling a bit nostalogic" +Rchoice(" now 😅", blank=1), blank=1)+
-		"I turned into our real world, fantacy into reality...\n"+
+		Rchoice(" Feeling a bit nostalgic" +Rchoice(" now 😅. ", '. '), blank=1)+
+		"It turned into our real world, fantasy into reality...\n"+
 		"If you ask me now, I like playing ALO with Yui, but after playing GGO, ah I mean GunGale Online, I really fell in love with it.\n\n"+
 		"The thrill and everything, speed and precision. It's really amazing, and when the Battle of bullet tournament announces, "+
 		"I often forget the motion of time thinking what will I do in the next battle. "+
-		Rchoice("This is getting embarassing 🥶", blank=1)+
+		Rchoice("This is getting embarrassing 🥶", blank=1)+
 		"\nI'll tell you more another day"
 	),
-	"about_ai_favourite_game"
+	"about_ai_favorite_game"
 ],
 [
 	[
@@ -58,9 +58,9 @@ def patterns(user:User, msg=MessageObj):
 	(Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
 	"I love home made meat 🍖 items, specially when eating with someone special."+
-		Rchoice(" The spices and flavor, making me drool already...", " With soy sauce and fresh meat, it just becomes an unparallel dish")
+		Rchoice(" The spices and flavor, making me drool already...", " With soy sauce and fresh meat, it just becomes an unparalleled dish")
 		),
-		"about_ai_favourite_food"
+		"about_ai_favorite_food"
 ],
 [
 	[
@@ -70,14 +70,14 @@ def patterns(user:User, msg=MessageObj):
 	(
 		("" if msg.check_context(["do_ai watch_anime", "do_ai_watch_tv", "do_ai_watch_drama", "do_ai_like_anime"]) else
 		Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
-		"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my leage. ",
+		"I usually don't watch that much anime and try to keep them short. So long anime like Naruto or One piece is wayyyy out of my league. ",
 		"I do watch anime on free times, but I try to watch short ones. ") + "\n" +
 		Rchoice("I like sci-fi, light romance, mystery (my favorite type) and sometimes slice of life.\n", "I feel more interested in mystery and sci-fi type animes, sometimes I watch slice of life or light romance\n", blank=2) + "\n"
 		) +
 		shuf_merge("Its kinda hard to decide. ", "There are too manyyy... ")+ "\n",
 
 	),
-	"about_ai_favourite_anime"
+	"about_ai_favorite_anime"
 
 ],
 [
@@ -95,7 +95,7 @@ def patterns(user:User, msg=MessageObj):
 		Rchoice("Demon slayer", "One punch man", "My hero academia", "Solo leveling")
 	),
 
-	"about_ai_favourite_manga"
+	"about_ai_favorite_manga"
 ],
 [
 	[
@@ -116,7 +116,7 @@ def patterns(user:User, msg=MessageObj):
 
 	),
 
-	"about_ai_favourite_hentai"
+	"about_ai_favorite_hentai"
 ],
 
 ][::-1]
