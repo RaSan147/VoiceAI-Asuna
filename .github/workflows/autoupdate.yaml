@@ -12,10 +12,9 @@ jobs:
     name: autoupdate
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
       - run: |
-          git checkout for_repl
-          git rebase master
-          git push <origin> for_repl
+          git checkout <for_repl>
+          git rebase main
+          git push <origin> <for_repl>
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
