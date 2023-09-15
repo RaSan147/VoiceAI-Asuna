@@ -142,7 +142,7 @@ class User(GETdict):
 		if user:
 			user= "USER"
 			# actual time on user side
-			chat["uTime"] = str(TIME_sys.ts2dt(self.user_client_time, self.user_client_time_offset))
+			chat["uTime"] = str(self.get_user_dt())
 		else:
 			user= "BOT"
 

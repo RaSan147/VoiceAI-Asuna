@@ -182,7 +182,7 @@ byId("login").onsubmit = (e) => {
 	// const filenames = formData.getAll('files').map(v => v.name).join(', ')
 	const request = new XMLHttpRequest()
 	request.open(e.target.method, e.target.action)
-	request.timeout = 3600000;
+	request.timeout = 60*1000;
 	request.onreadystatechange = () => {
 		if (request.readyState === XMLHttpRequest.DONE) {
 			msg = `${request.status}: ${request.statusText}`

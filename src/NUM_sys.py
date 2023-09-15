@@ -222,17 +222,17 @@ def flatten_array(out, output_type = list):
 	return out
 
 
-def hash_bin64(data):
-	try:
-		import xxhash
-	except ImportError:
-		raise ImportError("Please install xxhash")
+# def hash_bin64(data):
+# 	try:
+# 		import xxhash
+# 	except ImportError:
+# 		raise ImportError("Please install xxhash")
 
-	if isinstance(data, int):
-		data = data.to_bytes((data.bit_length() + 7) // 8, byteorder="big")  # Here's where the magic happens
+# 	if isinstance(data, int):
+# 		data = data.to_bytes((data.bit_length() + 7) // 8, byteorder="big")  # Here's where the magic happens
 
-	x = xxhash.xxh3_64_digest(data)
-	return b85encode(x)
+# 	x = xxhash.xxh3_64_digest(data)
+# 	return b85encode(x)
 
 
 

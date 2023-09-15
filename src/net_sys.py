@@ -75,7 +75,8 @@ def hdr(header):  # fc=0803 v
 
 	return str(header_list.index(header['User-Agent']))
 
-def get_link(i, current_link, homepage=None):  # fc=0804 v
+
+def get_link(i, current_link, homepage=None):  # UPDATED
 	"""Gets permanent link from relative link.
 
 	Args:
@@ -92,8 +93,24 @@ def get_link(i, current_link, homepage=None):  # fc=0804 v
 	if homepage is None:
 		homepage = get_homepage(current_link)
 
-	if i.startswith('#'): i = current_link
-	if i.startswith('//'):
+	if i.startswith('#'): 
+		frag = gen_link_facts(current_link)['fragment']
+		if frag:
+			i = current_link.partition('#')[0] + i
+	elif i.startswith('?'): 
+		no_Q = gen_link_facts(current_link)['noQuery']
+		query = gen_link_facts(current_link)['query']
+		if query:
+			i = no_Q + '?' + query + '&' + i[1:]
+
+		else:
+			i = no_Q + '?' + i[1:]
+
+		if frag:
+			i += '#' + frag
+
+
+	elif i.startswith('//'):
 		if current_link.startswith('https'):
 			i = 'https:' + i
 		elif current_link.startswith('http'):
@@ -105,17 +122,40 @@ def get_link(i, current_link, homepage=None):  # fc=0804 v
 			else:
 				i = 'http:' + i
 
-	if i.startswith('../'):
-		_temp = current_link
+	elif i.startswith('../'):
+		_temp = gen_link_facts(current_link)["path"]
 		while i.startswith('../'):
 			_temp = Fsys.go_prev_dir(_temp)
 			i = i.replace('../', '', 1)
-		i = _temp + i
+		i = _temp + i # new path
+		i = get_link(i, homepage)
 
-	if i.startswith('/'):
+	elif i.startswith('/'):
 		i = homepage + i
 
-	i = i.partition('#')[0]  # removes the fragment
+	elif i.startswith('./'):
+		_current_link = gen_link_facts(current_link)["noQuery"]
+		path = gen_link_facts(_current_link)["path"]
+		if _current_link.endswith('/'):
+			i = _current_link + i[2:]
+		else:
+			prev_dir = path.rpartition('/')[0]
+			i = get_link(i[2:], prev_dir, homepage)
+
+
+	else:
+		_current_link = gen_link_facts(current_link)["noQuery"]
+		path = gen_link_facts(_current_link)["path"]
+
+		prev_dir = get_link("../", _current_link, homepage)
+		if _current_link.endswith('/'):
+			i = current_link + i
+		else:
+			i = _current_link + '/' + i
+
+
+
+	# i = i.partition('#')[0]  # removes the fragment
 
 	if '//' not in i:
 		temp = homepage
@@ -131,6 +171,7 @@ def get_link(i, current_link, homepage=None):  # fc=0804 v
 				i = temp + '/' + i
 
 	return i
+
 
 def get_homepage(link):  # fc=0805
 	"""Gets the homepage of a link
