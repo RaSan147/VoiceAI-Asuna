@@ -37,7 +37,7 @@ def search(SEARCHPAGE:str, max=10):
 
 	#print(*[i for i in DATA['query']['search']], sep="\n\n")
 
-	return [Flag(i) for i in DATA['query']['search']]
+	return [Flag(i) for i in DATA.get('query', {}).get('search', {}) if i]
 
 
 #if DATA['query']['search'][0]['title'] == SEARCHPAGE:
