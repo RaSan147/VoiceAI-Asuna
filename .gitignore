@@ -8,7 +8,7 @@ src/Asuna_data/*
 poetry.lock
 pyproject.toml
 replit.nix
-
+.pythonlibs
 
 
 
