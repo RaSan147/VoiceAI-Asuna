@@ -191,7 +191,7 @@ class ChatHandler{
 
 
 		if (voice) {
-			bot.speak(voice, volume, expression)
+			bot.speak(voice, {volume: volume, expression: expression})
 		}
 
 		return msg_ele
