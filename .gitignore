@@ -9,7 +9,10 @@ poetry.lock
 pyproject.toml
 replit.nix
 .pythonlibs
-
+.pythonlibs
+.upm
+poetry.lock
+pyproject.toml
 
 
 
