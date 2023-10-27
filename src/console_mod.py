@@ -97,8 +97,24 @@ def set_width(y=14):
 
 
 def enable_color():
+	"""
+	Enables colored output in the console on Windows systems.  (via https://stackoverflow.com/a/36760881/9209949)
+	"""
 	kernel32 = ctypes.windll.kernel32
 	kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+	
+def enable_color2():
+	"""
+	Enables ANSI color codes in the Windows console. [preferred method]
+
+	This function uses the Windows API to enable ANSI color codes in the console.
+	"""
+	kernel32 = ctypes.WinDLL('kernel32')
+	hStdOut = kernel32.GetStdHandle(-11)
+	mode = ctypes.c_ulong()
+	kernel32.GetConsoleMode(hStdOut, ctypes.byref(mode))
+	mode.value |= 4
+	kernel32.SetConsoleMode(hStdOut, mode)
 
 if __name__ == "__main__":
 	print("Python {:s} on {:s}\n".format(sys.version, sys.platform))
