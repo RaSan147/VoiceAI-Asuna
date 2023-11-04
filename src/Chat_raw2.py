@@ -45,7 +45,7 @@ from CHAT_TOOLS import Rchoice
 
 # CHAT PATTERN LIBS
 
-from basic_conv_re_pattern import ip, ot, it, remove_suffix, ___you, preprocess, pre_rem_bot_call, post_rem_can_you
+from basic_conv_re_pattern import ip, ot, it, remove_suffix, YOU___, preprocess, pre_rem_bot_call, post_rem_can_you
 
 from basic_conv_pattern import *
 
@@ -54,6 +54,7 @@ from chat_ai import patterns as ai_patterns
 from chat_can_you import patterns as can_you_patterns
 from chat_can_i import patterns as can_i_patterns
 from chat_expressions import patterns as expressions_patterns
+from chat_what_quest import patterns as what_quest_patterns
 from chat_what_extra import patterns as what_extra_patterns
 from chat_about_bot import patterns as about_bot_patterns
 from chat_compliment import patterns as compliments_patterns
@@ -244,6 +245,75 @@ def wikisearch(uix='', raw='', user: User = None):
 def find_person(name, user:User = None):
 	# return searcher(name)
 	return wikisearch(name, name, user)
+
+
+def bbc_news_report(prompt="top"):
+	"""
+	returns BBC news report based on prompt
+	"""
+	prompt = prompt.lower()
+	def in_prompt(li, txt=prompt):
+		for i in li:
+			if i.lower() in txt:
+				return True
+		return False
+	if in_prompt(["tech", "computer"]):
+		topic = "tech_url"
+	elif in_prompt(["science", "environment"]):
+		topic = "science_url"
+	elif in_prompt(["business", "economy", "money", "market", "stock"]):
+		topic = "busi_url"
+	elif in_prompt(["politic"]):
+		topic = "polit_url"
+	elif in_prompt(["entertain", "art", "music", "movie", "film", "song"]):
+		topic = "entertain_url"
+	elif in_prompt(["health", "medical", "medicine", "doctor", "hospital"]):
+		topic = "health_url"
+	elif in_prompt(["world", "global", "international"]):
+		topic = "world_url"
+	elif in_prompt(["top", "headlines", "headline", "breaking", "breaking news"]):
+		topic = "top_url"
+	elif in_prompt(["uk", "britain", "british", "england", "english", "london"]):
+		topic = "UK_url"
+	elif in_prompt(["africa", "african"]):
+		topic = "Africa_url"
+	elif in_prompt(["europe", "european"]):
+		topic = "EU_url"
+	elif in_prompt(["latin", "america", "latina", "latino"]):
+		topic = "LatA_url"
+	elif in_prompt(["middle", "east", "arab", "arabic"]):
+		topic = "MidE_url"
+	elif in_prompt(["us", "usa", "america", "american", "canada", "canadian"]):
+		topic = "US_Ca_url"
+	elif in_prompt(["england", "english", "london"]):
+		topic = "Eng_url"
+	elif in_prompt(["northern", "ireland", "irish"]):
+		topic = "NIre_url"
+	elif in_prompt(["scotland", "scottish"]):
+		topic = "Scot_url"
+	elif in_prompt(["wales", "welsh"]):
+		topic = "Wales_url"
+
+
+	elif in_prompt(["asia",]):
+		topic = "Asia_url"
+
+	else:
+		topic = "top_url"
+
+	if check_internet():
+		news = bbc_news.task(topic)
+		if news is None:
+			return "No news available"
+		else:
+			return "".join(news[:5])
+			# asker("Do you want to hear the rest?", true_func=read_rest_news)
+
+	else:
+		return choice(ot.no_internet)
+
+
+
 
 
 
@@ -548,35 +618,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			_ui=ui,
 			_ui_raw=ui_raw,
 			action="remove")
+		
+	_msg_is_what_quest, ui, ui_raw = check_patterns(
+		what_quest_patterns,
+		_ui=ui,
+		_ui_raw=ui_raw,
+		action="remove")
 
 
-	if re_check(ip.whats_your_name, ui):
-		msg.rep(choice(ot.my_name_is) + user.ai_name)
-
-		msg.add_intent('whats_your_name')
-
-	elif re_check(ip.what_to_call_you, ui):
-		msg.rep(choice(ot.call_me) + user.ai_name + choice(ot.happy_emj))
-
-		msg.add_intent('what_to_call_you')
-
-	elif re_check(ip.what_time, ui):
-		msg.rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
-
-		msg.add_intent('whats_the_time')
-
-	elif re_check(ip.what_date, ui):
-		msg.rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
-
-		msg.add_intent('whats_the_time')
-
-
-	elif re_check(ip.whats_up, ui):
-		msg.rep(choice(ot.on_whats_up))
-
-		msg.add_intent("whats_up")
-
-	elif re_check(ip.whats_, ui_raw):
+	if re_check(ip.whats_, ui_raw):
 		_what = re_search(ip.whats_, ui)
 		_what_raw = re_search(ip.whats_, ui_raw)
 
@@ -585,54 +635,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
-		if re_fullmatch(ip.you_self, uiopen):
-			msg.rep(choice(ot.about_self),
-				render="innerHTML")
-
-			msg.add_intent('what_are_you')
-			return msg.flush()
-
-		if uiopen in it.my_name:
-			msg.rep(Rchoice("Your name is ", "You are ", "You're ") +
-				user.nickname +
-				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
-
-			msg.add_intent("(whats)_my_name")
-
-		elif re_fullmatch(ip.my_self, uiopen):
-			msg.rep(Rchoice("Your are ", "You are ", "You're ") +
-				Rchoice("my beloved ", "my sweetheart ", "my master ", "my dear ", blank=2) +
-				user.nickname +
-				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2))
-
-			msg.add_intent("(what)_my_self")
-
-		elif re_fullmatch(ip.your_bday, uiopen):
-			msg.rep(
-				Rchoice("It's", "My birthday is") + " " +
-				Rchoice("on ", blank=1) + "September 30th" +
-				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
-			)
-
-			msg.add_intent("(what)_my_bday")
-
-		elif re.match("(current )?time( is| it)*( now)?", uiopen):
-			msg.rep(choice(ot.tell_time) + user.user_client_dt.strftime("%I:%M %p."))
-
-			msg.add_intent("(whats)_the_time")
-
-
-		elif re_check(ip.latest_news, uiopen):
-			if check_internet():
-				news = bbc_news.task(bbc_topic)
-				if news is None:
-					msg.rep("No news available")
-				else:
-					msg.rep("".join(news[:5]))
-					# asker("Do you want to hear the rest?", true_func=read_rest_news)
-
-			else:
-				msg.rep(choice(ot.no_internet))
+		if re_check(ip.latest_news, uiopen):
+			msg.rep(bbc_news_report(uiopen))
 
 			msg.add_intent("(whats)_the_news")
 
@@ -823,15 +827,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		msg.add_intent("parrot_on")
 
 	elif re_check(ip.tell_latest_news, ui):
-		if check_internet():
-			news = bbc_news.task(bbc_topic)
-			if news is None:
-				msg.rep('No news available')
-			else:
-				msg.rep("".join(news[:5]))
-				# asker("Do you want to read more?", true_func=lambda: out = (*news[5:15]))
-		else:
-			msg.rep(choice(ot.no_internet))
+		msg.rep(bbc_news_report(ui))
 
 		msg.add_intent("whats_the_news")
 
@@ -889,8 +885,10 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		elif re_check(ip.created_program, uiopen):
 			act = re_search(ip.created_program, uiopen).group("action")
-			if act == "make":
+			if act == "make" or act == "made":
 				act = "made"
+			elif act.endswith('e'):
+				act += 'd'
 			elif not act.endswith('ed'):
 				act += 'ed'
 			msg.rep(choice(ot.created_by) % act)

@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_conv_re_pattern import C, ___you, ___your, ___youre, ___auxV
+from basic_conv_re_pattern import C, YOU___, YOUR___, YOURE___, AuxV___
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 
@@ -19,7 +19,7 @@ def patterns(user:User, msg=MessageObj):
 	return [
 [
 	[
-		C(rf"{___youre} (an? )?(bot|gpt|chat( |-)?gpt|ai|robot)"),
+		C(rf"{YOURE___} (an? )?(bot|gpt|chat( |-)?gpt|ai|robot)"),
 	],
 	(
 		Rchoice(
@@ -34,7 +34,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"what programming language {___auxV}? {___you} (made|written|coded|created)"),
+		C(rf"what programming language {AuxV___}? {YOU___} (made|written|coded|created)"),
 	],
 	(
 		Rchoice(
@@ -48,8 +48,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"how[' ]?a?re? {___you}( doing?)?( today| now)?"),
-		C(rf"how do {___you} do")
+		C(rf"how[' ]?a?re? {YOU___}( doing?)?( today| now)?"),
+		C(rf"how do {YOU___} do")
 	],
 	( Rchoice("I'm fine!", "I'm doing great.")),
 
@@ -58,8 +58,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"how {___auxV} ({___your}|the) day"),
-		C(rf"how {___auxV}( ({___your}|the))? yesterday")
+		C(rf"how {AuxV___} ({YOUR___}|the) day"),
+		C(rf"how {AuxV___}( ({YOUR___}|the))? yesterday")
 	],
 	(Rchoice(
 		"It was great, thanks for asking!",
@@ -73,8 +73,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"how old ?a?re? {___you}( now)?"),
-		C(rf"{___youre} age"),
+		C(rf"how old ?a?re? {YOU___}( now)?"),
+		C(rf"{YOURE___} age"),
 	],
 	( Rchoice("I'm 17",
 		"I'm 17 this year.",
@@ -86,7 +86,7 @@ def patterns(user:User, msg=MessageObj):
 
 [
 	[
-		C(rf"about {___youre}( ?self)?( \<\:ai_name\>)?$"),
+		C(rf"about {YOURE___}( ?self)?( \<\:ai_name\>)?$"),
 	],
 	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki. " +
 		Rchoice("I'm 17 this year. ",blank=2) +
@@ -103,8 +103,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(about )?({___your} )?fav(ou?rite)? (game|hobby|activity)"),
-		C(rf"(about )?{___your} (hobb(y|ies)|pastimes?)"),
+		C(rf"(about )?({YOUR___} )?fav(ou?rite)? (game|hobby|activity)"),
+		C(rf"(about )?{YOUR___} (hobb(y|ies)|pastimes?)"),
 	],
 	( Rchoice("Besides cooking, ", blank=1)+
 		"I like to play different types of games" + Rchoice(" (specially anything with friends)", blank=1) +
@@ -121,8 +121,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(about )?(the )?food (items? )?({___your} )?(like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(rf"(about )?{___your} fav(ou?rite)? food( items?)?( most|(a )?lot)?"),
+		C(rf"(about )?(the )?food (items? )?({YOUR___} )?(like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(rf"(about )?{YOUR___} fav(ou?rite)? food( items?)?( most|(a )?lot)?"),
 	],
 	( Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",
 	"I love chocolate, anything with chocolate 🍫🤩, but I also like pastry  with strawberries, lots of them"),
@@ -133,8 +133,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(about )?(the )?anime (shows? )?{___your} (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(rf"(about )?({___your} )?fav(ou?rite)? anime( shows?)?( most|(a )?lot)?"),
+		C(rf"(about )?(the )?anime (shows? )?{YOUR___} (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(rf"(about )?({YOUR___} )?fav(ou?rite)? anime( shows?)?( most|(a )?lot)?"),
 	],
 	(
 		((Rchoice("I'm not a fan of horror type, so I try to avoid anything related that. Other than that, ",
@@ -153,8 +153,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(about )?(the )?manga (series )?{___your} (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(rf"(about )?({___your} )?fav(ou?rite)? manga( most|(a )?lot)?"),
+		C(rf"(about )?(the )?manga (series )?{YOUR___} (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(rf"(about )?({YOUR___} )?fav(ou?rite)? manga( most|(a )?lot)?"),
 	],
 	(
 		Rchoice(
@@ -170,8 +170,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?{___your} (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
-		C(rf"(about )?({___your} )?fav(ou?rite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
+		C(rf"(about )?(the )?(hentai|porn|doujin|sex) (shows? )?{YOUR___} (like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(rf"(about )?({YOUR___} )?fav(ou?rite)? (hentai|porn|doujin|sex)( most|(a )?lot)?"),
 	],
 	(
 		Rchoice(
@@ -191,7 +191,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"a?re? {___you} (fine|ok((a|e)y)?|well|alright)"),
+		C(rf"a?re? {YOU___} (fine|ok((a|e)y)?|well|alright)"),
 	],
 	( Rchoice("Yeah, I'm fine!", "Yeah! I'm doing great.", "I'm alright") +
 			Rchoice(" Thanks", blank=1)  +
@@ -202,7 +202,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"a?re? {___you} (sad|mad|angry|jls|jealous)")
+		C(rf"a?re? {YOU___} (sad|mad|angry|jls|jealous)")
 	],
 	Rchoice(
 		"No, not at all",

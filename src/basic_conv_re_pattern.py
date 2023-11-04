@@ -28,8 +28,29 @@ def C(pattern):
 		traceback.print_exc()
 		exit()
 
+
+AuxV___ = r"([' ]?(m|s|is|a?re?|was|were|am|will|ll|will be|ll be))"
+
+PLEASE___ = r"(p[lw](ease|z|s)e?)"
+CHANGE___ = r"(change|swap|switch)"
+WHAT___ = rf"(w(h|g)?[au]t{AuxV___}?( the)? ?)"
+WHO___ = rf"(w(h|g)?o{AuxV___}?( the)? ?)"
+WHEN___ = rf"(w(h|g)?en{AuxV___}?( the)? ?)"
+
+
+WHO_WHAT___ = rf"({WHO___}|{WHAT___})"
+WHEN_WHAT___ = rf"({WHEN___}|{WHAT___})"
+
+YOU___ = r"((yo)?u|y[ao])"
+YOUR___ = r"((yo)?u|y(a|o))([' ]?r)"
+YOURE___ = r"(((yo)?u|y[ao])[' ]?(a?re?)?)"
+
+DRESS___ = r"(dress|cloth|skin|costume|wear)(e?s)?"
+ROOM___ = r"(room|place|location|background|bg)"
+
+
 to_bot_suffix = C(
-	r"(( please| plz)? (<:ai_name>|girl|dear|babe|honey|sweet ?heart|darling|ma.?am))$"
+	rf"({PLEASE___}? ?(<:ai_name>|girl|dear|babe|honey|sweet ?heart|darling|ma.?am)?)$"
 )
 
 
@@ -39,21 +60,6 @@ def remove_suffix(string):
 
 
 
-
-
-
-
-
-___auxV = r"([' ]?(m|s|re|is|are|r|was|were|am|will|ll|will be|ll be))"
-
-___change = r"(change|swap|switch)"
-
-___you = r"((yo)?u|y[ao])"
-___your = r"((yo)?u|y(a|o))(( |')?r)"
-___youre = r"(((yo)?u|y[ao])[' ]?(a?re?)?)"
-
-___dress = r"(dress|cloth|skin|costume|wear)(e?s)?"
-___room = r"(room|place|location|background|bg)"
 
 
 
@@ -100,15 +106,16 @@ ot.no = ("No", "Sorry but nope")
 ot.tell_time = ('The time is ', "It's ")
 ot.tell_date = ("Today is", "It's")
 
-ot.happy_emj = ("(◕‿◕)💞", "😄",
+happy_emj = ("(◕‿◕)💞", "😄",
 				"😇", "😊", "~", "...", "", "")
-ot.sad_emj = ("😿", "😢", "😭",
+sad_emj = ("😿", "😢", "😭",
 			  "😞", "😔", "~", "...", "", "")
-
+ot.happy_emj = happy_emj
+ot.sad_emj = sad_emj
 ot.my_name_is = ["My name is ", "I am ",
 				 "Its ", "Call me ", "You can call me "]
 ot.call_me = ["You can call me ", "Call me ", "Its "]
-ot.about_self = ('I am your virtual partner. My name is <:ai_name> and I was made by <a href="https://github.com/RaSan147">RaSan147</a>',
+ot.about_self = ('I am your virtual partner. My name is <:ai_name> and I was made by <a href="https://github.com/RaSan147/VoiceAI-Asuna" target="_blank">RaSan147</a>',
 				 'I am an AI. My name is <:ai_name> & I am your voice assistant.', 'My name is <:ai_name>. I am an AI voice assistant.')
 
 ot.on_whats_up = (
@@ -175,29 +182,29 @@ li_QyuiNamePre = "can i call you ", 'may i call you'
 li_redo = 'redo my last command', 'retry my last command', 'redo last command', 'redo last command', 'redo'
 
 ip.created_program = [
-	C(rf'(?P<action>created?|program(med)?|invent(ed)?|design(ed)?|ma(d|k)e) {___you}'),
-	C(r"({___your} )? (?P<action>creat|programm?|invent|design|mak)(o|e)?r")
+	C(rf'(?P<action>created?|program(med)?|invent(ed)?|design(ed)?|ma(d|k)e) {YOU___}'),
+	C(r"({YOUR___} )? (?P<action>creat|programm?|invent|design|mak)(o|e)?r")
 ]
 
 ip.r_u_ok = [
-	C(rf"a?re? {___you} (fine|ok((a|e)y)?|well|alright)"),
+	C(rf"a?re? {YOU___} (fine|ok((a|e)y)?|well|alright)"),
 ]
 
 ip.thanks = [
-	C(rf"thank(s( a (lot|bunch))?| {___you}( (so+|very) much))?"),
+	C(rf"thank(s( a (lot|bunch))?| {YOU___}( (so+|very) much))?"),
 ]
 
 ip.r_u = [
-	C(rf"a?re? {___you}"),
+	C(rf"a?re? {YOU___}"),
 ]
 ip.who_are_you = [
-	C(rf"who ?a?re? {___you}"),  # who are u
+	C(rf"who ?a?re? {YOU___}"),  # who are u
 ]
 
 
 ip.whats_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(r"w(h|g)at('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
+	C(rf"w(h|g)at{AuxV___}? (the )?(?P<query>.*)"),
 ]
 
 ip.whos_ = [
@@ -206,33 +213,33 @@ ip.whos_ = [
 ]
 
 ip.whens_ = [
-	C(rf"when('| )?{___auxV}? (the )?(?P<query>.*)"),
+	C(rf"when('| )?{AuxV___}? (the )?(?P<query>.*)"),
 ]
 
 ip.hows_ = [
-	C(rf"how('| )?{___auxV}? (the )?(?P<query>.*)"),
+	C(rf"how('| )?{AuxV___}? (the )?(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
-	C(rf"(what('| )?{___auxV}? )?{___your} name"),
+	C(rf"(what('| )?{AuxV___}? )?{YOUR___} name"),
 	# C(r"((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
 
 ]
 
 ip.what_to_call_you = [
-	C(rf"what should i call {___you}( by)?"),
+	C(rf"what should i call {YOU___}( by)?"),
 ]
 
 ip.what_time = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C(r"(what('| )?{___auxV}? )?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?(please|plz)?"),
+	C(rf"(what('| )?{AuxV___}? )?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
 	'clock',
 ]
 
 ip.what_date = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C(r"(what('| )?{___auxV}? )?(the )?(current )?date((?!s)| |$)(is|it)* ?(now)? ?(please|plz)?"),
+	C(rf"(what('| )?{AuxV___}? )?(the )?(current )?date((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
 	'clock',
 ]
 
@@ -249,19 +256,19 @@ it.my_name = ['my name', 'my nickname']
 
 "what/who am i to you?"
 ip.my_self = [
-	C(rf"me( to {___you})?"),
-	C(rf"my ?self( to {___you})?"),
-	C(rf"i( to {___you})?")
+	C(rf"me( to {YOU___})?"),
+	C(rf"my ?self( to {YOU___})?"),
+	C(rf"i( to {YOU___})?")
 ]
 
 
 "what are you?"
 ip.you_self = [
-	C(rf"{___youre}( ?self)?( really)?"),
+	C(rf"{YOURE___}( ?self)?( really)?"),
 ]
 
 ip.your_bday = [
-	C(rf"{___your} (birth|b) ?day")
+	C(rf"{YOUR___} (birth|b) ?day")
 ]
 
 
@@ -272,7 +279,7 @@ ip.latest_news = [
 
 ip.tell_latest_news = ip.latest_news + [
 	"anything interesting happening",
-	C(rf"(do {___you})? ?(got|have) (some|any)(thing)? (news|headlines?|interesting)(today)?")
+	C(rf"(do {YOU___})? ?(got|have) (some|any)(thing)? (news|headlines?|interesting)(today)?")
 ]
 
 
@@ -282,14 +289,14 @@ ip.tell_latest_news = ip.latest_news + [
 
 ip.change_cloth = [
 	'change',
-	C(rf"{___change} (((yo)?u|y(a|o))('| )?(re?)? )?{___dress}"),
-	C(rf"wear (a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{___dress}"),
+	C(rf"{CHANGE___} (((yo)?u|y(a|o))('| )?(re?)? )?{DRESS___}"),
+	C(rf"wear (a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{DRESS___}"),
 ]
 
 "change Anime room"
 
 ip.change_room = [
-	C(rf"({___change}|move) (to )?(a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{___room}"),
+	C(rf"({CHANGE___}|move) (to )?(a )?(((yo)?u|y(a|o))('| )?(re?)? )?(new )?{ROOM___}"),
 ]
 
 
@@ -351,11 +358,11 @@ ot.fuck_you = (
 
 
 ip.love_you = [
-	C(rf'(i )?(really )?(love|wuv) {___you}( so much| a lot)?'),
+	C(rf'(i )?(really )?(love|wuv) {YOU___}( so much| a lot)?'),
 ]
 
 ip.hate_you = [
-	C(rf"(i )?(really )?(hate|don('| )t like) {___you}"),
+	C(rf"(i )?(really )?(hate|don('| )t like) {YOU___}"),
 ]
 
 ip.whats_up = [
@@ -521,7 +528,7 @@ def pre_rem_bot_call(ui):
 	ui = re.sub(
 		rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})? ', '', ui, flags=re.IGNORECASE)
 
-	ui = re.sub(r'^(please|plz) ', '', ui, flags=re.IGNORECASE)
+	ui = re.sub(rf'^{PLEASE___} ', '', ui, flags=re.IGNORECASE)
 
 	return ui
 
@@ -535,7 +542,7 @@ def post_rem_can_you(ui):
 		3. replace `*tell me* ....` with `....`
 		4. remove `*tell me regarding* ....` with `*about* ....`
 	"""
-	ui = re.sub(rf'^((can|will|do|did) {___you})?( please| plz)?( even)? ?(know|tell|remember|speak|say)?( to)?( me)? (?P<msg>.+)',
+	ui = re.sub(rf'^((can|will|do|did) {YOU___})?( please| plz)?( even)? ?(know|tell|remember|speak|say)?( to)?( me)? (?P<msg>.+)',
 				r'\g<msg>', ui, flags=re.IGNORECASE)
 	ui = re.sub(r'^(of|regarding) ', 'about ', ui, flags=re.IGNORECASE)
 

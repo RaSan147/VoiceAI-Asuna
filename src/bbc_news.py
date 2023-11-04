@@ -28,7 +28,7 @@ bbc_bit = 0
 bbc_topics = {
 	"Asia_url": 'http://feeds.bbci.co.uk/news/world/asia/rss.xml',
 	"UK_url": 'http://feeds.bbci.co.uk/news/rss.xml?edition=uk#',
-	"Afri_url": 'http://feeds.bbci.co.uk/news/world/africa/rss.xml',
+	"Africa_url": 'http://feeds.bbci.co.uk/news/world/africa/rss.xml',
 	"EU_url": 'http://feeds.bbci.co.uk/news/world/europe/rss.xml',
 	"LatA_url": 'http://feeds.bbci.co.uk/news/world/latin_america/rss.xml',
 	"MidE_url": 'http://feeds.bbci.co.uk/news/world/middle_east/rss.xml',
