@@ -14,7 +14,6 @@
 
 
 
-
 <meta id="seoDescription" name="description" content="Demo webpage for VoiceAI Asuna server.">
 
 
@@ -27,6 +26,7 @@
 
 
 <link rel="icon" href="/icons/icon-512x512.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/icon-512x512.png">
 
 <link rel="manifest" href="/manifest.webmanifest">
 
@@ -60,26 +60,26 @@
 
 <div id='TopBar' class='top_bar inactive'>
 
-	<button class="open-sidebar-btn" onclick="pages.to_anime()" style='float: left;'>
+	<div class="open-sidebar-btn" onclick="pages.to_anime()" style='float: left;'>
 		<span class="fa fa-light fa-arrow-left">&#8592;</span >
-	</button>
+	</div>
 
 	
 	<div id="app_header" class="disable_selection">
 		<span id="app_name_container">
-			<img id="profile_pic" class="profile_pic">
+			<img id="profile_pic" class="profile_pic" alt="profile_pic">
 			<a id='app_name'></a> <span id="app_status"> &bull; </span>
 		</span>
 	</div>
 	
 
-	<button class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span>
+	<div class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span>
 		<span class='nav-btn-text'>Menu</span> <span class="fa fa-thin fa-ellipsis-stroke-vertical">&vellip;</span></span>
-	</button>
+	</div>
 		
-	<button class="open-sidebar-btn" onclick="chat.minimize()" style='float: right;'>
-		<span class="fa fa-solid fa-window-maximize fa-rotate-180"><b>_</b></span >
-	</button>
+	<div class="open-sidebar-btn" onclick="chat.minimize()" style='float: right;'>
+		<span class="fa fa-light fa-volume"><b>🔊</b></span >
+	</div>
 
 </div>
 
@@ -112,25 +112,25 @@
 		<canvas id="canvas" class="character" style="height: 75%;width: auto;"></canvas>
 	</div>
 	
-	<buttom id="to-chat" class="disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-light fa-paper-plane">&#9010;</span> Chat</buttom>
+	<div id="to-chat" class="disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-light fa-paper-plane">&#9010;</span> Chat</div>
 	
-	<buttom id="maximize-page" class="invisible disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-regular fa-arrows-maximize">&#x26F6;</span></buttom>
+	<div id="maximize-page" class="invisible disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-regular fa-arrows-maximize">&#x26F6;</span></div>
 	
-		<buttom id="to-install" class="disable_selection home-btns"><span class="fa fa-light fa-disc-drive">&#9019;</span> Install</buttom>
+		<div id="to-install" class="disable_selection home-btns"><span class="fa fa-light fa-disc-drive">&#9019;</span> Install</div>
 		
-		<buttom id="to-open-pwa" class="disable_selection home-btns">&#9004; Open App</buttom>
+		<div id="to-open-pwa" class="disable_selection home-btns">&#9004; Open App</div>
 </div>
 
 <div id="chat-page" class="inactive">
 
 
 	<div id="chat_input_container" class="chat_input_container">
-		<!-- milti line input -->
+		<!-- multi line input -->
 
 		<textarea id="chat_input" class="chat_input"
 		type="text" maxlength="512" placeholder="Type a message..."></textarea>
 
-		<button id="chat_send" class="chat_send" onclick="chat.send_message()"><span class="fa fa-solid fa-paper-plane-top">➡️</span></button>
+		<div id="chat_send" class="chat_send" onclick="chat.send_message()"><span class="fa fa-solid fa-paper-plane-top">➡️</span></div>
 
 	</div>
 
@@ -140,22 +140,23 @@
 			<div class="markdown">
 				<b> SAMPLE MESSAGES (but not limited to)</b>
 
-				<li>  Basic <span>hiiii</span>, <span>hello</span>
-				</li> <li>  <span>What's your/my name</span> / <span>how're u</span>
-				</li> <li>  <span>Whats the time</span> / <span>tell time</span>
-				</li> <li>  <ins><b>Static Q/A</b></ins>, like <span>whats newtons 3rd law</span> / <span>whos the president of canada</span> / <span>whats root(69+420)</span>
-				</li> <li>  <span>Whats the latest news</span> / <span>news highlights</span>
-				</li> <li>  <span>Tell me about yourself</span> / <span>... your hobby/favorite game/anime</span>
-				</li> <li>  <span>Love ya</span>
-				</li> <li>  <span>Repeat after me</span> → will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
-				</li> <li>  <span>change dress</span> to change costumes and <span>change room</span> to switch background 
-				</li> <li>  <b>many more...</b> and tons of updates coming every day (if if she doesn't understand, she'll soon. So keep speaking)
-				</li> <li>  <b>To recheck, go to MENU &vellip; &gt; Sample message</b>
-				</li> 
-				<br>
-				<li> <b>IMPORTANT: since its still demo, SHE CAN'T LISTEN OR SPEAK (coming soon...)</b></li>
-				
-				</div>
+				<ul>
+					<li>  Basic <span>hiiii</span>, <span>hello</span>
+					</li> <li>  <span>What's your/my name</span> / <span>how're u</span>
+					</li> <li>  <span>Whats the time</span> / <span>tell time</span>
+					</li> <li>  <ins><b>Static Q/A</b></ins>, like <span>whats newtons 3rd law</span> / <span>whos the president of canada</span> / <span>whats root(69+420)</span>
+					</li> <li>  <span>Whats the latest news</span> / <span>news highlights</span>
+					</li> <li>  <span>Tell me about yourself</span> / <span>... your hobby/favorite game/anime</span>
+					</li> <li>  <span>Love ya</span>
+					</li> <li>  <span>Repeat after me</span> → will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
+					</li> <li>  <span>change dress</span> to change costumes and <span>change room</span> to switch background 
+					</li> <li>  <b>many more...</b> and tons of updates coming every day (if if she doesn't understand, she'll soon. So keep speaking)
+					</li> <li>  <b>To recheck, go to MENU &vellip; &gt; Sample message</b>
+					</li> 
+					<br>
+					<li> <b>IMPORTANT: since its still demo, SHE CAN'T LISTEN OR SPEAK (coming soon...)</b></li>
+				</ul>
+			</div>
 		</div>
 
 	</div>
