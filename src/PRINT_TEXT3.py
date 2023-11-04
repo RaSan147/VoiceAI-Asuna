@@ -6,6 +6,15 @@ from shutil import get_terminal_size
 from math import ceil
 
 
+# if os is windows import console_mod
+import platform
+if platform.system() == "Windows":
+	from console_mod import enable_color2
+	enable_color2() # enable color on windows cmd terminal
+
+
+
+
 wait_time = 0.0
 
 

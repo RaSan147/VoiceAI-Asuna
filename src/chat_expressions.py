@@ -1,6 +1,6 @@
 
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_conv_re_pattern import C, ___auxV, ___you, ___your, ___youre
+from basic_conv_re_pattern import C, AuxV___, YOU___, YOUR___, YOURE___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -13,7 +13,7 @@ from msg_class import MessageObj
 def patterns(user:User, msg=MessageObj):
 	"""
 	context: Counter object to keep track of previous message intents
-	check_context: function to check if someting is in the prev msg intent (context)
+	check_context: function to check if something is in the prev msg intent (context)
 
 
 	"""
@@ -46,7 +46,7 @@ def patterns(user:User, msg=MessageObj):
 	"say_hello"
 ],
 [
-	[C(rf"(i )?(really )?(love|luv|wuv) {___you}( (so |very )*much| a lot)?"),],
+	[C(rf"(i )?(really )?(love|luv|wuv) {YOU___}( (so |very )*much| a lot)?"),],
 	( Rchoice('Love you too','Love you so much','I love you too') +
 			Rchoice(" dear", " <:u_name>", " babe", blank=2) +
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
@@ -55,7 +55,7 @@ def patterns(user:User, msg=MessageObj):
 	"love_you"
 ],
 [
-	[C(rf"(i )?(really )?like {___you}( (so |very )*much| a lot)?"),],
+	[C(rf"(i )?(really )?like {YOU___}( (so |very )*much| a lot)?"),],
 	( Rchoice("You're really nice, I like you too.",'I like you too') + " " +
 			Rchoice("dear", "<:u_name>", "babe", blank=2) + " " +
 			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
@@ -64,7 +64,7 @@ def patterns(user:User, msg=MessageObj):
 	"like_you"
 ],
 [
-	[C(rf"(i )?(really )?miss(ed|d|) {___you}( (so |very )*much| a lot)?"),],
+	[C(rf"(i )?(really )?miss(ed|d|) {YOU___}( (so |very )*much| a lot)?"),],
 	(
 		Rchoice("Aww~!", "Really?", "Seriously!!", "uwu...", blank=2) + " " +
 			Rchoice("Thankss... ", blank=2) +
@@ -76,7 +76,7 @@ def patterns(user:User, msg=MessageObj):
 	"miss_you"
 ],
 [
-	[C(rf"(i )?(really )?(hate|don('| )t like) {___you}"),],
+	[C(rf"(i )?(really )?(hate|don('| )t like) {YOU___}"),],
 	( Rchoice(Rchoice("I hate you too", "I hate you so much", "I hate you"),
 			(
 				Rchoice("I'm sorry. ", 'Sorry to dissapoint you. ',"Please forgive me. ")+
@@ -94,8 +94,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"{___you} {___auxV}? ?(rude|mean)"),
-		C(rf"{___you} hurt me"),
+		C(rf"{YOU___} {AuxV___}? ?(rude|mean)"),
+		C(rf"{YOU___} hurt me"),
 	],
 	(
 		Rchoice("I'm sorry. ", 'Sorry to disappoint you. ',"Please forgive me. ")+
@@ -106,7 +106,7 @@ def patterns(user:User, msg=MessageObj):
 	"you_are_rude"
 ],
 [
-	[C(rf"((a?re?) )?{___you} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) ?)+"),],
+	[C(rf"((a?re?) )?{YOU___} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) ?)+"),],
 	(
 		Rchoice("You meani...", "You baka...", "Huh..", "Whatt!!", blank=1) + "\n" +
 			Rchoice(
@@ -124,7 +124,7 @@ def patterns(user:User, msg=MessageObj):
 	"you_stupid"
 ],
 [
-	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {___youre}( (mo(m|ther|mmy))|sis(ter)?)?"),],
+	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {YOURE___}( (mo(m|ther|mmy))|sis(ter)?)?"),],
 	# this is terrible, i wish no one use this ever
 	(Rchoice("I don't like you.",
 		'How rude!',
@@ -147,7 +147,7 @@ def patterns(user:User, msg=MessageObj):
 	"user_bid_take_care"
 ],
 [
-	[C(rf"(thank|tnx|tnq|thx)s?( {___you})?( a ?lot|very much)?( for .+)?"),
+	[C(rf"(thank|tnx|tnq|thx)s?( {YOU___})?( a ?lot|very much)?( for .+)?"),
 	C(rf"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
 	],
 	( Rchoice(
@@ -170,7 +170,7 @@ def patterns(user:User, msg=MessageObj):
 [
 	[
 		C(r"(give me)?( a)? kiss(e?s+)( me)?"),
-		C(rf"(\*)?kiss(es)?( {___you})?( on (the |{___your} )?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
+		C(rf"(\*)?kiss(es)?( {YOU___})?( on (the |{YOUR___} )?)?(forehead|chick|lips?|boobs?|chest|pussy|nose)?(\*)?")
 	],
 	(
 		Rchoice(
@@ -198,7 +198,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(will {___you} )?marry me"),
+		C(rf"(will {YOU___} )?marry me"),
 	],
 	(
 		Rchoice(
@@ -249,7 +249,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(I{___auxV}? |^)(feel(ing)? )?a?lone(ly)?"),
+		C(rf"(I{AuxV___}? |^)(feel(ing)? )?a?lone(ly)?"),
 	],
 	(
 		Rchoice(
