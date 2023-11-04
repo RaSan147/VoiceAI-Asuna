@@ -94,5 +94,3 @@ Welcome to project Asuna.
 3. Replit for continuously hosting Demo link for free
 4. (Coming soon) Anyone who's willing to share chat data and ideas
 
-# Additional members:
-0. https://github.com/coolst3r (technical and knowledge-base support)
