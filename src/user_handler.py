@@ -186,6 +186,7 @@ class UserHandler:
 			"bot": None, # user preferred bot name
 			"id": "default", #
 			"ai_name": "Asuna", # user preferred ai name
+			"ai_fullname": "Asuna Yuuki", # user preferred ai full name
 			"bot_character": "Asuna", # user preferred ai avatar
 			"bot_skin": 0,
 			"skin_mode": 1, # 0 = offline, 1 = online
@@ -230,6 +231,7 @@ class UserHandler:
 			"bot": None, # user preferred bot name
 			"id": id, #
 			"ai_name": "Asuna", # user preferred ai name
+			"ai_fullname": "Asuna Yuuki", # user preferred ai full name
 			"bot_character": "Asuna", # user preferred ai avatar
 			"bot_skin": 0,
 			"skin_mode": 1, # 0 = offline, 1 = online
