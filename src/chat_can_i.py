@@ -11,7 +11,7 @@ from msg_class import MessageObj
 def patterns(user:User, msg=MessageObj):
 	"""
 	context: Counter object to keep track of previous message intents
-	check_context: function to check if someting is in the prev msg intent (context)
+	check_context: function to check if something is in the prev msg intent (context)
 	"""
 
 	return [
