@@ -246,7 +246,7 @@ class UserHandler:
 
 		return id
 
-	def update_user(self, username=None, user=None):
+	def update_user(self, username=None, user:User=None):
 		"""update user data"""
 		if not user:
 			user = self.get_user(username)
@@ -259,7 +259,7 @@ class UserHandler:
 		#	if key not in user:
 		#		user[key] = temp[key]
 		temp = {**temp, **user}
-		self.default_user.update(temp)
+		user.update(temp)
 
 	def server_signup(self, username, password):
 		# check if username is already taken
@@ -308,6 +308,7 @@ class UserHandler:
 			return self.users[username]
 		try:
 			user = User(username)
+			self.update_user(user=user)
 			if not temp:
 				self.users[username] = user
 				self.get_skin_link(user=user)
