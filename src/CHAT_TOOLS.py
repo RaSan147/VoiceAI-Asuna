@@ -2,6 +2,8 @@ from typing import List
 from random import choice, shuffle
 import re
 
+from bs4 import BeautifulSoup as bs
+
 def if_list(obj):
 	if isinstance(obj, str):
 		# fix list("ab") = ["a", "b"]
@@ -45,7 +47,13 @@ def shuf_merge(*args):
 
 
 
-def for_voice(text):
+def for_voice(message:dict):
+	text = message["message"]
+	render = message["render"]
+
+	if render == "innerHTML":
+		text = bs(text, 'html.parser').text
+
 	text = re.sub(r'\*[a-zA-Z\s]+\*', '', text)
 	text = text.encode('ascii', 'ignore').decode('ascii')
 

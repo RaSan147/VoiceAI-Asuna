@@ -565,7 +565,8 @@ def chat(self: SH, *args, **kwargs):
 		out["message"] = reply
 
 	if _voice:
-		voice = for_voice(out["message"])
+		voice = for_voice(out)
+
 		voice_file = get_audio(voice, output_dir= appConfig.audio_file)
 		# get file name from voice file
 		voice_file = os.path.basename(voice_file)
