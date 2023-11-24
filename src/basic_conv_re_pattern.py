@@ -19,8 +19,12 @@ def C(pattern):
 	""" return re.compile of the pattern with ignore case flag
 	also add to to_bot_suffix so that it can capture calling by bot name or other nouns
 	"""
+	pattern = pattern.replace(" ?) ", " ?)") # to avoid double space catcher
+	pattern = pattern.replace(" ? ", " ?") # to avoid double space catcher
+	pattern = pattern.replace(" *) ", " *)") # to avoid double space catcher
+	pattern = pattern.replace(" * ", " *") # to avoid double space catcher
 	try:
-		return compile(rf"{pattern}", flags=re.IGNORECASE)
+		return compile(pattern, flags=re.IGNORECASE)
 	except re.error:
 		print("FAILED TO COMPILE:")
 		print(pattern)
@@ -28,22 +32,32 @@ def C(pattern):
 		traceback.print_exc()
 		exit()
 
+YOU___ = r"((yo)?u|y[ao])"
+YOUR___ = r"((yo)?u|y(a|o))([' ]?r)"
+YOURE___ = r"(((yo)?u|y[ao])[' ]?(a?re?)?)"
+
 
 AuxV___ = r"([' ]?(m|s|is|a?re?|was|were|am|will|ll|will be|ll be))"
+An___ = r"(an?)"
 
-PLEASE___ = r"(p[lw](ease|z|s)e?)"
 CHANGE___ = r"(change|swap|switch)"
-WHAT___ = rf"(w(h|g)?[au]t{AuxV___}?( the)? ?)"
-WHO___ = rf"(w(h|g)?o{AuxV___}?( the)? ?)"
-WHEN___ = rf"(w(h|g)?en{AuxV___}?( the)? ?)"
+PLEASE___ = r"((p[lw](ease|z|s)e?)|kindly)"
+WILL_U___ = rf"(will {YOU___}( eve(n|r))*)"
+CAN_U___ = rf"(can {YOU___}( eve(n|r))*)"
+DO_U___ = rf"((do|did) {YOU___}( eve(n|r))*)"
+
+REQUESTING___ = rf"(" + '|'.join([WILL_U___, CAN_U___]) + ")"
+ASKING___ = rf"(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
+
+
+WHAT___ = rf"(w(h|g)?[au]t{AuxV___}?( the)?)"
+WHO___ = rf"(w(h|g)?o{AuxV___}?( the)?)"
+WHEN___ = rf"(w(h|g)?en{AuxV___}?( the)?)"
+HOW___ = rf"(how{AuxV___}?( the)?)"
 
 
 WHO_WHAT___ = rf"({WHO___}|{WHAT___})"
 WHEN_WHAT___ = rf"({WHEN___}|{WHAT___})"
-
-YOU___ = r"((yo)?u|y[ao])"
-YOUR___ = r"((yo)?u|y(a|o))([' ]?r)"
-YOURE___ = r"(((yo)?u|y[ao])[' ]?(a?re?)?)"
 
 DRESS___ = r"(dress|cloth|skin|costume|wear)(e?s)?"
 ROOM___ = r"(room|place|location|background|bg)"
@@ -183,7 +197,7 @@ li_redo = 'redo my last command', 'retry my last command', 'redo last command', 
 
 ip.created_program = [
 	C(rf'(?P<action>created?|program(med)?|invent(ed)?|design(ed)?|ma(d|k)e) {YOU___}'),
-	C(r"({YOUR___} )? (?P<action>creat|programm?|invent|design|mak)(o|e)?r")
+	C(rf"({YOUR___} )? (?P<action>creat|programm?|invent|design|mak)(o|e)?r")
 ]
 
 ip.r_u_ok = [
@@ -204,42 +218,42 @@ ip.who_are_you = [
 
 ip.whats_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(rf"w(h|g)at{AuxV___}? (the )?(?P<query>.*)"),
+	C(rf"{WHAT___}{AuxV___}? ?(the )?(?P<query>.*)"),
 ]
 
 ip.whos_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(r"who('| )?(s|re|is|are|r|was|were|am|will|will be)? (the )?(?P<query>.*)"),
+	C(rf"{WHO___}{AuxV___}? ?(?P<query>.*)"),
 ]
 
 ip.whens_ = [
-	C(rf"when('| )?{AuxV___}? (the )?(?P<query>.*)"),
+	C(rf"{WHEN___}{AuxV___}? ?(?P<query>.*)"),
 ]
 
 ip.hows_ = [
-	C(rf"how('| )?{AuxV___}? (the )?(?P<query>.*)"),
+	C(rf"{HOW___}{AuxV___}? ?(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
-	C(rf"(what('| )?{AuxV___}? )?{YOUR___} name"),
+	C(rf"({WHAT___}{AuxV___}? ?)?{YOUR___} name"),
 	# C(r"((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
 
 ]
 
 ip.what_to_call_you = [
-	C(rf"what should i call {YOU___}( by)?"),
+	C(rf"{WHAT___} should i call {YOU___}( by)?"),
 ]
 
 ip.what_time = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C(rf"(what('| )?{AuxV___}? )?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
+	C(rf"({WHAT___}{AuxV___}? ?)?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
 	'clock',
 ]
 
 ip.what_date = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C(rf"(what('| )?{AuxV___}? )?(the )?(current )?date((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
+	C(rf"({WHAT___}{AuxV___}? )?(the )?(current )?date((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
 	'clock',
 ]
 
@@ -455,14 +469,14 @@ m_comm = generate_list('mc_')
 ip.start_parrot = [
 	C(r"(start )?parrot(mode )?( on)?"),
 	C(r"mimic( me)?"),
-	C(r"start mimicing( me)?"),
+	C(r"start mimicking( me)?"),
 	C(r"(re(ply|peat)|say) what i (say|type|send|write)"),
 	C(r"repeat after me")
 ]
 stop_parrot = "stop", "stop it", "stop mimicing", "stop mimic", "stop parrot", "off", "turn off", "turn parrot off", "cancel", "cancel mimic", "cancel parrot"
 
 ip.stop_parrot = [
-	C(r"(stop|cancel)( (it|mimicing|repeating|parrot))?"),
+	C(r"(stop|cancel)( (it|mimicking|repeating|parrot))?"),
 	C(r"(turn )?((parrot|it) )?of+"),
 ]
 
@@ -528,7 +542,7 @@ def pre_rem_bot_call(ui):
 	ui = re.sub(
 		rf'^(hey|miss|dear|yo)? ?(girl|babe|{nick})? ', '', ui, flags=re.IGNORECASE)
 
-	ui = re.sub(rf'^{PLEASE___} ', '', ui, flags=re.IGNORECASE)
+	ui = re.sub(rf'^{REQUESTING___} ', '', ui, flags=re.IGNORECASE)
 
 	return ui
 

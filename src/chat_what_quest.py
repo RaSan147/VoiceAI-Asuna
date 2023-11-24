@@ -51,7 +51,6 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
 		C(rf"{WHAT___}( my )?(current )?(time|date)((?!s)| |$)(is|it)* ?(now)?"),
 		'clock',
 		'time',
@@ -84,6 +83,21 @@ def patterns(user:User, msg=MessageObj):
 		Rchoice(happy_emj)
 	),
 	"whats_up"
+],
+[
+	[	
+		C(rf"{WHO_WHAT___}{YOUR___} (creator|maker|invertor|programmer|engineer|coder)")
+	],
+	(
+		Rchoice(
+			'I was created by Ratul Hasan.', 
+			'A boy named Ratul Hasan programmed me.', 
+			'Ratul Hasan made me.'
+		) + '\n' +
+		'Check the project on <a href="https://github.com/RaSan147/VoiceAI-Asuna" target="_blank">Github</a>'
+	),
+	"what|who_is_your_creator"
+
 ],
 [
 	[
