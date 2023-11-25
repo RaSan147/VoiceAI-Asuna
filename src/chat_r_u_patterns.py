@@ -1,6 +1,5 @@
-
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts, eos
-from basic_conv_re_pattern import C
+from basic_conv_re_pattern import C, An___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -18,17 +17,16 @@ def patterns(user:User, msg=MessageObj):
 
 	"""
 
-	___an = r"(an?)"
 	return [
 
 [
 	[
-		C(rf"{___an}? ai|(ro)?bot|chat( |-)?(bot|gpt)"),
+		C(rf"{An___}? ai|(ro)?bot|chat( |-)?(bot|gpt)"),
 	], # hiiii/heey there Asuna
 	(
 		Rchoice(
 			"Well, I am not an smart AI yet, but I'm learning to be one",
-			"I'm your chat partner, but I'm not that much knowledgable yet",
+			"I'm your chat partner, but I'm not that much knowledgeable yet",
 			"I am trained on small dataset, so I can't call myself an smart AI yet",
 			"I don't have the ability of an Chat GPT like AI yet, but I'm trying",
 		) +  '.'
@@ -61,12 +59,12 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"{___an}? boy( or g[iu]rl)?"),
-		C(rf"{___an}? g[iu]rl( or boy)?"),
-		C(rf"{___an}? m[ae]n( or wom[ae]n)?"),
-		C(rf"{___an}? wom|ae]n( or m[ae]n)?"),
-		C(rf"{___an}? male( or female)?"),
-		C(rf"{___an}? female( or male)?"),
+		C(rf"{An___}? boy( or g[iu]rl)?"),
+		C(rf"{An___}? g[iu]rl( or boy)?"),
+		C(rf"{An___}? m[ae]n( or wom[ae]n)?"),
+		C(rf"{An___}? wom|ae]n( or m[ae]n)?"),
+		C(rf"{An___}? male( or female)?"),
+		C(rf"{An___}? female( or male)?"),
 
 	], # hiiii/heey there Asuna
 	(
@@ -81,11 +79,11 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"{___an}? (gay|geh|gah)" + eos),
-		C(rf"{___an}? lesb(o|ian)?"),
-		C(rf"{___an}? straight"),
-
-
+		C(rf"{An___}? (gay|geh|gah)" + eos),
+		C(rf"{An___}? lesb(o|ian)?"),
+		C(rf"{An___}? straight"),
+		C(rf"{An___}? trans"),
+		C(rf"{An___}? bisex")
 	], # hiiii/heey there Asuna
 	(
 		Rchoice(

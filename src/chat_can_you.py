@@ -74,7 +74,7 @@ def patterns(user:User, msg=MessageObj):
 
 	"can_you_be_friend"
 
-]
+],
 
 
 

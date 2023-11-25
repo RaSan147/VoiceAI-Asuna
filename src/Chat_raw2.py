@@ -45,7 +45,7 @@ from CHAT_TOOLS import Rchoice
 
 # CHAT PATTERN LIBS
 
-from basic_conv_re_pattern import ip, ot, it, remove_suffix, YOU___, preprocess, pre_rem_bot_call, post_rem_can_you
+from basic_conv_re_pattern import ip, ot, it, C, remove_suffix, YOU___, preprocess, pre_rem_bot_call, post_rem_can_you, ASKING___
 
 from basic_conv_pattern import *
 
@@ -59,6 +59,7 @@ from chat_what_extra import patterns as what_extra_patterns
 from chat_about_bot import patterns as about_bot_patterns
 from chat_compliment import patterns as compliments_patterns
 from chat_r_u_patterns import patterns as r_u_sub_patterns
+from chat_asking_you import patterns as asking_u_sub_patterns
 
 
 
@@ -116,7 +117,7 @@ def searcher(search_txt):
 			}
 
 
-def wolfram(text, raw=''):
+def wolfram(text):
 	"""
 	returns wolfram alpha response based on query text
 	text: query
@@ -169,7 +170,7 @@ def wikisearch(uix='', raw='', user: User = None):
 		return choice(ot.no_internet)
 
 	if user:
-		uix = parsed_names_back(uix, user)
+		uix = symbols_to_names(uix, user)
 
 	wolf = wolfram(uix)
 	if wolf:
@@ -318,14 +319,14 @@ def bbc_news_report(prompt="top"):
 
 
 
-def parsed_names(ui, user: User):
+def names_to_symbols(ui, user: User):
 	"""Replace variable nicknames with constant strings"""
 	ui = re.sub(re.escape(user.ai_name), "<:ai_name>", ui, flags=re.IGNORECASE)
-	ui = re.sub(re.escape(user.nickname), "<:u_name>", ui, re.IGNORECASE)
+	ui = re.sub(re.escape(user.nickname), "<:u_name>", ui, flags=re.IGNORECASE)
 	return ui
 
 
-def parsed_names_back(ui, user: User):
+def symbols_to_names(ui, user: User):
 	"""Replace constant strings with variable nicknames"""
 	ui = ui.replace("<:ai_name>", user.ai_name)
 	ui = ui.replace("<:u_name>", user.nickname)
@@ -345,7 +346,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	if user is None and username:
 		user = user_handler.get_user(username)
 
-	_INPUT = parsed_names(INPUT, user)
+	_INPUT = names_to_symbols(INPUT, user)
 	_INPUT = preprocess(_INPUT)
 	_ui_raw = pre_rem_bot_call(_INPUT)
 	_ui = _ui_raw.lower().replace(".", " ").replace("'", " ")  # remove . from input
@@ -383,7 +384,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	else:
 		message = out
 
-	message = parsed_names_back(message, user)
+	message = symbols_to_names(message, user)
 
 	message = remove_style(message)
 	msg["message"] = message.strip()
@@ -450,7 +451,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		NOTE: Regex check callback(user, match, uiPart, otpt, msgObj, options)
 		"""
-		patterns:list = patterns(user=user, msg=msg)
+		patterns_list:list = patterns(user=user, msg=msg)
 
 		if not _ui:
 			_ui = ui
@@ -482,7 +483,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		to_del = []
 
 		for n, uiPart in enumerate(uiParts):
-			for options in patterns:
+			for options in patterns_list:
 				ptrn:re.Pattern = options[0]
 				otpt:Union[tuple,str] = options[1]
 				intnt:str = options[2]
@@ -501,8 +502,6 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 					msg.add_intent(intnt)
 
 					if action == "remove":
-						# uiParts[n] = re.sub(m.Pattern, '', i)
-						# uiParts[n] = uiParts[n].replace(m.group(0), "")
 						to_del.append(n)
 					if action == "remove_match":
 						uiParts[n] = match.re.sub('', uiPart).strip()
@@ -519,7 +518,6 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		return (found, split.join(uiParts).strip(), split.join(uiRParts).strip())
 
-	# global talk_aloud_temp, reloader, ui, ui1, ui2, case, cases, uibit1, uibit2, reloader, reloaded, BREAK_POINT, m_paused
 
 	log_xprint("\t/c/Flags: /=/", user.flags)
 
@@ -569,8 +567,19 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		ai_patterns,
 		action="remove_match",
 		split="AND")
+	
 
+	print(re_starts(C(ASKING___), ui))
+	print(C(ASKING___))
 
+	if re_starts(C(ASKING___), ui):
+		print("FUCKKKKK")
+		_msg_asking_u, ui, ui_raw = check_patterns(
+			asking_u_sub_patterns,
+			_ui=ui,
+			_ui_raw=ui_raw,
+			action="remove")
+		
 
 
 	# remove "can you" from the beginning of the sentence
@@ -613,12 +622,13 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 
 	if re_starts(ip.r_u, ui):
-		_msg_is_expression, ui, ui_raw = check_patterns(
+		_msg_r_u, ui, ui_raw = check_patterns(
 			r_u_sub_patterns,
 			_ui=ui,
 			_ui_raw=ui_raw,
 			action="remove")
 		
+	
 	_msg_is_what_quest, ui, ui_raw = check_patterns(
 		what_quest_patterns,
 		_ui=ui,
