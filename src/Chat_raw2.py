@@ -152,9 +152,7 @@ def _wiki(uix):
 	s = s.replace("\n", "<br>")
 	s = re.sub(r"</?br>", " <br>", s)
 	s = re.sub("( ){2,}", " ", s)
-	x = re.split("<br> ?<br>", s)
-	print(x)
-	s= x[0]
+	s = re.split("<br> ?<br>", s)[0]
 	s = (". ").join(s.split(". ")[:4]).strip() + "..." # should end with a fullstop as well
 
 	return link, s
