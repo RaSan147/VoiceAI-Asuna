@@ -50,7 +50,7 @@ REQUESTING___ = rf"(" + '|'.join([WILL_U___, CAN_U___]) + ")"
 ASKING___ = rf"(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
 
 
-WHAT___ = rf"(w(h|g)?[au]t{AuxV___}?( the)?)"
+WHAT___ = rf"(define|(w(h|g)?[au]t{AuxV___}?)( the)?)"
 WHO___ = rf"(w(h|g)?o{AuxV___}?( the)?)"
 WHEN___ = rf"(w(h|g)?en{AuxV___}?( the)?)"
 HOW___ = rf"(how{AuxV___}?( the)?)"
