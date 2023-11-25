@@ -148,11 +148,14 @@ def _wiki(uix):
 
 	# returns 4 line of summary
 	s = ny.summary
+	s = s.split("\n\n")[0]
 	s = s.replace("\n", "<br>")
-	s = re.sub("</?br>", " <br>", s)
+	s = re.sub(r"</?br>", " <br>", s)
 	s = re.sub("( ){2,}", " ", s)
-	s = (". ").join(ny.summary.split(". ")[:4]) + "." # should end with a fullstop as well
-
+	x = re.split("<br> ?<br>", s)
+	print(x)
+	s= x[0]
+	s = (". ").join(s.split(". ")[:4]).strip() + "." # should end with a fullstop as well
 
 	return link, s
 
