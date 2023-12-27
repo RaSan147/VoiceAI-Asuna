@@ -1,6 +1,7 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
 from basic_conv_re_pattern import C, happy_emj, sad_emj, AuxV___, YOURE___, YOUR___, YOU___, PLEASE___, WHAT___, WHAT___, WHEN_WHAT___, WHO_WHAT___, WHEN___, eos
 
+
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 from OS_sys import null
@@ -17,7 +18,7 @@ def patterns(user:User, msg=MessageObj):
 	return [
 [
 	[
-		C(rf"{WHAT___}?{YOUR___} (nick|sur)?name"),
+		C(rf"{WHAT___}?{YOUR___} (nick|first)? ?name"),
 	],
 	(
 		Rchoice("My name is ", "I am ",
@@ -33,7 +34,7 @@ def patterns(user:User, msg=MessageObj):
 	],
 	(
 		Rchoice("My name is ", "I am ", "My full name is ") +
-		user.ai_name +
+		user.ai_fullname +
 		Rchoice(happy_emj)
 	),
 	"whats_your_name"
