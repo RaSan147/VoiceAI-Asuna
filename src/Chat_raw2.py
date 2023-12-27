@@ -1,3 +1,4 @@
+#pylint:disable=C0413
 import urllib.parse
 import webbrowser
 from random import choice
@@ -14,7 +15,7 @@ re._MAXCACHE = 5*1024  # increase regex cache size
 # PIP PACKAGES
 
 import requests
-import wikipediaapi
+
 from unidecode import unidecode
 import wikix
 
@@ -70,17 +71,20 @@ LOG_DEBUG = True
 
 
 
-
-wikipedia = wikipediaapi.Wikipedia(user_agent="VoiceAI-Asuna/1.0 (https://github.com/RaSan147/VoiceAI-Asuna; wwwqweasd147@gmail.com)")
-bbc_topic = 'Asia_url'
-
-
-def null(*args, **kwargs):
-	pass
+def null(*_, **__):
+	'''
+	Does nothing, Returns None
+	'''
+	return None
 
 
 def log_unknown(*args, **kwargs):
-	F_sys.writer(appConfig.log_unknown, "a", str(list(args)) + "\n", timeout=0)
+	'''logs the unknown commands/chats in a file'''
+	F_sys.writer(
+			appConfig.log_unknown, 
+			"a", 
+			str(list(args)) + "\n" + str(dict(kwargs) if kwargs else ''), 
+			timeout=0)
 
 
 
@@ -117,46 +121,6 @@ def searcher(search_txt):
 			}
 
 
-def wolfram(text):
-	"""
-	returns wolfram alpha response based on query text
-	text: query
-	raw: the untouched user input for logging
-	"""
-	r = requests.get("http://api.wolframalpha.com/v1/spoken",
-					params={
-						"i": text,
-						"appid": "L32A8W-J8X5U6KG26"
-					}
-				)
-	if not r:
-		return False
-
-	if r.text == "My name is Wolfram Alpha":
-		return "My name is <:ai_name>"
-	return r.text
-
-
-def _wiki(uix):
-	"""
-	search in wikipedia,
-	split only 4 sentences
-	parse results to HTML
-	"""
-	ny = wikipedia.page(uix)
-	link = ny.fullurl
-
-	# returns 4 line of summary
-	s = ny.summary
-	s = s.split("\n\n")[0]
-	s = s.replace("\n", "<br>")
-	s = re.sub(r"</?br>", " <br>", s)
-	s = re.sub("( ){2,}", " ", s)
-	s = re.split("<br> ?<br>", s)[0]
-	s = (". ").join(s.split(". ")[:4]).strip() + "..." # should end with a fullstop as well
-
-	return link, s
-
 
 
 def wikisearch(uix='', raw='', user: User = None):
@@ -173,7 +137,7 @@ def wikisearch(uix='', raw='', user: User = None):
 	if user:
 		uix = symbols_to_names(uix, user)
 
-	wolf = wolfram(uix)
+	wolf = wikix.wolfram(uix)
 	if wolf:
 		return wolf
 	log_xprint("\t/c/Searching wiki:/=//~`", uix, "`~/")
@@ -193,7 +157,7 @@ def wikisearch(uix='', raw='', user: User = None):
 		if match_search:
 			uix_ = match_search[0]
 
-			link, response = _wiki(uix_)
+			link, response = wikix.wiki_summary(uix_)
 			user.flags.ask_yes = user.msg_id
 
 			user.flags.on_yes = {"message": "You can find more from here.",
@@ -216,7 +180,7 @@ def wikisearch(uix='', raw='', user: User = None):
 
 			user.flags.ask_yes = user.msg_id
 
-			link, response = _wiki(uix_)
+			link, response = wikix.wiki_summary(uix_)
 			user.flags.on_yes = {"message": response + f'\n\n<a href={link}">Read More</a>',
 				"render": "innerHTML"
 			}
@@ -303,16 +267,19 @@ def bbc_news_report(prompt="top"):
 	else:
 		topic = "top_url"
 
-	if check_internet():
-		news = bbc_news.task(topic)
-		if news is None:
-			return "No news available"
-		else:
-			return "".join(news[:5])
-			# asker("Do you want to hear the rest?", true_func=read_rest_news)
-
-	else:
+	if not check_internet():
 		return choice(ot.no_internet)
+		
+	
+	news = bbc_news.task(topic)
+	if news is None:
+		return "No news available"
+	
+	return "".join(news[:5])
+		# asker("Do you want to hear the rest?", true_func=read_rest_news)
+
+
+		
 
 
 
@@ -350,8 +317,9 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	_INPUT = names_to_symbols(INPUT, user)
 	_INPUT = preprocess(_INPUT)
 	_ui_raw = pre_rem_bot_call(_INPUT)
-	_ui = _ui_raw.lower().replace(".", " ").replace("'", " ")  # remove . from input
-	# keep . in raw to make sure its not removed it mathmatical expressions
+	_ui = _ui_raw.lower() 
+	# keep .?! in raw to make sure its not removed it mathmatical expressions
+	_ui = re.sub(r'[\?\!\,\.\s]+', " ", _ui) # remove tab and multiple space in ui (removed punctuations from it)
 	log_xprint(f"\t/hi//~`{INPUT}`~//=/ >> /chi//~`{_ui_raw}`~//=/ ")
 	if _ui == "":
 		return
@@ -568,10 +536,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		ai_patterns,
 		action="remove_match",
 		split="AND")
-	
 
-	print(re_starts(C(ASKING___), ui))
-	print(C(ASKING___))
 
 	if re_starts(C(ASKING___), ui):
 		print("FUCKKKKK")
@@ -635,6 +600,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		_ui=ui,
 		_ui_raw=ui_raw,
 		action="remove")
+
 
 
 	if re_check(ip.whats_, ui_raw):
@@ -932,7 +898,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			msg.rep(choice(ot.no_internet))
 		else:
 			msg.rep(choice(ot.internet_ok) +
-				choice(".", "!", "👌", "👍")
+				Rchoice(".", "!", "👌", "👍")
 				)
 
 		msg.add_intent("check_internet")
@@ -1062,20 +1028,20 @@ if __name__ == "__main__":
 	user_handler.server_signup("TEST", "TEST")
 
 	# ACCESS THE USER
-	user = user_handler.get_user("TEST")
+	_user = user_handler.get_user("TEST")
 	# user = user_handler.collection(user.username, user.id)
 	# print(user.skins)
 	# user_handler.get_skin_link(user.username, user.id)
 
-	user.user_client_time_offset = TIME_sys.get_time_offset()
+	_user.user_client_time_offset = TIME_sys.get_time_offset()
 
 	print("INIT TIME:", time() -  _chat_raw_start_time)
 
 	while 1:
 		inp = input(">> ")
-		user.user_client_time = time()
+		_user.user_client_time = time()
 
-		_msg = basic_output(inp, user)
+		_msg = basic_output(inp, _user)
 
 		if not _msg:
 			continue  # break

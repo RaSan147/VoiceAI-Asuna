@@ -146,11 +146,11 @@ class User(GETdict):
 		else:
 			user= "BOT"
 
-		id = self.msg_id
+		mid = self.msg_id
 
 		self.msg_id += 1 # starts from 0 => User, 1 => Bot, 2 => User, 3 => Bot, ...
 
-		chat['id'] = id
+		chat['id'] = mid
 		chat['msg'] = msg # dict, contains msg, script and render mode
 		chat['time'] = str(TIME_sys.utc_to_bd_time(mtime))
 		chat["parsed_msg"] = parsed_msg
@@ -159,11 +159,13 @@ class User(GETdict):
 		chat['user'] = user
 
 		old.append(chat)
+		
+		#print(old)
 
 		J = json.dumps(old, indent="\t", separators=(',', ':'))
 		F_sys.writer(pointer+'.json', 'w', J, self.user_path)
 
-		return id
+		return mid
 
 
 	def get_user_dt(self):
@@ -219,17 +221,17 @@ class UserHandler:
 	# 	return None
 
 	def create_user(self, username, password):
-		hash = hashlib.sha256((username+password).encode('utf-8'))
-		id = hashlib.sha1((str(time.time()) + username).encode("utf-8")).hexdigest()
+		_hash = hashlib.sha256((username+password).encode('utf-8'))
+		_id = hashlib.sha1((str(time.time()) + username).encode("utf-8")).hexdigest()
 		u_data = {
 			"username": username,
-			"password": hash.hexdigest(),
+			"password": _hash.hexdigest(),
 			"created_at": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
 			"last_active": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
 			"pointer": 0, # current chat index (100 msg => 1 pointer)
 			"nickname": username, # current user name
 			"bot": None, # user preferred bot name
-			"id": id, #
+			"id": _id, #
 			"ai_name": "Asuna", # user preferred ai name
 			"ai_fullname": "Asuna Yuuki", # user preferred ai full name
 			"bot_character": "Asuna", # user preferred ai avatar
@@ -238,7 +240,6 @@ class UserHandler:
 			"room": 0,
 			"custom_room": None,
 			"msg_id": 0,
-			"pointer": 0,
 		}
 
 		new = json.dumps(u_data, indent=2)
@@ -260,6 +261,8 @@ class UserHandler:
 		#		user[key] = temp[key]
 		temp = {**temp, **user}
 		user.update(temp)
+		
+		return True
 
 	def server_signup(self, username, password):
 		# check if username is already taken
@@ -270,12 +273,12 @@ class UserHandler:
 			}
 
 		# create user
-		id = self.create_user(username, password)
+		uid = self.create_user(username, password)
 		return {
 			"status": "success",
 			"message": "User created",
 			"user_name": username,
-			"user_id": id
+			"user_id": uid
 		}
 
 	def server_login(self, username, password):
@@ -285,8 +288,8 @@ class UserHandler:
 				"status": "error",
 				"message": "User not found"
 			}
-		hash = hashlib.sha256((username+password).encode('utf-8'))
-		if user["password"] != hash.hexdigest():
+		_hash = hashlib.sha256((username+password).encode('utf-8'))
+		if user["password"] != _hash.hexdigest():
 			return {
 				"status": "error",
 				"message": "Wrong password"
@@ -319,11 +322,11 @@ class UserHandler:
 			return None
 
 
-	def server_verify(self, username, id, return_user=False):
+	def server_verify(self, username, uid, return_user=False):
 		user = self.get_user(username)
 		if not user:
 			return False
-		if user.get("id") != id:
+		if user.get("id") != uid:
 			return False
 
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
@@ -373,7 +376,8 @@ class UserHandler:
 				return None
 			except Exception:
 				traceback.print_exc()
-				if retry: return None
+				if retry: #already retried
+					return None
 
 				user["bot_character"] = self.default_user["bot_character"]
 				user["bot_skin"] = self.default_user["bot_skin"]
@@ -439,12 +443,12 @@ user_handler = UserHandler()
 
 if __name__ == "__main__":
 	user_handler.create_user("test", "test")
-	__user = User("test")
-	print(__user.username)
-	__user.x = 1 # set temporary data (not saved in file)
-	__user['y'] = 2 # set permanent data (saved in file)
-	print(__user.x)
-	__user.y = 3 # change permanently (saved)
-	__user.x = 4 # changed, but not saved in file
-	print(__user)
-	print(user_handler.get_skin_link("test", __user["id"]))
+	_user = User("test")
+	print(_user.username)
+	_user.x = 1 # set temporary data (not saved in file)
+	_user['y'] = 2 # set permanent data (saved in file)
+	print(_user.x)
+	_user.y = 3 # change permanently (saved)
+	_user.x = 4 # changed, but not saved in file
+	print(_user)
+	print(user_handler.get_skin_link("test", _user["id"]))

@@ -406,11 +406,36 @@ if __name__ == '__main__':
 
 	oneline = oneLine()
 
-	l = [i for i in range(101)] + [i for i in range(101)[::-1]]
+	l = [i for i in range(50)] + [i for i in range(101)[::-1]]
 	for i in l:
 		# oneline.update([i for i in range(i)])
 		oneline._update(i, end="", run_at_start=xx)
 		sleep(.02)
+		
+	print("\n\nTesting multiline")
+		
+	loads = [
+"""\t\\
+\t \\
+\t  \\
+""",
+'''\t |
+\t |
+\t |
+''',
+"""\t  /
+\t /
+\t/
+""",
+"""
+\t————
+
+"""
+]
+	oneline = oneLine()
+	for i in range(50):
+		oneline._update(loads[i%len(loads)])
+		sleep(.2)
 
 	xprint("/rhu/hello/=/ q to quit")
 

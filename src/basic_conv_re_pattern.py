@@ -32,12 +32,12 @@ def C(pattern):
 		traceback.print_exc()
 		exit()
 
-YOU___ = r"((yo)?u|y[ao])"
-YOUR___ = r"((yo)?u|y(a|o))([' ]?r)"
-YOURE___ = r"(((yo)?u|y[ao])[' ]?(a?re?)?)"
+YOU___ = r"(\s?(yo)?u|y[ao])"
+YOUR___ = rf"{YOU___}([' ]?r)"
+YOURE___ = rf"({YOU___}[' ]?(a?re?)?)"
 
 
-AuxV___ = r"([' ]?(m|s|is|a?re?|was|were|am|will|ll|will be|ll be))"
+AuxV___ = r"('?(m|s|is|a?re?|was|were|am|will|ll|will be|ll be))"
 An___ = r"(an?)"
 
 CHANGE___ = r"(change|swap|switch)"
@@ -218,12 +218,12 @@ ip.who_are_you = [
 
 ip.whats_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(rf"{WHAT___}{AuxV___}? ?(the )?(?P<query>.*)"),
+	C(rf"{WHAT___} ?(?P<query>.*)"),
 ]
 
 ip.whos_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(rf"{WHO___}{AuxV___}? ?(?P<query>.*)"),
+	C(rf"{WHO___}(?P<query>.*)"),
 ]
 
 ip.whens_ = [
@@ -518,7 +518,7 @@ links_li = tuple(v for k, v in links_dict.items())
 def preprocess(in_dat):
 	""" replace . , " ' ? ! with space """
 	# in_dat = in_dat.replace("'", " ")
-	in_dat = re.sub(r'[\?\!\,]|\s{2,}', ' ', in_dat)
+	#in_dat = re.sub(r'[\?\!\,]|\s{2,}', ' ', in_dat)
 	#in_dat = in_dat.replace("?", " ")
 #	in_dat = in_dat.replace("!", " ")
 #	in_dat = in_dat.replace(",", " ")

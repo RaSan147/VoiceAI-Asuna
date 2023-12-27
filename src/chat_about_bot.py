@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_conv_re_pattern import C, YOU___, YOUR___, YOURE___, AuxV___
+from basic_conv_re_pattern import C, YOU___, YOUR___, YOURE___, AuxV___, WHAT___
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 
@@ -74,7 +74,7 @@ def patterns(user:User, msg=MessageObj):
 [
 	[
 		C(rf"how old ?a?re? {YOU___}( now)?"),
-		C(rf"{YOURE___} age"),
+		C(rf"{WHAT___}?{YOURE___} age"),
 	],
 	( Rchoice("I'm 17",
 		"I'm 17 this year.",
@@ -90,12 +90,17 @@ def patterns(user:User, msg=MessageObj):
 	],
 	( Rchoice("I am", "I'm", "My name is")+" Asuna Yuuki. " +
 		Rchoice("I'm 17 this year. ",blank=2) +
-		Rchoice("I continue my education from SAO Survivor School. ", blank=1)+
+		Rchoice("I am continuing my education from SAO Survivor School. ", blank=1)+
 		" I love to study and play video games with friends. "+
-		shuf_merge(Rchoice("I often go to the pool or beach for swimming.", blank=1),
-			"I like to go shopping too! ") +
-		Rchoice(" I also "+Rchoice("like ", "love ")+Rchoice("talking", "being", "staying", "chatting")+" with you.",
-			" I also love to cook. ", blank=1)+
+		shuf_merge(
+			Rchoice("I often go to the pool or beach for swimming.", blank=1),
+				"I like to go shopping too! "
+		) +
+		Rchoice(
+			" I also "+Rchoice("like ", "love ")+Rchoice("talking", "being", "staying", "chatting")+" with you.",
+			" I also love to cook. ", 
+			blank=1
+		) +
 		Rchoice("😁", " 😄", " 😇", " 😊", " ~", "...", blank=1)
 	),
 
