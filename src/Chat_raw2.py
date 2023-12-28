@@ -410,7 +410,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	msg = MessageObj(user, ui, ui_raw, mid)
 
 
-	def check_patterns(patterns:Callable, _ui:str="", _ui_raw:str="", action:str="", split:str="", callback:Union[Callable,None]=None, expression:str=""):
+	def check_patterns(patterns:Callable, _ui:str="", _ui_raw:str="", action:str="", split:str="", callback:Union[Callable,None]=None, expression:str="", print_ptrn=False):
 		"""
 		check for pattern match in list of patterns,
 		if match add the reply in out and intent,
@@ -459,6 +459,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				# 1st 3 are mandatory
 
 				match = re_search(ptrn, uiPart, PRINT_PATTERN=LOG_DEBUG)
+				if print_ptrn:
+					print(ptrn, match)
 				if match:
 					others = options[3] if len(options) > 3 else {}
 					expression = expression or others.get("expression", "")
@@ -592,14 +594,18 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			r_u_sub_patterns,
 			_ui=ui,
 			_ui_raw=ui_raw,
-			action="remove")
+			action="remove"
+		)
 		
 	
 	_msg_is_what_quest, ui, ui_raw = check_patterns(
 		what_quest_patterns,
 		_ui=ui,
 		_ui_raw=ui_raw,
-		action="remove")
+		action="remove",
+	)
+		
+	#print(_msg_is_what_quest, ui, ui_raw)
 
 
 
@@ -824,7 +830,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
 			)
 
-			msg.add_intent("(what)_my_bday")
+			msg.add_intent("(when)_my_bday")
 
 		else:
 			x = wikisearch(uiopen, uiopen_raw, user)

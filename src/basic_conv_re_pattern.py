@@ -37,23 +37,70 @@ YOUR___ = rf"{YOU___}([' ]?r)"
 YOURE___ = rf"({YOU___}[' ]?(a?re?)?)"
 
 
-AuxV___ = r"('?(m|s|is|a?re?|was|were|am|will|ll|will be|ll be))"
-An___ = r"(an?)"
+
+AuxV___ = (
+	r"("  
+		"(?:" 
+			"'?(?:" 
+				"m|s|re?|ll|ve"  
+			")"
+			"|"
+			r"\s(?:"
+				"is|a?re?|was|were|am|will"
+			")"
+		")"
+		"(?:"
+			" ha(?:ve|d|s)"
+		")?"
+		"(?:"
+			" be(?:en|ing)?"
+		")?"
+	")"
+)
+An___ = r"(?:an?)"
 
 CHANGE___ = r"(change|swap|switch)"
-PLEASE___ = r"((p[lw](ease|z|s)e?)|kindly)"
-WILL_U___ = rf"(will {YOU___}( eve(n|r))*)"
-CAN_U___ = rf"(can {YOU___}( eve(n|r))*)"
-DO_U___ = rf"((do|did) {YOU___}( eve(n|r))*)"
+PLEASE___ = r"((p[lw](?:ease|z|s)e?)|kindly)"
+WILL_U___ = rf"(will {YOU___}(?: eve(?:n|r))*)"
+CAN_U___ = rf"(can {YOU___}(?: eve(?:n|r))*)"
+DO_U___ = rf"((?:do|did) {YOU___}(?: eve(?:n|r))*)"
 
-REQUESTING___ = rf"(" + '|'.join([WILL_U___, CAN_U___]) + ")"
-ASKING___ = rf"(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
+REQUESTING___ = "(" + '|'.join([WILL_U___, CAN_U___]) + ")"
+ASKING___ = "(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
 
 
-WHAT___ = rf"(define|(w(h|g)?[au]t{AuxV___}?)( the)?)"
-WHO___ = rf"(w(h|g)?o{AuxV___}?( the)?)"
-WHEN___ = rf"(w(h|g)?en{AuxV___}?( the)?)"
-HOW___ = rf"(how{AuxV___}?( the)?)"
+WHAT___ = ( 
+	"("
+		"define" # define this or that
+		"|"
+		"("
+			"w(?:h|g)?[au]t" # what is ....
+			f"{AuxV___}?"
+		")"
+		"(?: the)?" #define the ..., what is the ..
+	")"
+)
+WHO___ = (
+	"("
+		"w(?:h|g)?o" # who typo wgo
+		f"{AuxV___}?"
+		"(?: the)?"
+	")"
+)
+WHEN___ = (
+	"("
+		"w(?:h|g)?en"
+		f"{AuxV___}?"
+		"(?: the)?"
+	")"
+)
+HOW___ = (
+	"("
+		"how"
+		f"{AuxV___}?"
+		"(?: the)?"
+	")"
+)
 
 
 WHO_WHAT___ = rf"({WHO___}|{WHAT___})"
@@ -64,20 +111,25 @@ ROOM___ = r"(room|place|location|background|bg)"
 
 
 to_bot_suffix = C(
-	rf"({PLEASE___}? ?(<:ai_name>|girl|dear|babe|honey|sweet ?heart|darling|ma.?am)?)$"
+	"("
+		f"{PLEASE___}? ?"
+		"("
+			"<:ai_name>|"
+			"girl|"
+			"dear|"
+			"babe|"
+			"honey|"
+			"sweet ?heart|"
+			"darling|"
+			"ma.?am"
+		")?"
+	")"
+	"$" # make sure line ends with it
 )
 
 
 def remove_suffix(string):
 	return to_bot_suffix.sub("", string)
-
-
-
-
-
-
-
-
 
 
 
@@ -180,7 +232,7 @@ cond = yes + no
 ip.no = [
 	# well actually no/nope/not/nah // not at all! never!!!
 	C(r"(well )?(actually )?n(o(pe)?t?|ah?)( at all)?( never)?"),
-	"(please |plz )?stop",
+	C(rf"{PLEASE___}?stop"),
 	"never",
 ]
 
@@ -196,16 +248,56 @@ li_QyuiNamePre = "can i call you ", 'may i call you'
 li_redo = 'redo my last command', 'retry my last command', 'redo last command', 'redo last command', 'redo'
 
 ip.created_program = [
-	C(rf'(?P<action>created?|program(med)?|invent(ed)?|design(ed)?|ma(d|k)e) {YOU___}'),
-	C(rf"({YOUR___} )? (?P<action>creat|programm?|invent|design|mak)(o|e)?r")
+	C(
+		'(?P<action>' # save the action to use in reply
+			'created?|'
+			'program(med)?|'
+			'invent(ed)?|'
+			'design(ed)?|'
+			'ma(d|k)e'
+		') '
+		f'{YOU___}'
+	),
+	C(
+		"("
+			f"{YOUR___} "
+		")?"
+		" (?P<action>" #we only need the base verb
+			"creat|"
+			"programm?|"
+			"invent|"
+			"design|"
+			"mak"
+		")(o|e)?r"
+	)
 ]
 
 ip.r_u_ok = [
-	C(rf"a?re? {YOU___} (fine|ok((a|e)y)?|well|alright)"),
+	C(
+		f"a?re? {YOU___}"
+		"(?: feeling)?"
+		" (?P<OK___>" # can be used in reply
+			"fine"
+			"|ok(?:[ae]y)?"
+			"|well"
+			"|alright"
+		")"
+	),
 ]
 
 ip.thanks = [
-	C(rf"thank(s( a (lot|bunch))?| {YOU___}( (so+|very) much))?"),
+	C(
+		"("
+			"thanks?"
+			"(?: "
+				"a (?:lot|bunch)"
+				"|"
+				"{YOU___}(?:"
+						"(?: so| very)* much"
+					")?" # so/very much (optional)
+			")?"
+		")"
+	),
 ]
 
 ip.r_u = [
@@ -247,14 +339,38 @@ ip.what_to_call_you = [
 
 ip.what_time = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C(rf"({WHAT___}{AuxV___}? ?)?(the )?(current )?time((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
+	C(
+		"("
+			"(?:"
+				f"{WHAT___}{AuxV___}? ?"
+			")?"
+			"(?:the )?"
+			"(?:current )?"
+			"time"
+			f"{eos}" # end of sent. or nexr word
+			"(?:is|it)*"
+			"(?: now)?"
+			f"(?: {PLEASE___})?"
+		')'
+	),
 	'clock',
 ]
 
 ip.what_date = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
-	C(rf"({WHAT___}{AuxV___}? )?(the )?(current )?date((?!s)| |$)(is|it)* ?(now)? ?{PLEASE___}?"),
-	'clock',
+	C(
+		'('
+			"(?:{WHAT___}{AuxV___}? )?"
+			"(?:the )?"
+			"(?:current )?"
+			"date"
+			f'{eos}'
+			"(?: is| it)*"
+			"(?: now)?"
+			f"(?: {PLEASE___}?)"
+		')'
+	),
+	C('cal[ae]nd[ae]r'),
 ]
 
 li_how_old_r_u = 'old are you', 'your age'
