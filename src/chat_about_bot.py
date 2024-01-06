@@ -58,8 +58,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"how {AuxV___} ({YOUR___}|the) day"),
-		C(rf"how {AuxV___}( ({YOUR___}|the))? yesterday")
+		C(rf"how{AuxV___} ({YOUR___}|the)? (to|yester|satur|sun|mon|tue|wed|thurs|fri)?day"),
 	],
 	(Rchoice(
 		"It was great, thanks for asking!",
@@ -126,7 +125,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C(rf"(about )?(the )?food (items? )?({YOUR___} )?(like|love|fav(ou?rite)?)( most|(a )?lot)?"),
+		C(rf"(about )?(the )?food (items? )?({YOUR___} )?(like|love|fav(ou?rite)?)( most|( a )?lot)?"),
 		C(rf"(about )?{YOUR___} fav(ou?rite)? food( items?)?( most|(a )?lot)?"),
 	],
 	( Rchoice("I do like to cook my favorite dishes, but when it comes to chocolate, I can't control myself. 😫",

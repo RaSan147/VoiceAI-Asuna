@@ -39,23 +39,22 @@ YOURE___ = rf"({YOU___}[' ]?(a?re?)?)"
 
 
 AuxV___ = (
-	r"("  
-		"(?:" 
-			"'?(?:" 
-				"m|s|re?|ll|ve"  
-			")"
-			"|"
-			r"\s(?:"
-				"is|a?re?|was|were|am|will"
-			")"
+	"(?:"
+		"'?(?:"
+			"m|s|re?|ll|ve"
 		")"
-		"(?:"
-			" ha(?:ve|d|s)"
-		")?"
-		"(?:"
-			" be(?:en|ing)?"
-		")?"
+		r"\s"
+		"|"
+		r"\s(?:"
+			"is|a?re?|was|were|am|will"
+		")"
 	")"
+	"(?:"
+		" ha(?:ve|d|s)"
+	")?"
+	"(?:"
+		" be(?:en|ing)?"
+	")?"
 )
 An___ = r"(?:an?)"
 
@@ -69,7 +68,7 @@ REQUESTING___ = "(" + '|'.join([WILL_U___, CAN_U___]) + ")"
 ASKING___ = "(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
 
 
-WHAT___ = ( 
+WHAT___ = (
 	"("
 		"define" # define this or that
 		"|"
@@ -502,7 +501,7 @@ ip.whats_up = [
 
 
 ip.check_net = [
-	C("check (wifi )?(inter)?net(work)?"), 
+	C("check (wifi )?(inter)?net(work)?"),
 	C("check ((wifi )?(inter)?net(work)? )?connection")
 ]
 
@@ -562,7 +561,7 @@ ip.help = [
 ]
 
 ip.slur = [
-	"fuck", "shit", "damn", 
+	"fuck", "shit", "damn",
 	C(r"bull.?shit"),
 	"wtf", "tf",
 	"suck",
@@ -596,8 +595,8 @@ ip.stop_parrot = [
 	C(r"(turn )?((parrot|it) )?of+"),
 ]
 
-ot.created_by = ('I was %s by Ratul Hasan.', 
-		'Ratul Hasan %s me.', 
+ot.created_by = ('I was %s by Ratul Hasan.',
+		'Ratul Hasan %s me.',
 		"I was %s by Rasan147 (Ratul Hasan)")
 
 

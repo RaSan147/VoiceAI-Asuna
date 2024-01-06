@@ -100,7 +100,7 @@ def patterns(user:User, msg=MessageObj):
 	(
 		Rchoice("I'm sorry. ", 'Sorry to disappoint you. ',"Please forgive me. ")+
 		Rchoice("I didn't mean to hurt you",
-				"I'll try my best to help you",	
+				"I'll try my best to help you",
 		) + "."
 	),
 	"you_are_rude"
@@ -220,13 +220,13 @@ def patterns(user:User, msg=MessageObj):
 			"I will marry you ",
 			"It's just a bit early, I'll let my parents know",
 			"Its so embarassinggggg and makes me so happy",
-			"I will"+ Rchoice(" dear", " my love", " <:u_name>", blank=2), 
+			"I will"+ Rchoice(" dear", " my love", " <:u_name>", blank=2),
 			"Hearing this makes me so happy",
 			"*kisses you*\nYou are mine and mine alone. I will marry you",
 			"*kisses you on the forehead* I will ve your bride",
 		)
 	),
-	
+
 	"marry_me"
 ],
 [
@@ -283,7 +283,7 @@ def patterns(user:User, msg=MessageObj):
 		"🥺",
 		blank = 2)
 	),
-		
+
 	"uwu"
 ]
 
