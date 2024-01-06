@@ -4,14 +4,16 @@ import re
 
 from bs4 import BeautifulSoup as bs
 
+from msg_class import MessageObj
+
 def if_list(obj):
 	if isinstance(obj, str):
 		# fix list("ab") = ["a", "b"]
 		obj = [obj]
 	if len(obj)==1 and not isinstance(obj[0], str):
 		obj = obj[0]
-	
-		
+
+
 	return list(obj)
 
 def Rchoice(*args, blank=0):
@@ -26,7 +28,7 @@ def Rshuffle(*args):
 	args = if_list(args)
 	shuffle(args)
 	return args
-	
+
 
 
 def list_merge(li:List):
@@ -34,27 +36,28 @@ def list_merge(li:List):
 	txt = re.sub(r'\s{2,}', ' ', txt)
 
 	return txt.strip()
-	
+
 def merge(*args):
 	args = if_list(args)
-	
+
 	return list_merge(args)
 
 def shuf_merge(*args):
 	args = if_list(args)
-	
+
 	return list_merge(Rshuffle(args))
 
 
 
-def for_voice(message:dict):
+def for_voice(message:MessageObj):
 	text = message["message"]
 	render = message["render"]
 
-	if render == "innerHTML":
-		text = bs(text, 'html.parser').text
 
-	text = re.sub(r'\*[a-zA-Z\s]+\*', '', text)
+	if render == "innerHTML":
+		soup = bs(text, 'html.parser')
+		text = soup.get_text()
+
 	text = text.encode('ascii', 'ignore').decode('ascii')
 
 	return text

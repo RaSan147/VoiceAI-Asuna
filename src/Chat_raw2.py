@@ -81,9 +81,9 @@ def null(*_, **__):
 def log_unknown(*args, **kwargs):
 	'''logs the unknown commands/chats in a file'''
 	F_sys.writer(
-			appConfig.log_unknown, 
-			"a", 
-			str(list(args)) + "\n" + str(dict(kwargs) if kwargs else ''), 
+			appConfig.log_unknown,
+			"a",
+			str(list(args)) + "\n" + str(dict(kwargs) if kwargs else ''),
 			timeout=0)
 
 
@@ -111,12 +111,12 @@ def linker(link):
 	return False
 
 
-def searcher(search_txt):
+def searcher(search_txt, target="_blank"):
 	"""
 	return the google link for search_txt query
 	"""
 	loc = urllib.parse.quote(search_txt)
-	return {"message": f'Please check here <a href="https://www.google.com/search?q={loc}">{search_txt}</a>',
+	return {"message": f'Please check here <a target="{target}" href="https://www.google.com/search?q={loc}">{search_txt}</a>',
 			"render": "innerHTML"
 			}
 
@@ -269,17 +269,17 @@ def bbc_news_report(prompt="top"):
 
 	if not check_internet():
 		return choice(ot.no_internet)
-		
-	
+
+
 	news = bbc_news.task(topic)
 	if news is None:
 		return "No news available"
-	
+
 	return "".join(news[:5])
 		# asker("Do you want to hear the rest?", true_func=read_rest_news)
 
 
-		
+
 
 
 
@@ -300,10 +300,10 @@ def symbols_to_names(ui, user: User):
 	ui = ui.replace("<:u_name>", user.nickname)
 
 	return ui
-	
 
 
-def basic_output(INPUT, user: User = None, username: str = ""):
+
+def basic_output(INPUT, user: User = None, username: str = "") -> MessageObj:
 	"""
 		INPUT: user input
 		user: User object
@@ -317,12 +317,12 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	_INPUT = names_to_symbols(INPUT, user)
 	_INPUT = preprocess(_INPUT)
 	_ui_raw = pre_rem_bot_call(_INPUT)
-	_ui = _ui_raw.lower() 
+	_ui = _ui_raw.lower()
 	# keep .?! in raw to make sure its not removed it mathmatical expressions
 	_ui = re.sub(r'[\?\!\,\.\s]+', " ", _ui) # remove tab and multiple space in ui (removed punctuations from it)
 	log_xprint(f"\t/hi//~`{INPUT}`~//=/ >> /chi//~`{_ui_raw}`~//=/ ")
 	if _ui == "":
-		return
+		return None
 
 	user.user_client_dt = user.get_user_dt()
 	# update client datetime
@@ -370,7 +370,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 
 	processed_time = time()
 	mid = user.add_chat(msg, processed_time, 0, rTo=rid, intent=intent, context=on_context)
-	
+
 	msg["mid"] = mid
 
 
@@ -547,7 +547,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			_ui=ui,
 			_ui_raw=ui_raw,
 			action="remove")
-		
+
 
 
 	# remove "can you" from the beginning of the sentence
@@ -561,7 +561,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
 		about_bot_patterns,
 		action="remove",
-		split="AND")
+		split="AND",)
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
@@ -596,15 +596,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			_ui_raw=ui_raw,
 			action="remove"
 		)
-		
-	
+
+
 	_msg_is_what_quest, ui, ui_raw = check_patterns(
 		what_quest_patterns,
 		_ui=ui,
 		_ui_raw=ui_raw,
 		action="remove",
 	)
-		
+
 	#print(_msg_is_what_quest, ui, ui_raw)
 
 
@@ -958,7 +958,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 	if re_fullmatch(ip.slur, ui):
 		msg.rep(Rchoice(ot.slur))
-		
+
 		msg.add_intent("said_bad_word")
 
 
@@ -1051,7 +1051,7 @@ if __name__ == "__main__":
 
 		if not _msg:
 			continue  # break
-		_msg = net_sys.html2str(_msg["message"])
+		_msg = _msg.for_console()
 		if _msg == "exit":
 			break
 		xprint("/ih/>>/=/", _msg)
