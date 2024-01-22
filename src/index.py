@@ -1,8 +1,11 @@
-# print current path
+# print current path and file list
 
 import os
 
-raise Exception(os.getcwd())
+print(os.getcwd())
+
+
+raise Exception(os.getcwd(), os.listdir())
 
 
 from App_server import SH
