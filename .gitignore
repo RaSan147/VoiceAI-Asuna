@@ -160,3 +160,5 @@ dmypy.json
 cython_debug/
 .idea/
 src/log.txt
+
+.vercel
