@@ -1,7 +1,7 @@
 import requests
 import json
 import net_sys
-
+import CONSTANTS
 
 class OnLine:
 	def __init__(self):
@@ -21,8 +21,8 @@ class OnLine:
 							cache=True,
 							do_not_cache=False,
 							cache_priority=True)
-		commits = json.loads(r.content)
-		return commits['sha']
+		commits = json.loads(r.content)['sha'] if r else CONSTANTS.LIVE2D_SHA
+		return commits
 
 	def get_character(self, name):
 		c = self.characters[name]
