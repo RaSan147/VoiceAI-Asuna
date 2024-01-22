@@ -4,7 +4,7 @@ PROJECT Asuna (NOT AI/ChatGPT yet)
 
 Welcome to project Asuna.
 
-## Live Demo: https://aigirl.repl.co
+## Live Demo: https://ai-asuna.onrender.com
 *(voice available in Minimize mode in chat)*
 
 ## Feel Free to Support Me:
@@ -16,15 +16,15 @@ Welcome to project Asuna.
 * This is an English only, pattern based chat bot (for now)
 * Currently using regular expressions to catch and reply specific patterns of messaged and collecting inputs and unknown inputs to train in future
 * Once, With sufficient data and resources, we will perform AI training
-* If you have any idea or want to provide IO datas, please file an Issue or Pull Request
+* If you have any idea or want to provide IO data, please file an Issue or Pull Request
 * Documentation will be created soon for ease of group development.
-* Currently this is an one man project and my 1st language is not English, Using 1000 years of knowledge from animes and movies to enreach the chat input response.
+* Currently this is an one man project and my 1st language is not English, Using 1000 years of knowledge from animes and movies to enrich the chat input response.
 * So please don't expect much but I hope I'll be able to provide great performance with it.
 
 * **Please have patience** Maintaining completely new (self made) server, UI and back end is not easy task (for me). Then again adding IO based patterns, sequencing them takes time.
 
 
-* My/Our main goal is to create a Multi platform accessable voice assistant.
+* My/Our main goal is to create a Multi platform accessible voice assistant.
 
 * our additional plan is to create their animated avatar and make it available online (via Browsers)
 
@@ -60,7 +60,7 @@ Welcome to project Asuna.
 
 # Requirement:
 * Python 3.7 or higher
-* Works on Android Pydroid 3 😄 too (most develoment is done using this)
+* Works on Android Pydroid 3 😄 too (most development is done using this)
 
 
 # Common IO: (similar inputs may/will work too)
@@ -91,6 +91,7 @@ Welcome to project Asuna.
 0. Reki Kawahara and abec (for creating Asuna)
 1. Sony group (for Wake me up Asuna App idea and illustrations)
 2. Pixi.js and live2D for character animation
-3. Replit for continuously hosting Demo link for free
+3. ~Replit for continuously hosting Demo link for free~ (not anymore)
+4. Render.com for hosting Demo link for free
 4. (Coming soon) Anyone who's willing to share chat data and ideas
 
