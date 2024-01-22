@@ -2,10 +2,8 @@
 
 import os
 
-print(os.getcwd())
-
-
-raise Exception(os.getcwd(), os.listdir())
+if not os.getcwd().endswith("src"):
+	os.chdir("./src")
 
 
 from App_server import SH
