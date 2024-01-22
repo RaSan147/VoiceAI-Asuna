@@ -2,7 +2,7 @@
 
 import os
 
-Exception(os.getcwd())
+raise Exception(os.getcwd())
 
 
 from App_server import SH
