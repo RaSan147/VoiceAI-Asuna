@@ -1,0 +1,12 @@
+pafy
+mutagen
+comtypes
+six
+yt-dlp
+requests
+pytz
+beautifulsoup4
+Unidecode
+Wikipedia-API
+edge_tts
+emoji

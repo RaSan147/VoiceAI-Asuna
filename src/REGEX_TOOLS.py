@@ -165,5 +165,5 @@ re_check = re_tools.check
 re_fullmatch = re_tools.fullmatch
 re_search = re_tools.search
 
-eos = r"(?:\s|$)"
+eol = eos = r"(?:\n|$)"
 

@@ -189,9 +189,9 @@ def send_test_page(self: SH, *args, **kwargs):
 	cookie_check = handle_user_cookie(self, on_ok="/", on_fail=None)
 	if cookie_check:
 		return None
-		
-	
-	
+
+
+
 	user_handler.server_signup("Test_user", "TEST")
 
 	# ACCESS THE USER
@@ -212,12 +212,12 @@ def send_voice(self: SH, *args, **kwargs):
 	cookie_check = handle_user_cookie(self, on_fail="/signup", on_ok="")
 	if cookie_check:
 		return None
-	
+
 	# print(self.query)
 	voice = self.query.get("id", None)
 	if voice is None:
 		return None
-	
+
 	voice = voice[0]
 
 	path = join_path(appConfig.temp_file, "audio/", voice)
@@ -554,7 +554,7 @@ def chat(self: SH, *args, **kwargs):
 	user.user_client_time = int(_time)/1000
 
 	# TODO: REMOVE THIS IN PRODUCTION
-	# importlib.reload(Chat_raw2)
+	importlib.reload(Chat_raw2)
 
 	Chat_raw2.LOG_DEBUG = False
 
@@ -564,14 +564,16 @@ def chat(self: SH, *args, **kwargs):
 		if "unknown" in reply.intents:
 			_voice = False
 
-		reply = reply.trimmed() # remove unnecessary objects
-		out.update(reply)
-		
+		out_msg = reply
+		out["message"] = reply.for_HTML()
+
 	else:
+		out_msg = MessageObj(user)
 		out["message"] = reply
 
+
 	if _voice:
-		voice = for_voice(out)
+		voice = reply.for_voice()
 
 		voice_file = get_audio(voice, output_dir= appConfig.audio_file)
 		# get file name from voice file
@@ -579,8 +581,9 @@ def chat(self: SH, *args, **kwargs):
 
 		out["voice"] = f"/voice?id={voice_file}"
 
+	out_msg.update(out)
 
-	return self.send_json(out)
+	return self.send_json(out_msg.trimmed())
 
 
 def main():

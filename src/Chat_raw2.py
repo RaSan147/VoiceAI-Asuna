@@ -14,8 +14,6 @@ re._MAXCACHE = 5*1024  # increase regex cache size
 
 # PIP PACKAGES
 
-import requests
-
 from unidecode import unidecode
 import wikix
 
@@ -46,7 +44,18 @@ from CHAT_TOOLS import Rchoice
 
 # CHAT PATTERN LIBS
 
-from basic_conv_re_pattern import ip, ot, it, C, remove_suffix, YOU___, preprocess, pre_rem_bot_call, post_rem_can_you, ASKING___
+from basic_conv_re_pattern import (
+	ip, 
+	ot, 
+	it, 
+	C, 
+	remove_suffix, 
+	YOU___, 
+	preprocess, 
+	pre_rem_bot_call, 
+	post_rem_can_you, 
+	ASKING___
+)
 
 from basic_conv_pattern import *
 
@@ -61,6 +70,7 @@ from chat_about_bot import patterns as about_bot_patterns
 from chat_compliment import patterns as compliments_patterns
 from chat_r_u_patterns import patterns as r_u_sub_patterns
 from chat_asking_you import patterns as asking_u_sub_patterns
+from chat_reply_1 import patterns as reply_1_patterns
 
 
 
@@ -81,9 +91,9 @@ def null(*_, **__):
 def log_unknown(*args, **kwargs):
 	'''logs the unknown commands/chats in a file'''
 	F_sys.writer(
-			appConfig.log_unknown, 
-			"a", 
-			str(list(args)) + "\n" + str(dict(kwargs) if kwargs else ''), 
+			appConfig.log_unknown,
+			"a",
+			str(list(args)) + "\n" + str(dict(kwargs) if kwargs else ''),
 			timeout=0)
 
 
@@ -111,12 +121,12 @@ def linker(link):
 	return False
 
 
-def searcher(search_txt):
+def searcher(search_txt, target="_blank"):
 	"""
 	return the google link for search_txt query
 	"""
 	loc = urllib.parse.quote(search_txt)
-	return {"message": f'Please check here <a href="https://www.google.com/search?q={loc}">{search_txt}</a>',
+	return {"message": f'Please check here <a target="{target}" href="https://www.google.com/search?q={loc}">{search_txt}</a>',
 			"render": "innerHTML"
 			}
 
@@ -269,17 +279,17 @@ def bbc_news_report(prompt="top"):
 
 	if not check_internet():
 		return choice(ot.no_internet)
-		
-	
+
+
 	news = bbc_news.task(topic)
 	if news is None:
 		return "No news available"
-	
+
 	return "".join(news[:5])
 		# asker("Do you want to hear the rest?", true_func=read_rest_news)
 
 
-		
+
 
 
 
@@ -300,10 +310,10 @@ def symbols_to_names(ui, user: User):
 	ui = ui.replace("<:u_name>", user.nickname)
 
 	return ui
-	
 
 
-def basic_output(INPUT, user: User = None, username: str = ""):
+
+def basic_output(INPUT, user: User = None, username: str = "") -> MessageObj:
 	"""
 		INPUT: user input
 		user: User object
@@ -317,12 +327,12 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 	_INPUT = names_to_symbols(INPUT, user)
 	_INPUT = preprocess(_INPUT)
 	_ui_raw = pre_rem_bot_call(_INPUT)
-	_ui = _ui_raw.lower() 
+	_ui = _ui_raw.lower()
 	# keep .?! in raw to make sure its not removed it mathmatical expressions
 	_ui = re.sub(r'[\?\!\,\.\s]+', " ", _ui) # remove tab and multiple space in ui (removed punctuations from it)
 	log_xprint(f"\t/hi//~`{INPUT}`~//=/ >> /chi//~`{_ui_raw}`~//=/ ")
 	if _ui == "":
-		return
+		return None
 
 	user.user_client_dt = user.get_user_dt()
 	# update client datetime
@@ -370,7 +380,7 @@ def basic_output(INPUT, user: User = None, username: str = ""):
 
 	processed_time = time()
 	mid = user.add_chat(msg, processed_time, 0, rTo=rid, intent=intent, context=on_context)
-	
+
 	msg["mid"] = mid
 
 
@@ -423,9 +433,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		patterns_list:list = patterns(user=user, msg=msg)
 
 		if not _ui:
-			_ui = ui
+			_ui = ui # assigning global 
 		if not _ui_raw:
-			_ui_raw = ui_raw
+			_ui_raw = ui_raw #assigning global 
 
 		uiParts = [] # splitting parts of ui
 		uiRParts = [] # splitting parts of ui_raw
@@ -458,7 +468,11 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				intnt:str = options[2]
 				# 1st 3 are mandatory
 
-				match = re_search(ptrn, uiPart, PRINT_PATTERN=LOG_DEBUG)
+				try:
+					match = re_search(ptrn, uiPart, PRINT_PATTERN=LOG_DEBUG)
+				except Exception:
+					traceback.print_exc()
+					print("ERROR IN PATTERN:", ptrn, intnt)
 				if print_ptrn:
 					print(ptrn, match)
 				if match:
@@ -516,11 +530,11 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 
 	if user.flags.ask_yes and (user.flags.ask_yes > user.msg_id-3):
-		if re_fullmatch(ip.yeses, ui):
+		if re_starts(ip.yeses, ui):
 			msg.rep(call_or_return(user.flags.on_yes))
 
 			msg.add_intent("accept_yes_no")
-		elif re_fullmatch(ip.no, ui):
+		elif re_starts(ip.no, ui):
 			if user.flags.on_no:
 				msg.rep(call_or_return(user.flags.on_no))
 
@@ -537,7 +551,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		ai_patterns,
 		action="remove_match",
-		split="AND")
+		split="AND"
+	)
 
 
 	if re_starts(C(ASKING___), ui):
@@ -546,8 +561,9 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			asking_u_sub_patterns,
 			_ui=ui,
 			_ui_raw=ui_raw,
-			action="remove")
-		
+			action="remove"
+		)
+
 
 
 	# remove "can you" from the beginning of the sentence
@@ -561,23 +577,32 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	_msg_is_about_ai, ui, ui_raw = check_patterns(
 		about_bot_patterns,
 		action="remove",
-		split="AND")
+		split="AND",
+	)
+
+	_msg_is_expression, ui, ui_raw = check_patterns(
+		reply_1_patterns,
+		action="remove_match"
+	)
 
 	# CHECK IF USER IS ASKING IF AI CAN DO SOMETHING
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		can_you_patterns,
 		action="remove_match",
-		split="AND")
+		split="AND"
+	)
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		compliments_patterns,
-		action="remove_match")
+		action="remove_match"
+	)
 
 
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		expressions_patterns,
-			action="remove_match")
-
+		action="remove_match"
+	)
+	
 	_msg_is_expression, ui, ui_raw = check_patterns(
 		can_i_patterns,
 		action="remove_match")
@@ -596,15 +621,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			_ui_raw=ui_raw,
 			action="remove"
 		)
-		
-	
+
+
 	_msg_is_what_quest, ui, ui_raw = check_patterns(
 		what_quest_patterns,
 		_ui=ui,
 		_ui_raw=ui_raw,
 		action="remove",
 	)
-		
+
 	#print(_msg_is_what_quest, ui, ui_raw)
 
 
@@ -884,6 +909,33 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 			msg.add_intent("(who)_something")
 
+	elif re_starts(ip.wheres_, ui):
+		_where = re_search(ip.wheres_, ui)
+		_where_raw = re_search(ip.wheres_, ui_raw)
+		uiopen = remove_suffix(_where.group("query"))
+		uiopen_raw = remove_suffix(_where_raw.group("query"))
+
+		log_xprint("\t/r/query:/=/", uiopen_raw)
+
+		if re_fullmatch(ip.you_self, uiopen):
+			msg.rep(
+				Rchoice("I'm ", "I'm currently ", "I'm currently in ") +
+				Rchoice("in your heart", "in your mind", "in your computer", "in your phone", "in your device", "in your system", "in your memory", "in your soul", "in your brain", "in your head", "in your thoughts", "in your dreams", "in your imagination", "in your fantasy", "in your life", "in your world", "in your universe") +
+				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
+			)
+
+			msg.add_intent("(where)_are_you")
+
+		else:
+			x = wikisearch(uiopen, uiopen_raw, user)
+			if x:
+				msg.rep(x)
+			else:
+				msg.rep(find_person(uiopen_raw))
+
+			msg.add_intent("(where)_something")
+
+
 	elif re_starts(ip.hows_, ui):
 		_how = re_search(ip.hows_, ui)
 		_how_raw = re_search(ip.hows_, ui_raw)
@@ -891,6 +943,23 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		uiopen_raw = remove_suffix(_how_raw.group("query"))
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
+
+		if False:
+			pass # TODO: add MORE CONDITIONS
+			
+
+
+		else:
+			x = wikisearch(uiopen, uiopen_raw, user)
+			if x:
+				msg.rep(x)
+			else:
+				msg.rep(find_person(uiopen_raw))
+
+			msg.add_intent("(who)_something")
+
+
+		
 
 		msg.rep(
 			Rchoice("Sorry, I don't remember", "Umm, I forgot", "Well, I don't remember clearly")
@@ -939,6 +1008,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 	# WHY [-2:-2]? => if len < 2, it will return empty list instead of error
 
+	print("UI:", ui)
+	print(re_starts(ip.wheres_, ui))
 
 	if re_check(ip.help, ui):
 		msg.rep(
@@ -958,7 +1029,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 	if re_fullmatch(ip.slur, ui):
 		msg.rep(Rchoice(ot.slur))
-		
+
 		msg.add_intent("said_bad_word")
 
 
@@ -1051,7 +1122,7 @@ if __name__ == "__main__":
 
 		if not _msg:
 			continue  # break
-		_msg = net_sys.html2str(_msg["message"])
+		_msg = _msg.for_console()
 		if _msg == "exit":
 			break
 		xprint("/ih/>>/=/", _msg)
