@@ -944,18 +944,10 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
-		if re_fullmatch(ip.you_self, uiopen):
-			msg.rep(Rchoice("I'm doing ", "I'm feeling ", "I'm ") +
-				Rchoice("great", "fine", "good", "okay", "alright", "awesome", "amazing") +
-				Rchoice(" 😄", " 😇", " 😊", " ~", "...", blank=2)
-				+
-				Rchoice(" Thanks", blank=1) +
-				+
-				Rchoice("How about you?", "How are you?", "What about you?", "What about yourself?", "What about yourself?", blank=2)
-				
-			)
+		if False:
+			pass # TODO: add MORE CONDITIONS
+			
 
-			msg.add_intent("(how)_are_you")
 
 		else:
 			x = wikisearch(uiopen, uiopen_raw, user)
