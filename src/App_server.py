@@ -442,6 +442,8 @@ def do_signup(self: SH, *args, **kwargs):
 		self.send_response(200)
 		self.send_header_string(cookie.output())
 
+	print('*'*50, data)
+
 	return self.send_json(data)
 
 
