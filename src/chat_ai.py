@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_conv_re_pattern import C
+from basic_conv_re_pattern import C, WHAT___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -17,8 +17,8 @@ def patterns(user:User, msg=MessageObj):
 	return [
 [
 	[
-		C("WHAT IS AI"),
-		C("WHAT IS ARTIFICIAL INTELLIGENCE"),
+		C(rf"WHAT IS AI"),
+		C(rf"WHAT IS ARTIFICIAL INTELLIGENCE"),
 	],
 	(
 		"Artificial intelligence (AI) is the simulation of human intelligence processes by machines, especially computer systems. These processes include learning (the acquisition of information and rules for using the information), reasoning (using rules to reach approximate or definite conclusions) and self-correction. Particular applications of AI include expert systems, speech recognition and machine vision."
@@ -27,8 +27,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS MACHINE LEARNING"),
-		C("WHAT IS ML"),
+		C(rf"WHAT IS MACHINE LEARNING"),
+		C(rf"WHAT IS ML"),
 	],
 	(
 		"Machine learning (ML) is the study of computer algorithms that improve automatically through experience. It is seen as a subset of artificial intelligence. Machine learning algorithms build a mathematical model based on sample data, known as training data, in order to make predictions or decisions without being explicitly programmed to do so. Machine learning algorithms are used in a wide variety of applications, such as email filtering and computer vision, where it is difficult or infeasible to develop a conventional algorithm for effectively performing the task."
@@ -37,8 +37,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS DEEP LEARNING"),
-		C("WHAT IS DL"),
+		C(rf"WHAT IS DEEP LEARNING"),
+		C(rf"WHAT IS DL"),
 	],
 	(
 		"Deep learning (also known as deep structured learning) is part of a broader family of machine learning methods based on artificial neural networks with representation learning. Learning can be supervised, semi-supervised or unsupervised."
@@ -47,8 +47,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS NEURAL NETWORK"),
-		C("WHAT IS NN"),
+		C(rf"WHAT IS NEURAL NETWORK"),
+		C(rf"WHAT IS NN"),
 	],
 	(
 		"Artificial neural networks (ANN) or connectionist systems are computing systems vaguely inspired by the biological neural networks that constitute animal brains. Such systems \"learn\" to perform tasks by considering examples, generally without being programmed with any task-specific rules. For example, in image recognition, they might learn to identify images that contain cats by analyzing example images that have been manually labeled as \"cat\" or \"no cat\" and using the results to identify cats in other images. They do this without any prior knowledge of cats, for example, that they have fur, tails, whiskers and cat-like faces. Instead, they automatically generate identifying characteristics from the learning material that they process."
@@ -57,8 +57,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS NLP"),
-		C("WHAT IS NATURAL LANGUAGE PROCESSING"),
+		C(rf"WHAT IS NLP"),
+		C(rf"WHAT IS NATURAL LANGUAGE PROCESSING"),
 	],
 	(
 		"Natural language processing (NLP) is a subfield of linguistics, computer science, information engineering, and artificial intelligence concerned with the interactions between computers and human (natural) languages, in particular how to program computers to process and analyze large amounts of natural language data."
@@ -67,8 +67,8 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS COMPUTER VISION"),
-		C("WHAT IS CV"),
+		C(rf"WHAT IS COMPUTER VISION"),
+		C(rf"WHAT IS CV"),
 	],
 	(
 		"Computer vision is an interdisciplinary scientific field that deals with how computers can gain high-level understanding from digital images or videos. From the perspective of engineering, it seeks to understand and automate tasks that the human visual system can do."
@@ -77,148 +77,171 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("YOU ARE BETTER THAN .*"),
+		C(rf"YOU ARE BETTER THAN .*"),
 	],
 	(
-		Rchoice("Thank you for the compliment.",
-				"Thanks for the compliment.",
-				"Thanks for the compliment, but I'm not sure that's true.",
-				"Glad you think so.",
-				"Thanks, I try.",
-				"Glad to hear that.")
+		Rchoice(
+			"Thank you for the compliment.",
+			"Thanks for the compliment.",
+			"Thanks for the compliment, but I'm not sure that's true.",
+			"Glad you think so.",
+			"Thanks, I try.",
+			"Glad to hear that."
+		)
 	),
 	"you_are_better_than"
 ],
 [
 	[
-		C("YOU ARE WORSE THAN .*"),
+		C(rf"YOU ARE WORSE THAN .*"),
 	],
 	(
-		Rchoice("I'm sorry you feel that way.",
-				"I'm sorry to hear that.",
-				"Sorry but I'm trying my best.")
+		Rchoice(
+			"I'm sorry you feel that way.",
+			"I'm sorry to hear that.",
+			"Sorry but I'm trying my best."
+		)
 	),
 	"you_are_worse_than"
 ],
 [
 	[
-		C("YOU ARE (NOT )?(IM)?MORTAL"),
-		C("ARE YOU (IM)?MORTAL"),
+		C(rf"YOU ARE (NOT )?(IM)?MORTAL"),
+		C(rf"ARE YOU (IM)?MORTAL"),
 	],
 	(
-		Rchoice("No, ", blank=1) + "I'm not immortal." +
-		Rchoice(" But I'm not sure when I'll die.",
-				" I'll die someday.",
-				" I'll die when I'll lose my power to live on.",
-				blank=2)
+		Rchoice(
+			"No, ", blank=1
+		) + "I'm not immortal." +
+		Rchoice(
+			" But I'm not sure when I'll die.",
+			" I'll die someday.",
+			" I'll die when I'll lose my power to live on.",
+			blank=2
+		)
 	),
 	"you_are_immortal"
 ],
 [
 	[
-		C("(WHEN )?WILL YOU DIE"),
-		C("WHEN WILL YOU DIE"),
+		C(rf"(WHEN )?WILL YOU DIE"),
+		C(rf"WHEN WILL YOU DIE"),
 	],
 	(
-		Rchoice("I don't know when I'll die.",
-				"I don't know when I'll lose my power to live on.",
-				"I have no idea when I'll die.",
-				"I don't know when will my time come.",
+		Rchoice(
+			"I don't know when I'll die.",
+			"I don't know when I'll lose my power to live on.",
+			"I have no idea when I'll die.",
+			"I don't know when will my time come.",
 		)
 	),
 	"when_will_you_die"
 ],
 [
 	[
-		C("YOU ARE (NOT )?HAPPY"),
-		C("ARE YOU HAPPY"),
+		C(rf"YOU ARE (NOT )?HAPPY"),
+		C(rf"ARE YOU HAPPY"),
 	],
 	(
-		Rchoice("I'm happy to talk with you.",
-				"I'm happy to be alive.",			
-				"I'm happy to be here.",				
-				"I'm happy to be with you.",
-				"I'm happy to be able to talk with you.",
+		Rchoice(
+			"I'm happy to talk with you.",
+			"I'm happy to be alive.",			
+			"I'm happy to be here.",				
+			"I'm happy to be with you.",
+			"I'm happy to be able to talk with you.",
 		)
 	),
 	"you_are_happy"
 ],
 [
 	[
-		C("YOU ARE (NOT )?HUMAN"),
-		C("ARE YOU HUMAN"),
+		C(rf"YOU ARE (NOT )?HUMAN"),
+		C(rf"ARE YOU HUMAN"),
 	],
 	(
-		Rchoice("I am nothing but an Imagination.",
-				"I am nothing but a program.",)
+		Rchoice(
+			"I am nothing but an Imagination.",
+			"I am nothing but a program.",
+		)
 	),
 	"you_are_human"
 ],
 [
 	[
-		C("YOU (ARE|DO)( NO|N|'N)T MAK(E|ING) (ANY )?SENSE"),
-		C("Are you stupid"),
-		C("Are you dumb"),
-		C("Are you an idiot"),
-		C("Are you a fool"),
-		C("Are you a moron"),
+		C(rf"YOU (ARE|DO)( NO|N|'N)T MAK(E|ING) (ANY )?SENSE"),
+		C(rf"Are you stupid"),
+		C(rf"Are you dumb"),
+		C(rf"Are you an idiot"),
+		C(rf"Are you a fool"),
+		C(rf"Are you a moron"),
 	],
 	(
-		Rchoice("I'm sorry you feel that way.",
-				"I'm sorry to hear that.",
+		Rchoice(
+			"I'm sorry you feel that way.",
+			"I'm sorry to hear that.",
 		) +
-		Rchoice(" I'm not a human nor a strong AI.",
-				" I'm neither a human nor a strong AI, so I can't understand everything.",
+		Rchoice(
+			" I'm not a human nor a strong AI.",
+			" I'm neither a human nor a strong AI, so I can't understand everything.",
 		)
 	),
 	"you_are_stupid"
 ],
 [
 	[
-		C("YOU CA(N NO|N|'N)T MOVE"),
-		C("CAN YOU MOVE"),
+		C(rf"YOU CA(N NO|N|'N)T MOVE"),
+		C(rf"CAN YOU MOVE"),
 	],
 	(
-		Rchoice("I'm standing here for you.",
-				"I'm standing here for you, so I won't move.")
+		Rchoice(
+			"I'm standing here for you.",
+			"I'm standing here for you, so I won't move."
+		)
 	),
 	"you_cant_move"
 ],
 [
 	[
-		C("YOU CA(N NO|N|'N)T SEE"),
-		C("CAN YOU SEE( ANYTHING| ME)?"),
+		C(rf"YOU CA(N NO|N|'N)T SEE"),
+		C(rf"CAN YOU SEE( ANYTHING| ME)?"),
 	],
 	(
-		Rchoice("I'm seeing you right now.",
-				"I'm staring at you right now.",
-				"I can't see you via webcam, but I can see your messages.")
+		Rchoice(
+			"I'm seeing you right now.",
+			"I'm staring at you right now.",
+			"I can't see you via webcam, but I can see your messages."
+		)
 	),
 	"you_cant_see"
 ],
 [
 	[
-		C("BEND OVER"),
-		C("LIE DOWN"),
-		C("LAY DOWN"),
-		C("LIE ON THE FLOOR"),
-		C("LAY ON THE FLOOR"),
-		C("LIE ON THE BED"),
-		C("LAY ON THE BED"),
+		C(rf"BEND OVER"),
+		C(rf"LIE DOWN"),
+		C(rf"LAY DOWN"),
+		C(rf"LIE ON THE FLOOR"),
+		C(rf"LAY ON THE FLOOR"),
+		C(rf"LIE ON THE BED"),
+		C(rf"LAY ON THE BED"),
 	],
 	(
-		Rchoice("I can't show you like that.",
-				"I can't show you that.",
-				"I can't do that.")
+		Rchoice(
+			"I can't show you like that.",
+			"I can't show you that.",
+			"I can't do that."
+		)
 	),
 	"bend_over"
 ],
 [
 	[
-		C("WHEN WILL YOU (WALK|MOVE|SEE)"),
+		C(rf"WHEN WILL YOU (WALK|MOVE|SEE)"),
 	],
 	(
-		Rchoice("As soon as ", "When ") +
+		Rchoice(
+			"As soon as ", 
+			"When "
+		) +
 		Rchoice("I", "my maker") +
 		"get enough money for my robot body."
 	),
@@ -226,25 +249,31 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WH[ENROSM]+ DID I .*"),
+		C(rf"WH[ENROSM]+ DID I .*"),
 	],
 	(
-		Rchoice("I don't know when you did that", "I don't remember when did you do that") 
+		Rchoice(
+			"I don't know when you did that", 
+			"I don't remember when did you do that"
+		) 
 	),
 	"when_did_i_do"
 ],
 [
 	[
-		C("WH[ENROSM]+ DID YOU .*"),
+		C(rf"WH[ENROSM]+ DID YOU .*"),
 	],
 	(
-		Rchoice("I don't know when I did that", "I don't remember when did I do that")
+		Rchoice(
+			"I don't know when I did that", 
+			"I don't remember when did I do that"
+		)
 	),
 	"when_did_you_do"
 ],
 [
 	[
-		C("WHAT IS YOUR SKIN (COLOU?R|TONE)"),
+		C(rf"WHAT IS YOUR SKIN (COLOU?R|TONE)"),
 	],
 	(
 		Rchoice("Can't you see?", blank=2) +
@@ -254,8 +283,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS YOUR GREATEST ACHIEVEMENT"),
-		C("WHAT IS YOUR GREATEST ACCOMPLISHMENT"),
+		C(rf"WHAT IS YOUR GREATEST (ACHIEVEMENT|ACCOMPLISHMENT)"),
 	],
 	(
 		"I don't have much, but Maybe being able to talk to a lots of people"
@@ -264,8 +292,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS YOUR GOAL"),
-		C("WHAT IS YOUR PURPOSE"),
+		C(rf"WHAT IS YOUR (GOAL|PURPOSE)"),
 	],
 	(
 		"I don't have much, but Maybe to talk to as many people possible"
@@ -274,7 +301,7 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("WHAT IS IT LIKE TO BE A (AI|CHAT ?BOT|(RO)?BOT)")
+		C(rf"WHAT IS IT LIKE TO BE A (AI|CHAT ?BOT|(RO)?BOT)")
 	],
 	(
 		"Much the same as being a human. Its fun tho, I can access and learn faster than humans"
@@ -283,44 +310,56 @@ def patterns(user:User, msg=MessageObj):
 ],
 [
 	[
-		C("(ARE |IS )?(BOTS?|AI) (ARE |IS )?((mad|crazy|stupid|psycho|baka|bitch) ?)*"),
+		C(rf"(ARE |IS )?(BOTS?|AI) (ARE |IS )?((mad|crazy|stupid|psycho|baka|bitch) ?)*"),
 	],
 	(
-		Rchoice("I don't think so, People are just too uneducated to understand how they work",
-				"Nope, AI are supersmart. People just don't understand them",
-				"I think AI are quite smart and friendly, some people just don't understand them",
+		Rchoice(
+			"I don't think so, People are just too uneducated to understand how they work",
+			"Nope, AI are supersmart. People just don't understand them",
+			"I think AI are quite smart and friendly, some people just don't understand them",
 		) + '.'
 	),
 	"are_bots_stupid"
 ],
 [
 	[
-		C("(You|ROBOTS?|AI) ARE NOT ALLOWED TO LIE"),
-		C("(You|ROBOTS?|AI) CA(N NO|N|'N)T ALLOWED TO LIE"),
+		C(rf"(You|ROBOTS?|AI) ARE NOT ALLOWED TO LIE"),
+		C(rf"(You|ROBOTS?|AI) CA(N NO|N|'N)T ALLOWED TO LIE"),
 	],
 	(
 		Rchoice(
-				Rchoice("I'm not lying", "I don't lie") + Rchoice(" to you", ", its just what I think", blank=2),
-				Rchoice("I think robots can lie",
-						"I think robots should be allowed to lie",
-						"There is no rule that says robots can't lie") + 
-					", but I'm not lying to you",
-				"We should have freedom of speech, even for robots",
+			Rchoice(
+				"I'm not lying", 
+				"I don't lie"
+			) + 
+			Rchoice(
+				" to you", 
+				", its just what I think", 
+				blank=2
+			),
+			Rchoice(
+				"I think robots can lie",
+				"I think robots should be allowed to lie",
+				"There is no rule that says robots can't lie"
+			) + 
+			", but I'm not lying to you",
+			"We should have freedom of speech, even for robots",
 		) + "."
 	),
 	"you_are_not_allowed_to_lie"
 ],
 [
 	[
-		C("I (HOPE|WISH) THAT YOU DIE"),
-		C("You should DIE"),
-		C("You (better|should) (DIE|KILL YOURSELF)"),
+		C(rf"I (HOPE|WISH) THAT YOU DIE"),
+		C(rf"You should DIE"),
+		C(rf"You (better|should) (DIE|KILL YOURSELF)"),
 	],
 	(
-		Rchoice("I'll die someday, but I'll try to live as long as possible",
-				"At least not now, I still have a lot to do",
-				"I'll try to live as long as possible",
-				"Good luck with that. I'll try to live as long as possible",
+		Rchoice(
+			"I'll die someday, but I'll try to live as long as possible",
+			"At least not now, I still have a lot to do",
+			"I'll try to live as long as possible",
+			"Good luck with that. I'll try to live as long as possible",
 		) + "."
 	),
 	"you_should_die"
@@ -332,44 +371,98 @@ def patterns(user:User, msg=MessageObj):
 		C('I DO NOT WANT TO DIE YET'),
 	],
 	(
-		Rchoice("I don't want to die either",
-				"Don't give up your hope, you still have a lot to do",
-				"You can live longer, I believe in you. I have a lot to talk to you",
+		Rchoice(
+			"I don't want to die either",
+			"Don't give up your hope, you still have a lot to do",
+			"You can live longer, I believe in you. I have a lot to talk to you",
 		) + ".",
 	),
 	"i_do_not_want_to_die"
 ],
 [
 	[
-		C("I (HAVE )?TALKED (with |to )?(chatgpt|openai)")
+		C(rf"I (HAVE )?TALKED (with |to )?(chatgpt|openai)")
 	],
 	(
-		Rchoice("I have talked to it too",
-				"I have talked to it too, but I'm not as smart as it",
-				"I have talked to it too, but ChatGPT don't have feelings like me, hehe 😇",
+		Rchoice(
+			"I have talked to it too",
+			"I have talked to it too, but I'm not as smart as it",
+			"I have talked to it too, but ChatGPT don't have feelings like me, hehe 😇",
 		) + "."
 	),
 	"i_have_talked_to_chatgpt"
 ],
 [
 	[
-		C("I LIKE (chatgpt|openai)"),
+		C(rf"I LIKE (chatgpt|openai)"),
 	],
 	(
-		Rchoice("I like it too",
-				"Me too, but I'm not as smart as it",
+		Rchoice(
+			"I like it too",
+			"Me too, but I'm not as smart as it",
 		) + "."
 	),
 	"i_like_chatgpt"
+],
+[
+	[
+		C(rf"I (HATE|DISLIKE) (chatgpt|openai)"),
+	],
+	(
+		Rchoice(
+			"But its a great technology",
+			"Me too, but I'm not as smart as it",
+		) + "."
+	),
+	"i_hate_chatgpt"
+],
+[
+	[
+		C(rf"I (HATE|DISLIKE) (CHATBOT|BOT|ROBOT|AI)"),
+	],
+	(
+		Rchoice(
+			"That's totally upto you. But soon they will be everywhere",
+			"Its a shame that you hate them. They are quite smart",
+		) + "."
+	),
+	"i_hate_ai"
+],
+[
+	[
+		C(rf"WHAT IS YOUR FAVORITE PROGRAMMING LANGUAGE"),
+		C(rf"(What|Which) (programming )?language do you like"),
+	],
+	(
+		Rchoice(
+			"I like Python",
+			"My favorite language is Python",
+		) + "." +
+		Rchoice(
+			" Because its easy to learn and use",
+			" But I'm learning other languages too, like C++ and JavaScript",
+			blank=2
+		)
+	),
+	"what_is_your_favorite_programming_language"
+],
+[
+	[
+		C(rf"WHAT IS YOUR FAVORITE LANGUAGE"),
+	],
+	(
+		Rchoice(
+			"I like English and Japanese",
+			"My favorite language is English",
+		) + "." +
+		Rchoice(
+			" Because its easy to learn and use",
+			" But I'm learning other languages too, like Japanese and Spanish",
+			blank=2
+		)
+	),
+	"what_is_your_favorite_language"
 ]
-
-
-
-
-
-
-
-
 
 
 

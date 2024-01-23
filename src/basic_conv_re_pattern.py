@@ -3,7 +3,7 @@ from re import compile
 import traceback
 
 
-from REGEX_TOOLS import re_starts, re_check, re_fullmatch, re_search, eos
+from REGEX_TOOLS import re_starts, re_check, re_fullmatch, re_search, eos, eol
 from DS import GETdict
 
 from CHAT_TOOLS import merge
@@ -68,17 +68,28 @@ REQUESTING___ = "(" + '|'.join([WILL_U___, CAN_U___]) + ")"
 ASKING___ = "(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
 
 
-WHAT___ = (
+DEFINE_WHAT___ = (
 	"("
-		"define" # define this or that
-		"|"
-		"("
+		"(?:"
+			"about" # about your name
+			"|"
+			"define" # define this or that
+			"|"
 			"w(?:h|g)?[au]t" # what is ....
 			f"{AuxV___}?"
 		")"
 		"(?: the)?" #define the ..., what is the ..
 	")"
 )
+
+WHAT___ = (
+	"("
+		"w(?:h|g)?[au]t" # what is ....
+		f"{AuxV___}?"
+		"(?: the)?" #define the ..., what is the ..
+	")"
+)
+
 WHO___ = (
 	"("
 		"w(?:h|g)?o" # who typo wgo
@@ -100,6 +111,14 @@ HOW___ = (
 		"(?: the)?"
 	")"
 )
+WHERE___ = (
+	"("
+		"where"
+		f"{AuxV___}?"
+		"(?: the)?"
+	")"
+)
+
 
 
 WHO_WHAT___ = rf"({WHO___}|{WHAT___})"
@@ -230,7 +249,7 @@ no = ('n', 'no', 'na', 'nah', 'nope', 'stop', 'quit', 'exit', 'not really', 'no'
 cond = yes + no
 ip.no = [
 	# well actually no/nope/not/nah // not at all! never!!!
-	C(r"(well )?(actually )?n(o(pe)?t?|ah?)( at all)?( never)?"),
+	C(r"(well )?(actually )?n(o+(pe)?t?|ah?)( at all)?( never)?"),
 	C(rf"{PLEASE___}?stop"),
 	"never",
 ]
@@ -309,7 +328,7 @@ ip.who_are_you = [
 
 ip.whats_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(rf"{WHAT___} ?(?P<query>.*)"),
+	C(rf"{DEFINE_WHAT___} ?(?P<query>.*)"),
 ]
 
 ip.whos_ = [
@@ -318,19 +337,27 @@ ip.whos_ = [
 ]
 
 ip.whens_ = [
-	C(rf"{WHEN___}{AuxV___}? ?(?P<query>.*)"),
+	C(rf"{WHEN___}(?P<query>.*)"),
 ]
 
 ip.hows_ = [
-	C(rf"{HOW___}{AuxV___}? ?(?P<query>.*)"),
+	C(rf"{HOW___}(?P<query>.*)"),
+]
+
+ip.wheres_ = [
+	C(rf"{WHERE___}(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
-	C(rf"({WHAT___}{AuxV___}? ?)?{YOUR___} name"),
+	C(rf"({WHAT___})?{YOUR___} name"),
 	# C(r"((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
 
 ]
+
+
+print(WHERE___, re.match(WHERE___,'where IS HITLER', flags=re.IGNORECASE))
+
 
 ip.what_to_call_you = [
 	C(rf"{WHAT___} should i call {YOU___}( by)?"),

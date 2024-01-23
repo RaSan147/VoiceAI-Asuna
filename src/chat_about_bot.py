@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_conv_re_pattern import C, YOU___, YOUR___, YOURE___, AuxV___, WHAT___
+from basic_conv_re_pattern import C, YOU___, YOUR___, YOURE___, AuxV___, DEFINE_WHAT___, WHAT___
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 
@@ -51,7 +51,12 @@ def patterns(user:User, msg=MessageObj):
 		C(rf"how[' ]?a?re? {YOU___}( doing?)?( today| now)?"),
 		C(rf"how do {YOU___} do")
 	],
-	( Rchoice("I'm fine!", "I'm doing great.")),
+	(
+		Rchoice("I'm fine!", "I'm doing great.") +
+		Rchoice(" Thanks", blank=1)  +
+		Rchoice("🥰", "😇", blank=1) + 
+		"\nHow about you?"
+	),
 
 
 	"how_are_you"

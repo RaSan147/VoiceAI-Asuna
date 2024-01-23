@@ -548,7 +548,7 @@ def chat(self: SH, *args, **kwargs):
 	user.user_client_time = int(_time)/1000
 
 	# TODO: REMOVE THIS IN PRODUCTION
-	# importlib.reload(Chat_raw2)
+	importlib.reload(Chat_raw2)
 
 	Chat_raw2.LOG_DEBUG = True
 
