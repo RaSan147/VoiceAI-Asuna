@@ -4,7 +4,6 @@
 
 __version__ = "0.3"
 
-import logging
 import os
 import sys
 import shutil
@@ -33,9 +32,7 @@ from pyroboxCore import run as run_server
 from pyroboxCore import config as pyrobox_config
 from pyroboxCore import DealPostData as DPD
 from pyroboxCore import PostError
-from pyroboxCore import logger
-logger.setLevel(logging.WARNING)
-logging.getLogger().setLevel(logging.WARNING)
+
 
 # CHAT LIB
 
@@ -48,9 +45,6 @@ pyrobox_config.log_location = appConfig.log_location
 true = T = True
 false = F = False
 null = N = None
-
-
-Chat_raw2.LOG_DEBUG = False
 
 
 
@@ -441,9 +435,7 @@ def do_signup(self: SH, *args, **kwargs):
 
 		self.send_response(200)
 		self.send_header_string(cookie.output())
-
-	print('*'*50, data)
-
+	print(data)
 	return self.send_json(data)
 
 
@@ -558,7 +550,7 @@ def chat(self: SH, *args, **kwargs):
 	# TODO: REMOVE THIS IN PRODUCTION
 	importlib.reload(Chat_raw2)
 
-	Chat_raw2.LOG_DEBUG = False
+	Chat_raw2.LOG_DEBUG = True
 
 	reply = Chat_raw2.basic_output(message, user)
 

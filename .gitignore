@@ -8,11 +8,8 @@ src/Asuna_data/*
 poetry.lock
 pyproject.toml
 replit.nix
-.pythonlibs
-.pythonlibs
-.upm
-poetry.lock
-pyproject.toml
+
+
 
 
 
@@ -163,5 +160,3 @@ dmypy.json
 cython_debug/
 .idea/
 src/log.txt
-
-.vercel

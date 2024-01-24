@@ -245,7 +245,7 @@ class UserHandler:
 		new = json.dumps(u_data, indent=2)
 		F_sys.writer("__init__.json", 'w', new, self.u_path(username))
 
-		return id
+		return _id
 
 	def update_user(self, username=None, user:User=None):
 		"""update user data"""
