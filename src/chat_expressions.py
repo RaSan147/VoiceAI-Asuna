@@ -29,7 +29,10 @@ def patterns(user:User, msg=MessageObj):
 	) if msg.context_count["say_hi"]<3 else
 	('Hello','Yeah!','Yes?','Yeah, need something?'),
 
-	"say_hi"
+	"say_hi",
+	{
+		"motion": "happy",
+	}
 ],
 [
 	[
@@ -43,7 +46,10 @@ def patterns(user:User, msg=MessageObj):
 	) if msg.context_count["say_hello"]<3 else
 	('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
 
-	"say_hello"
+	"say_hello",
+	{
+		"motion": "happy",
+	}
 ],
 [
 	[C(rf"(i )?(really )?(love|luv|wuv) {YOU___}( (so |very )*much| a lot)?"),],
@@ -52,7 +58,10 @@ def patterns(user:User, msg=MessageObj):
 			Rchoice(" 🥰", " 😘💕❤️", " 😘", "😘😘😘", blank=2)
 	),
 
-	"love_you"
+	"love_you",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[C(rf"(i )?(really )?like {YOU___}( (so |very )*much| a lot)?"),],
@@ -61,7 +70,10 @@ def patterns(user:User, msg=MessageObj):
 			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
 	),
 
-	"like_you"
+	"like_you",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[C(rf"(i )?(really )?miss(ed|d|) {YOU___}( (so |very )*much| a lot)?"),],
@@ -73,7 +85,10 @@ def patterns(user:User, msg=MessageObj):
 			Rchoice("🥰", "😘💕❤️", "😘", "😘😘😘", blank=2)
 	),
 
-	"miss_you"
+	"miss_you",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[C(rf"(i )?(really )?(hate|don('| )t like) {YOU___}"),],
@@ -90,7 +105,10 @@ def patterns(user:User, msg=MessageObj):
 			)
 	),
 
-	"hate_you"
+	"hate_you",
+	{
+		"motion": "sad"
+	}
 ],
 [
 	[
@@ -103,7 +121,10 @@ def patterns(user:User, msg=MessageObj):
 				"I'll try my best to help you",
 		) + "."
 	),
-	"you_are_rude"
+	"you_are_rude",
+	{
+		"motion": "angry"
+	}
 ],
 [
 	[C(rf"((a?re?) )?{YOU___} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) ?)+"),],
@@ -120,8 +141,10 @@ def patterns(user:User, msg=MessageObj):
 				"I still don't know the basics of English. So I think it won't hurt you to wait for me to learn more",
 				"I'm learning English and Gosh it's so confusing. You should have more patience. Its not like I was learning English to talk to a loner like you") + "."
 	),
-
-	"you_stupid"
+	"you_stupid",
+	{
+		"motion": "angry"
+	}
 ],
 [
 	[C(rf"(i('| | wi)ll )?(fuckh?|rape|torture|kill) {YOURE___}( (mo(m|ther|mmy))|sis(ter)?)?"),],
@@ -137,14 +160,20 @@ def patterns(user:User, msg=MessageObj):
 	Rchoice(" 😞", " 😭", " 🥺", " 😢", " 😡", " 😠", blank=2)
 	),
 
-	"user_will_(bad_words)"
+	"user_will_(bad_words)",
+	{
+		"motion": "angry"
+	}
 ],
 [
 	["take care"],
 	("You too" +
 		Rchoice(" dear", " my love", " <:u_name>", " sweetheart", " darling", blank=2)+"."
 	),
-	"user_bid_take_care"
+	"user_bid_take_care",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[C(rf"(thank|tnx|tnq|thx)s?( {YOU___})?( a ?lot|very much)?( for .+)?"),
@@ -165,7 +194,10 @@ def patterns(user:User, msg=MessageObj):
 	Rchoice("😇", "😁", "😽",  "🥰", "☺️", "❤️", blank=2)
 	),
 
-	"thank_you_ai"
+	"thank_you_ai",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[
@@ -193,7 +225,10 @@ def patterns(user:User, msg=MessageObj):
 			"*chuuu* happy now?"
 		)
 	),
-	"give_kiss"
+	"give_kiss",
+	{
+		"motion": "happy"
+	}
 
 ],
 [
@@ -227,7 +262,10 @@ def patterns(user:User, msg=MessageObj):
 		)
 	),
 
-	"marry_me"
+	"marry_me",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[
@@ -245,7 +283,10 @@ def patterns(user:User, msg=MessageObj):
 				blank=2)
 	),
 
-	"be_my_gf"
+	"be_my_gf",
+	{
+		"motion": "happy"
+	}
 ],
 [
 	[
@@ -265,7 +306,10 @@ def patterns(user:User, msg=MessageObj):
 		)
 	),
 
-	"feeling_lonely"
+	"feeling_lonely",
+	{
+		"motion": "sad"
+	}
 ],
 [
 	[
@@ -284,7 +328,10 @@ def patterns(user:User, msg=MessageObj):
 		blank = 2)
 	),
 
-	"uwu"
+	"uwu",
+	{
+		"motion": "happy"
+	}
 ]
 
 

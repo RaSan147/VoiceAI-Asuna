@@ -102,7 +102,7 @@ class MessageObj(dict):
 		self.clear()
 		self.update(message_dict.copy())
 
-	def rep(self, msg_txt, script="", render="", expression=""):
+	def rep(self, msg_txt, script="", render="", expression="", motion=""):
 		"""add message to the output"""
 		if isinstance(msg_txt, dict):
 			script = msg_txt.get("script", "") + "\n\n" + str(script)
@@ -122,6 +122,11 @@ class MessageObj(dict):
 
 		if expression:
 			self["expression"] = str(expression)
+
+		if motion:
+			self["motion"] = str(motion)
+		if self.request:
+			self["request"] = self.request
 
 		return strip_msg(self)
 

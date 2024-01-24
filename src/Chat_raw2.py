@@ -479,11 +479,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 					others = options[3] if len(options) > 3 else {}
 					expression = expression or others.get("expression", "")
 					render = others.get("render", "")
-
+					motion = others.get("motion", "")
 					callback = callback or others.get("callback")
 					call_or_return(callback, user, match, uiPart, otpt, msg, options)
 
-					msg.rep(Rchoice(otpt), render=render, expression=expression)
+					msg.rep(
+						Rchoice(otpt), 
+						render=render,
+						expression=expression,
+						motion=motion)
 					msg.add_intent(intnt)
 
 					if action == "remove":

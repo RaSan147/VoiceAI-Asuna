@@ -73,7 +73,7 @@ def patterns(user:User, msg=MessageObj):
 		"It was fantastic, thanks for asking!")
 	),
 
-	"how_was_day"
+	"how_was_day",
 ],
 [
 	[
