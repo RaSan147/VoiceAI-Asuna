@@ -125,8 +125,6 @@ class MessageObj(dict):
 
 		if motion:
 			self["motion"] = str(motion)
-		if self.request:
-			self["request"] = self.request
 
 		return strip_msg(self)
 
