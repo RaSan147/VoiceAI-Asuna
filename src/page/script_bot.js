@@ -157,11 +157,13 @@ class Bot_{
 		// var volume = 1; //[Optional arg, can be null or empty] [0.0 - 1.0]
 		// var expression = 4; //[Optional arg, can be null or empty] [index|name of expression]
 
-		this.model4.motion(type, mtn_id, priority_number, audio, volume, expression)
+		this.model4.motion(type, mtn_id, priority_number, {sound: audio, volume: volume, expression:expression})
+
 	}
 	
 	speak(audio_file, volume=1, expression=null){
-		this.model4.speak(audio_file, volume, expression)
+		this.model4.speak(audio_file, {volume: volume, expression:expression})
+)
 	}
 
 }
