@@ -163,7 +163,6 @@ class Bot_{
 	
 	speak(audio_file, volume=1, expression=null){
 		this.model4.speak(audio_file, {volume: volume, expression:expression})
-)
 	}
 
 }
