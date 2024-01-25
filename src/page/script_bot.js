@@ -149,7 +149,7 @@ class Bot_{
 	}
 
 	speak_mtn(mtn, audio=null, volume=1, expression=null){
-		let [type, mtn_id] = this.motions[mtn]
+		let [mtn_type, mtn_id] = this.motions[mtn]
 		// var category_name||type = "Idle" // name of the morion category
 		// var animation_index||mtn_id = 0 // index of animation under that motion category
 		var priority_number = 3 // if you want to keep the current animation going or move to new animation by force
@@ -157,7 +157,7 @@ class Bot_{
 		// var volume = 1; //[Optional arg, can be null or empty] [0.0 - 1.0]
 		// var expression = 4; //[Optional arg, can be null or empty] [index|name of expression]
 
-		this.model4.motion(type, mtn_id, priority_number, {sound: audio, volume: volume, expression:expression})
+		this.model4.motion(mtn_type, mtn_id, priority_number, {sound: audio, volume: volume, expression:expression})
 
 	}
 	
