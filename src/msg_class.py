@@ -30,7 +30,7 @@ def strip_msg(msg:dict):
 
 
 class MessageObj(dict):
-	def __init__(self, user: User, ui: str="", ui_raw: str="", mid: int=0, *args, **kwargs):
+	def __init__(self, user: User={}, ui: str="", ui_raw: str="", mid: int=0, test=False, *args, **kwargs):
 		super().__init__(message_dict.copy(), *args, **kwargs)
 
 		self.__dict__ = self
@@ -40,9 +40,16 @@ class MessageObj(dict):
 		self.ui_raw = ui_raw
 		self.mid = mid
 
+		if test:
+			intent = user.get("chat", {}).get("intent", [])
+		else:
+			if user=={}:
+				raise ValueError("User object is required")
+			intent = user.chat.intent
 
-		self.context_count = Counter([j for i in user.chat.intent for j in i])
-		self.prev_intent = user.chat.intent[-1] if user.chat.intent else []
+
+		self.context_count = Counter([j for i in intent for j in i])
+		self.prev_intent = intent[-1] if intent else []
 	# context [[...],...] is the intent of the previous message
 
 		self.on_context = []

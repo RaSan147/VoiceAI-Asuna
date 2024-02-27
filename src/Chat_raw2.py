@@ -467,6 +467,10 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				otpt:Union[tuple,str] = options[1]
 				intnt:str = options[2]
 				# 1st 3 are mandatory
+					
+				# print('\n\n>>>', [ptrn])
+				# print('<<<', intnt)
+				# print('\n\n')
 
 				try:
 					match = re_search(ptrn, uiPart, PRINT_PATTERN=LOG_DEBUG)
