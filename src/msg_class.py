@@ -171,7 +171,7 @@ class MessageObj(dict):
 		|*/|For Text|*|For Voice|/*|
 		"""
 
-		if self["render"] == "innerHTML":
+		if self["render"] == "innerHTML" or self.test_symbols():
 			text = self.str2html()
 		else:
 			text = self["message"]
@@ -221,13 +221,28 @@ class MessageObj(dict):
 
 	def str2html(self):
 		"""convert string to html"""
-		data = self["message"]
+		data:str = self["message"]
 
-		data = data.replace("\n", "<br>")
+		d = []
+		for line in data.splitlines():
+			_d = re.sub(r'`([^`]+)`', r'<i>\1</i>', line)
+			_d = re.sub(r'\*\*([^*]+)\*\*', r'<b>\1</b>', _d)
+			_d = re.sub(r'__([^_]+)__', r'<u>\1</u>', _d)
+
+			d.append(_d)
+
+		data = "<br>".join(d)
+
+		# data = data.replace("\n", "<br>")
 		data = data.replace("\t", "&emsp;")
 		data = data.replace("  ", "&nbsp; ")
 
-
 		return data
+	
+	def test_symbols(self):
+		"""test if the message has any symbols [** or __ or `]"""
+		for line in self["message"].splitlines():
+			if re.search(r'`([^`]+)`', line) or re.search(r'\*\*([^*]+)\*\*', line) or re.search(r'__([^_]+)__', line):
+				return True
 
 

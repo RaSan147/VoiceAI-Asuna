@@ -32,7 +32,7 @@ def C(pattern):
 		traceback.print_exc()
 		exit()
 
-YOU___ = r"(\s?(yo)?u|y[ao])"
+YOU___ = r"( ?(yo)?u|y[ao])"
 YOUR___ = rf"{YOU___}([' ]?r)"
 YOURE___ = rf"({YOU___}[' ]?(a?re?)?)"
 
@@ -43,9 +43,9 @@ AuxV___ = (
 		"'?(?:"
 			"m|s|re?|ll|ve"
 		")"
-		r"\s"
+		r" "
 		"|"
-		r"\s(?:"
+		r" (?:"
 			"is|a?re?|was|were|am|will"
 		")"
 	")"
@@ -356,8 +356,6 @@ ip.whats_your_name = [
 ]
 
 
-print(WHERE___, re.match(WHERE___,'where IS HITLER', flags=re.IGNORECASE))
-
 
 ip.what_to_call_you = [
 	C(rf"{WHAT___} should i call {YOU___}( by)?"),
@@ -660,12 +658,12 @@ links_li = tuple(v for k, v in links_dict.items())
 def preprocess(in_dat):
 	""" replace . , " ' ? ! with space """
 	# in_dat = in_dat.replace("'", " ")
-	#in_dat = re.sub(r'[\?\!\,]|\s{2,}', ' ', in_dat)
+	#in_dat = re.sub(r'[\?\!\,]| {2,}', ' ', in_dat)
 	#in_dat = in_dat.replace("?", " ")
 #	in_dat = in_dat.replace("!", " ")
 #	in_dat = in_dat.replace(",", " ")
 	in_dat = in_dat.strip()
-#	in_dat = re.sub(r'\s{2,}', ' ', in_dat)
+#	in_dat = re.sub(r' {2,}', ' ', in_dat)
 	# in_dat = in_dat.replace(" us ", " me")
 	# in_dat = in_dat.replace(" him", " me")
 	# in_dat = in_dat.replace(" her", " me")
