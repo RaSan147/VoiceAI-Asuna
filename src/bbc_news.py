@@ -5,7 +5,7 @@ Inspired by Kubas Google API:
 https://www.sololearn.com/learn/1099/?ref=app
 '''
 import urllib.request as RE
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 import xml.etree.ElementTree as ET
 
 
@@ -20,7 +20,7 @@ def check_internet(host='https://www.google.com/', timeout=3):
 		try:
 			RE.urlopen(host, timeout=timeout)
 			return True
-		except URLError:
+		except (URLError, HTTPError):
 			return False
 
 
@@ -37,14 +37,15 @@ bbc_topics = {
 	"NIre_url": 'http://feeds.bbci.co.uk/news/northern_ireland/rss.xml',
 	"Scot_url": 'http://feeds.bbci.co.uk/news/scotland/rss.xml',
 	"Wales_url": 'http://feeds.bbci.co.uk/news/wales/rss.xml',
-	"top_url": 'http://feeds.bbci.co.uk/news/video_and_audio/news_front_page/rss.xml?edition=uk',
-	"world_url": 'http://feeds.bbci.co.uk/news/video_and_audio/world/rss.xml',
-	"busi_url": 'http://feeds.bbci.co.uk/news/video_and_audio/business/rss.xml',
-	"tech_url": 'http://feeds.bbci.co.uk/news/video_and_audio/technology/rss.xml',
-	"science_url": 'http://feeds.bbci.co.uk/news/video_and_audio/science_and_environment/rss.xml',
-	"polit_url": 'http://feeds.bbci.co.uk/news/video_and_audio/politics/rss.xml',
-	"entertain_url": 'http://feeds.bbci.co.uk/news/video_and_audio/entertainment_and_arts/rss.xml',
-	"health_url": 'http://feeds.bbci.co.uk/news/video_and_audio/health/rss.xml'
+	"top_url": 'http://feeds.bbci.co.uk/news/rss.xml',
+	"world_url": 'http://feeds.bbci.co.uk/news/world/rss.xml',
+	"busi_url": 'http://feeds.bbci.co.uk/news/business/rss.xml',
+	"tech_url": 'http://feeds.bbci.co.uk/news/technology/rss.xml',
+	"science_url": 'http://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
+	"polit_url": 'http://feeds.bbci.co.uk/news/politics/rss.xml',
+	"entertain_url": 'http://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml',
+	"health_url": 'http://feeds.bbci.co.uk/news/health/rss.xml',
+	"educ_url": 'http://feeds.bbci.co.uk/news/education/rss.xml',
 }
 
 
@@ -55,7 +56,11 @@ class BBC_News:
 
 	def news_report(self,x):
 		link = bbc_topics[x]
-		data = RE.urlopen(link).read()
+		try:
+			print(link)
+			data = RE.urlopen(link).read()
+		except (URLError, HTTPError):
+			return []
 		# print(data)
 		tree = ET.fromstring(data)
 		x = data.find(b'lastBuildDate') + 14
