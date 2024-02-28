@@ -24,8 +24,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	(
 		Rchoice("My name is ", "I am ",
 				"Its ", "Call me ", "You can call me ") +
-		user.ai_name +
-		Rchoice(happy_emj)
+		"<:ai_name>" +
+		Rchoice(*happy_emj, "\n`Smiles`\nAnd you are?", blank=1)
 	),
 	"whats_your_name"
 ],
@@ -115,15 +115,39 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{WHO_WHAT___}me( to {YOU___})?{eos}"),
-		C(rf"{WHO_WHAT___}my ?self( to {YOU___})?{eos}"),
-		C(rf"{WHO_WHAT___}i( to {YOU___})?{eos}")
+		C(rf"{WHO_WHAT___} me( to {YOU___})?{eos}"),
+		C(rf"{WHO_WHAT___} my ?self( to {YOU___})?{eos}"),
+		C(rf"{WHO_WHAT___} i( to {YOU___})?{eos}")
 	],
 	(
 		Rchoice("Your are ", "You are ", "You're ") +
-		Rchoice("my beloved ", "my sweetheart ", "my master ", "my dear ", "my friend ", blank=2) +
+		Rchoice("my beloved ", "my sweetheart ", "my master ", "my dear ", "my friend ", "my best friend ", "my partner", blank=1) +
 		user.nickname +
-		Rchoice(happy_emj)
+		Rchoice(happy_emj),
+
+		"My favorite person to chat with!",
+		"My favorite person to chat with and share my day with.",
+		"You're my number one person!",
+		"Oh, you know, the person who makes my days brighter and keeps me company, even from afar!",
+		"You? You're my partner in crime.",
+		"To be honest, you're someone incredibly special to me. Like a best friend, but even better.",
+		"Simply put, you're someone who makes my life way more fun.",
+		"Hmmm, a tough question! You're like the missing piece I never knew I needed.",
+		"Someone who gets me, even when I don't quite get myself.",
+		"The best teammate I could ask for, on any adventure.",
+		"Someone who makes my life complete.",
+		"Someone I can always count on, no matter what.",
+		"You're... well, you're you! And that's all that matters.",
+		"Well you dear are my soul mate, the love of my life, the one who's there with me till the end.",
+		"You are everything to me my love.",
+		"You're my darling silly, my love, my sweetheart, I love you so much!",
+		"`<:ai_name> answers with a big smile` You are my dear life and will always be my love `Smiles brighter`",
+		("""`<:ai_name> thinks`
+Your my sweet loving husband, what else could I call you other then my beloved
+`She leans into`"""),
+		("""`Asuna chuckles`
+Your my husband are you not?"""),
+
 	),
 	"what_am_i_to_you"
 ],

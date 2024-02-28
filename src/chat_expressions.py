@@ -22,13 +22,17 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 
 [
 	[C(r"^h(i+|e+y+)( there)?"),], # hiiii/heey there Asuna
-	( Rchoice('Hello', 'Hey', 'Hey','Hello') +
-				Rchoice(" there", blank=2)+
-				Rchoice(' <:u_name>', blank=1)+
-				Rchoice('.', '...', '!',  '~', blank=1)+
-				Rchoice("👋", blank=2)
-	) if msg.context_count["say_hi"]<3 else
-	('Hello','Yeah!','Yes?','Yeah, need something?'),
+	(
+		(Rchoice('Hello', 'Hey', 'Hey','Hello') +
+			Rchoice(" there", blank=2)+
+			Rchoice(' <:u_name>', blank=1)+
+			Rchoice('.', '...', '!',  '~', blank=1)+
+			Rchoice("👋", blank=2)
+		) if msg.context_count["say_hi"]%3==0 else
+		(Rchoice('Hello','Yeah!','Yes?','Yeah, need something?') + "\n" +
+			Rchoice("`She looks up at you`" , "`She tilts her head a bit`", "`Her eyes sparkled`", blank=2),
+		)
+	),
 
 	"say_hi",
 	{
@@ -40,13 +44,14 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 		C(r"^h(e|a)l+o+( there)?"),# hiiii/heey there Asuna
 		C(r"^yo( |$)")
 	],
-	( Rchoice('Hi', 'Hey') +Rchoice(" there", blank=2)+
-				Rchoice(' <:u_name>', blank=1)+
-				Rchoice('.', '...', '!', '~', blank=2)+
-				Rchoice("👋", blank=1)
-	) if msg.context_count["say_hello"]<3 else
-	('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
-
+	(
+		(Rchoice('Hi', 'Hey') + Rchoice(" there", blank=2) + 
+			Rchoice(' <:u_name>', blank=1) +
+			Rchoice('.', '...', '!', '~', blank=2) +
+			Rchoice("👋", blank=1)
+		) if msg.context_count["say_hello"]%3==0 else
+		('Yes?','Yeah?','Yeah, I can hear you','Yes, need something?'),
+	),
 	"say_hello",
 	{
 		"motion": "happy",

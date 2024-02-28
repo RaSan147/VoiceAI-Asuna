@@ -282,7 +282,7 @@ def bbc_news_report(prompt="top"):
 
 
 	news = bbc_news.task(topic)
-	if news is None:
+	if not news:
 		return "No news available"
 
 	return "".join(news[:5])
@@ -299,8 +299,8 @@ def bbc_news_report(prompt="top"):
 
 def names_to_symbols(ui, user: User):
 	"""Replace variable nicknames with constant strings"""
-	ui = re.sub(re.escape(user.ai_name), "<:ai_name>", ui, flags=re.IGNORECASE)
-	ui = re.sub(re.escape(user.nickname), "<:u_name>", ui, flags=re.IGNORECASE)
+	ui = re.sub(r"(^|\s)" + re.escape(user.ai_name), "<:ai_name>", ui, flags=re.IGNORECASE)
+	ui = re.sub(r"(^|\s)" + re.escape(user.nickname), "<:u_name>", ui, flags=re.IGNORECASE)
 	return ui
 
 
@@ -368,8 +368,13 @@ def basic_output(INPUT, user: User = None, username: str = "") -> MessageObj:
 	message = remove_style(message)
 	msg["message"] = message.strip()
 
+
+	if msg.test_symbols():
+		msg["render"] = "innerHTML"
+
+
 	if msg["render"] == "innerHTML":
-		msg["message"] = net_sys.str2html(msg["message"])
+		msg["message"] = msg.str2html()
 
 	if msg["script"]:
 		msg["script"] = """
@@ -467,8 +472,13 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				otpt:Union[tuple,str] = options[1]
 				intnt:str = options[2]
 				# 1st 3 are mandatory
-					
-				# print('\n\n>>>', [ptrn])
+				
+				if not isinstance(ptrn, (list, tuple)):
+					ptrn = [ptrn]
+
+				# print('\n\n')
+				# for p in ptrn:
+				# 	print('>>>', [p.pattern] if hasattr(p, "pattern") else [p])
 				# print('<<<', intnt)
 				# print('\n\n')
 
