@@ -149,7 +149,7 @@ class Flag(GETdict):
 
 
 
-class LimitedDict(OrderedDict):
+class LimitedDict(OrderedDict, Callable_dict):
 	def __init__(self, *args, max=0, **kwargs):
 		self._max = max
 		super().__init__(*args, **kwargs)

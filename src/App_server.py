@@ -24,6 +24,7 @@ from CONFIG import appConfig
 from user_handler import User, user_handler
 from OS_sys import check_internet
 from PRINT_TEXT3 import xprint
+from REGEX_TOOLS import web_re
 
 # PYROBOX SERVER MODULES
 
@@ -132,6 +133,26 @@ def send_favico(self: SH, *args, **kwargs):
 	self.redirect('/icons/icon-512x512.png')
 
 	return
+
+@SH.on_req('GET', url_regex='/@fonts/.*')
+def send_font(self: SH, *args, **kwargs):
+	"""
+	re-direct font request to cloud to make server less file bloated
+	"""
+
+	file = web_re.gen_link_facts(self.path)["path"].split("/")[-1]
+	
+	if not os.path.exists(pyrobox_config.ftp_dir+"/fonts/"+file):
+		self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+		return None
+
+
+	if file.endswith(".css"):
+		with open(pyrobox_config.ftp_dir+"/fonts/"+file, "rb") as f:
+			file_data =	f.read()
+		return self.send_css(file_data)
+
+	return self.return_file(pyrobox_config.ftp_dir+"/fonts/"+file)
 
 
 

@@ -25,18 +25,18 @@ class ChatHandler{
 		this.chat_input.onkeydown = e => {
 			if(e.key == "Enter"){
 				if(e.shiftKey){
-					that.chat_input.value += "\n";
+					// that.chat_input.value += "\n";
 					return;
 				}
 				e.preventDefault();
 				that.send_message();
 			}
 		}
-		this.chat_input.onfocus = e => { that.go_to_bottom()
+		this.chat_input.onfocus = e => { //that.go_to_bottom()
 		}
 		if('visualViewport' in window) {
 			window.visualViewport.onresize = e =>{
-				that.go_to_bottom()
+				// that.go_to_bottom()
 			}
 		}
 
@@ -136,6 +136,7 @@ class ChatHandler{
 		}
 		this.chat_input.value = "";
 		this.chat_input.focus();
+		this.go_to_bottom()
 		if (msg.length == 0) return;
 		
 		const msg_ele = this.add_chat(this.make_message(msg, "user"));

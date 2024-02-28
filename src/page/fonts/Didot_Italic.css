@@ -1,0 +1,12 @@
+@font-face{
+    font-family: "Didot Italic";
+    src: url("/@fonts/Didot_Italic.eot");
+    src: url("/@fonts/Didot_Italic.eot?#iefix")format("embedded-opentype"),
+        url("/@fonts/Didot_Italic.woff")format("woff"),
+        url("/@fonts/Didot_Italic.woff2")format("woff2"),
+        url("/@fonts/Didot_Italic.ttf")format("truetype"),
+        url("/@fonts/Didot_Italic.svg#Didot Italic")format("svg");
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
+}

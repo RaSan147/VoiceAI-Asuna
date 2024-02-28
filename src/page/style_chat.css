@@ -135,6 +135,7 @@ background: linear-gradient( rgba(255,255,255,0.01) 0%, #3333330A 22%, #111111 1
 	align-items: flex-end;
 }
 
+
 .message .profile_pic {
 	margin: 10px 0;
 }
@@ -154,6 +155,15 @@ background: linear-gradient( rgba(255,255,255,0.01) 0%, #3333330A 22%, #111111 1
 	-moz-hyphens: auto;
 	-webkit-hyphens: auto;
 	hyphens: auto;
+}
+
+.message-text i {
+	font-family: "Go Italic", Arial, Helvetica, sans-serif;
+}
+
+.message-text b {
+	font-family: "Rubik", sans-serif;
+	font-optical-sizing: auto;
 }
 
 .message-text.user {

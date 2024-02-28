@@ -2,7 +2,7 @@ __all__ = ['web_re']
 
 import re
 from re import compile as re_compile
-from DS import Callable_dict
+from DS import LimitedDict
 from typing import Union
 from PRINT_TEXT3 import xprint
 
@@ -22,7 +22,7 @@ class WEB_RE:
 	# path: /r/UKWPmt/1
 	# query: ? part
 	# fragment: # part
-	link_facts = Callable_dict()
+	link_facts = LimitedDict(max=1000)
 
 	def gen_link_facts(self, link):  # fc=080C
 		"""Generates facts for a link

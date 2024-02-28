@@ -1,0 +1,12 @@
+@font-face{
+    font-family: "Go Italic";
+    src: url("/@fonts/Go_Italic.eot");
+    src: url("/@fonts/Go_Italic.eot?#iefix")format("embedded-opentype"),
+        url("/@fonts/Go_Italic.woff")format("woff"),
+        url("/@fonts/Go_Italic.woff2")format("woff2"),
+        url("/@fonts/Go_Italic.ttf")format("truetype"),
+        url("/@fonts/Go_Italic.svg#Go Italic")format("svg");
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
+}
