@@ -3,37 +3,13 @@ from re import compile
 import traceback
 
 
-from REGEX_TOOLS import re_starts, re_check, re_fullmatch, re_search, eos, eol
+from REGEX_TOOLS import re_starts, re_check, re_fullmatch, re_search, eos, eol, C
 from DS import GETdict
 
 from CHAT_TOOLS import merge
 
-def generate_list(prefix):
-	# l = [globals()[name] for name in globals().keys() if name.startswith(prefix)]
-	# return (item for sublist in l for item in sublist)
-
-	return tuple(item for sublist in [globals()[name] for name in globals().keys() if name.startswith(prefix)] for item in sublist)
-
-
-def C(pattern):
-	""" return re.compile of the pattern with ignore case flag
-	also add to to_bot_suffix so that it can capture calling by bot name or other nouns
-	"""
-	pattern = pattern.replace(" ?) ", " ?)") # to avoid double space catcher
-	pattern = pattern.replace(" ? ", " ?") # to avoid double space catcher
-	pattern = pattern.replace(" *) ", " *)") # to avoid double space catcher
-	pattern = pattern.replace(" * ", " *") # to avoid double space catcher
-	try:
-		return compile(pattern, flags=re.IGNORECASE)
-	except re.error:
-		print("FAILED TO COMPILE:")
-		print(pattern)
-		print("\n")
-		traceback.print_exc()
-		exit()
-
-YOU___ = r"( ?(yo)?u|y[ao])"
-YOUR___ = rf"{YOU___}([' ]?r)"
+YOU___ = r"((?:yo)?u|y[ao])"
+YOUR___ = rf"({YOU___}([' ]?r))"
 YOURE___ = rf"({YOU___}[' ]?(a?re?)?)"
 
 
@@ -43,9 +19,9 @@ AuxV___ = (
 		"'?(?:"
 			"m|s|re?|ll|ve"
 		")"
-		r" "
+		" "
 		"|"
-		r" (?:"
+		" (?:"
 			"is|a?re?|was|were|am|will"
 		")"
 	")"
@@ -59,7 +35,7 @@ AuxV___ = (
 An___ = r"(?:an?)"
 
 CHANGE___ = r"(change|swap|switch)"
-PLEASE___ = r"((p[lw](?:ease|z|s)e?)|kindly)"
+PLEASE___ = r"((?:p[lw](?:ease|z|s)e?)|kindly)"
 WILL_U___ = rf"(will {YOU___}(?: eve(?:n|r))*)"
 CAN_U___ = rf"(can {YOU___}(?: eve(?:n|r))*)"
 DO_U___ = rf"((?:do|did) {YOU___}(?: eve(?:n|r))*)"
@@ -124,9 +100,11 @@ WHERE___ = (
 WHO_WHAT___ = rf"({WHO___}|{WHAT___})"
 WHEN_WHAT___ = rf"({WHEN___}|{WHAT___})"
 
-DRESS___ = r"(dress|cloth|skin|costume|wear)(e?s)?"
+DRESS___ = r"(dress|cloth|skin|costume|wear)(?:e?s)?"
 ROOM___ = r"(room|place|location|background|bg)"
 
+YES___ = r"(y(?:e|a)(?:ah|s|p))"
+OKAY___ = r"(ok+(?:ay|h|eh)?)"
 
 to_bot_suffix = C(
 	"("
@@ -601,7 +579,6 @@ ot.slur = (
 )
 
 
-m_comm = generate_list('mc_')
 
 
 # start_parrot = "parrot", "repeat after me", "repeat what i say", "mimic", "mimic me", "parrot mode", "parrot on", "turn parrot on", "start parrot", "start mimic", "start mimicing", "start mimicing me", "start mimicing me", "reply what i say", 'reply what i send', "copy me"

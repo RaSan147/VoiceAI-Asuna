@@ -34,7 +34,7 @@ from DATA_sys import call_or_return
 import net_sys
 
 # MESSAGE CLASS
-from msg_class import MessageObj
+from msg_class import MessageObj, symbols_to_names, names_to_symbols
 
 
 
@@ -44,7 +44,7 @@ from CHAT_TOOLS import Rchoice
 
 # CHAT PATTERN LIBS
 
-from basic_conv_re_pattern import (
+from basic_re_pattern import (
 	ip, 
 	ot, 
 	it, 
@@ -79,13 +79,6 @@ __all__ = ('basic_output',)
 
 LOG_DEBUG = True
 
-
-
-def null(*_, **__):
-	'''
-	Does nothing, Returns None
-	'''
-	return None
 
 
 def log_unknown(*args, **kwargs):
@@ -218,7 +211,7 @@ def wikisearch(uix='', raw='', user: User = None):
 			"render": "innerHTML"
 		}
 
-def find_person(name, user:User = None):
+def find_person(name:str, user:User = None):
 	# return searcher(name)
 	return wikisearch(name, name, user)
 
@@ -296,20 +289,6 @@ def bbc_news_report(prompt="top"):
 
 
 
-
-def names_to_symbols(ui, user: User):
-	"""Replace variable nicknames with constant strings"""
-	ui = re.sub(r"(^|\s)" + re.escape(user.ai_name), "<:ai_name>", ui, flags=re.IGNORECASE)
-	ui = re.sub(r"(^|\s)" + re.escape(user.nickname), "<:u_name>", ui, flags=re.IGNORECASE)
-	return ui
-
-
-def symbols_to_names(ui, user: User):
-	"""Replace constant strings with variable nicknames"""
-	ui = ui.replace("<:ai_name>", user.ai_name)
-	ui = ui.replace("<:u_name>", user.nickname)
-
-	return ui
 
 
 

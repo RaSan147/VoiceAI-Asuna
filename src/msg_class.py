@@ -28,6 +28,22 @@ def strip_msg(msg:dict):
 	return msg
 
 
+def names_to_symbols(ui:str, user: User):
+	"""Replace variable nicknames with constant strings"""
+	ui = re.sub(r"(^|\s)" + re.escape(user.ai_name), "<:ai_name>", ui, flags=re.IGNORECASE)
+	ui = re.sub(r"(^|\s)" + re.escape(user.nickname), "<:u_name>", ui, flags=re.IGNORECASE)
+	return ui
+
+
+def symbols_to_names(ui:str, user: User):
+	"""Replace constant strings with variable nicknames"""
+	ui = ui.replace("<:ai_name>", user.ai_name)
+	ui = ui.replace("<:u_name>", user.nickname)
+
+	return ui
+
+
+
 
 class MessageObj(dict):
 	def __init__(self, user: User={}, ui: str="", ui_raw: str="", mid: int=0, test=False, *args, **kwargs):

@@ -1,6 +1,13 @@
 from collections import OrderedDict
 
 
+def null(*_, **__):
+	'''
+	Does nothing, Returns None
+	'''
+	return None
+
+
 class Callable_dict(dict):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

@@ -79,7 +79,7 @@ class Tools:
 tools = Tools()
 
 
-def join_path(*paths):
+def join_path(*paths:str):
 	"""join multiple path parts, same as `os.path.join()`
 	"""
 	return os.path.join(*paths)

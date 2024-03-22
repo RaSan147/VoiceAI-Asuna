@@ -2,6 +2,7 @@ __all__ = ['web_re']
 
 import re
 from re import compile as re_compile
+import traceback
 from DS import LimitedDict
 from typing import Union
 from PRINT_TEXT3 import xprint
@@ -167,3 +168,20 @@ re_search = re_tools.search
 
 eol = eos = r"(?:\n|$)"
 
+
+def C(pattern):
+	""" return re.compile of the pattern with ignore case flag
+	also add to to_bot_suffix so that it can capture calling by bot name or other nouns
+	"""
+	pattern = pattern.replace(" ?) ", " ?)") # to avoid double space catcher
+	pattern = pattern.replace(" ? ", " ?") # to avoid double space catcher
+	pattern = pattern.replace(" *) ", " *)") # to avoid double space catcher
+	pattern = pattern.replace(" * ", " *") # to avoid double space catcher
+	try:
+		return re_compile(pattern, flags=re.IGNORECASE)
+	except re.error:
+		print("FAILED TO COMPILE:")
+		print(pattern)
+		print("\n")
+		traceback.print_exc()
+		exit()

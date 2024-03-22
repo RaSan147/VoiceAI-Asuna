@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts, eos
-from basic_conv_re_pattern import C, An___
+from basic_re_pattern import C, An___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
