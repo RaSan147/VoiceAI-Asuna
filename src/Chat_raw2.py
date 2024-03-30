@@ -303,17 +303,19 @@ def basic_output(INPUT, user: User = None, username: str = "") -> MessageObj:
 	if user is None and username:
 		user = user_handler.get_user(username)
 
-	_INPUT = names_to_symbols(INPUT, user)
-	_INPUT = preprocess(_INPUT)
-	_ui_raw = pre_rem_bot_call(_INPUT)
-	_ui = _ui_raw.lower()
-	# keep .?! in raw to make sure its not removed it mathmatical expressions
-	_ui = re.sub(r'[\?\!\,\.\s]+', " ", _ui) # remove tab and multiple space in ui (removed punctuations from it)
+	if not user.flags.cli: # if user/admin/tester is not using COMMANDS
+		_INPUT = names_to_symbols(INPUT, user)
+		_INPUT = preprocess(_INPUT)
+		_ui_raw = pre_rem_bot_call(_INPUT)
+		_ui = _ui_raw.lower()
+		# keep .?! in raw to make sure its not removed it mathmatical expressions
+		_ui = re.sub(r'[\?\!\,\.\s]+', " ", _ui) # remove tab and multiple space in ui (removed punctuations from it)
+
 	log_xprint(f"\t/hi//~`{INPUT}`~//=/ >> /chi//~`{_ui_raw}`~//=/ ")
 	if _ui == "":
 		return None
 
-	user.user_client_dt = user.get_user_dt()
+	user.browser_dt = user.get_user_dt()
 	# update client datetime
 
 	# why raw?? because we want to keep the . in mathmatical expressions and CAPITALS
@@ -1082,11 +1084,11 @@ if __name__ == "__main__":
 	user = user_handler.collection(user.username, user.id)
 	user_handler.get_skin_link(user.username, user.id)
 
-	user.user_client_time_offset = TIME_sys.get_time_offset()
+	user.browser_time_offset = TIME_sys.get_time_offset()
 	a = set()
 	for i in range(2000):
 		inp = "random"
-		user.user_client_time = time()
+		user.browser_time = time()
 
 		msg = basic_output(inp, user)
 		if not msg:
@@ -1107,13 +1109,13 @@ if __name__ == "__main__":
 	# print(user.skins)
 	# user_handler.get_skin_link(user.username, user.id)
 
-	_user.user_client_time_offset = TIME_sys.get_time_offset()
+	_user.browser_time_offset = TIME_sys.get_time_offset()
 
 	print("INIT TIME:", time() -  _chat_raw_start_time)
 
 	while 1:
 		inp = input(">> ")
-		_user.user_client_time = time()
+		_user.browser_time = time()
 
 		_msg = basic_output(inp, _user)
 

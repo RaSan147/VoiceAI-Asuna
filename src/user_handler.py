@@ -6,12 +6,14 @@ import traceback
 # import inspect
 from collections import deque
 
+from PRINT_TEXT3 import xprint
+
 import F_sys
 import net_sys
 import TIME_sys
 
 from CONFIG import appConfig
-from DS import GETdict, Flag
+from DS import GETdict, Flag, NODict
 import live2d_sys
 import CONSTANTS
 
@@ -29,26 +31,64 @@ class User(GETdict):
 
 	but using dick.key = value 1st, will assign it as attribute and its temporary
 	"""
+
+	
+	_default_user = {
+		"username": "default",
+		"password" : "default",
+		"id": "default", # user token id (permanent)
+		"created_at": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+		"last_active": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+		"pointer": 0, # current chat index (100 msg => 1 pointer)
+		"nickname": "default", # current user name
+		"bot": None, # user preferred bot name
+		"ai_name": "Asuna", # user preferred ai name
+		"ai_fullname": "Asuna Yuuki", # user preferred ai full name
+		"bot_character": "Asuna", # user preferred ai avatar
+		"bot_skin": 0,
+		"skin_mode": 1, # 0 = offline, 1 = online
+		"room": 0,
+		"custom_room": None,
+		"msg_id": 0,
+		"pointer": 0,
+	}
+
+
+	__non_default_params = {
+		"msg_id"         : int,            # current id of last message
+		"chat"           : Flag            # cache chat data/intents
+	}
+
+
+	# FLAGS: if not found, returns None. DOESN'T STORE in DB
+	__available_flags = { 
+		"force_skin_link": str,           # to assign a forced skin link
+		"cli"            : bool,          # enables COMMAND MODE, disables text parsing
+		"parrot"         : bool,          # parrot mode, repeats user message
+		"ask_yes"        : int,           # msg_id which asked for yes or no
+		"on_yes"         : dict,          # MessageObj dict, to be sent on yes reply
+		"on_no"          : dict,          # MessageObj dict, to be sent on no reply
+	}
+
+
+
+
 	def __init__(self, username=""):
-
-
 		self.username = username
 		self.user_path = os.path.join(appConfig.user_data_dir, username)
 		self.file_path = os.path.join(self.user_path, '__init__.json')
 
-
-
 		self.flags = Flag()
-		self.chat = Flag()
-		self.chat.intent = deque(maxlen=20)
-		self.user_client_time = 0.0 # in seconds
-		self.user_client_time_offset = 0.0 # in seconds
-		self.user_client_dt = datetime.datetime.now() #will be replaced on new msg
+		self.chat = Flag() # dict to store session chat data (actual chats are stored separately in files)
+		self.chat.intent = deque(maxlen=20) # last 20 intents
+		self.os_time = 0.0 # in seconds
+		self.os_time_offset = 0.0 # in seconds
+		self.os_dt = datetime.datetime.now() #will be replaced on new msg
 		# self.pointer = self.msg_id = 0
 
 		# self.skins = {}
 		self.loaded_skin = None
-		self.skins = {}
+		self.skins = {} # cache skin links for a character
 
 
 		# if the data asked for is already there
@@ -65,11 +105,6 @@ class User(GETdict):
 			traceback.print_exc()
 			raise Exception("User data corrupted") from e
 
-	# def __eq__(self, __o: object) -> bool:
-	# 	if (bool(__o) or bool(self.username)) is False:
-	# 		# is user is none
-	# 		return True
-	# 	return super().__eq__(__o)
 
 	def __setitem__(self, key, value):
 		super().__setitem__(key, value)
@@ -169,7 +204,10 @@ class User(GETdict):
 
 
 	def get_user_dt(self):
-		return TIME_sys.ts2dt(self.user_client_time, self.user_client_time_offset)
+		return TIME_sys.ts2dt(self.os_time, self.os_time_offset)
+	
+	def update_user_dt(self):
+		self.os_dt = self.get_user_dt()
 
 
 class UserHandler:
@@ -178,47 +216,12 @@ class UserHandler:
 
 		self.online_avatar = live2d_sys.OnLine()
 
-		self.default_user = {
-			"username": "default",
-			"password" : "default",
-			"created_at": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
-			"last_active": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
-			"pointer": 0, # current chat index (100 msg => 1 pointer)
-			"nickname": "default", # current user name
-			"bot": None, # user preferred bot name
-			"id": "default", #
-			"ai_name": "Asuna", # user preferred ai name
-			"ai_fullname": "Asuna Yuuki", # user preferred ai full name
-			"bot_character": "Asuna", # user preferred ai avatar
-			"bot_skin": 0,
-			"skin_mode": 1, # 0 = offline, 1 = online
-			"room": 0,
-			"custom_room": None,
-			"msg_id": 0,
-			"pointer": 0,
-		}
+		self.default_user = User._default_user
 
 
 	def u_path(self, username):
 		"""returns user folder path"""
 		return os.path.join(appConfig.user_data_dir, username)
-
-	# def login(self, username, password):
-	# 	hash = hashlib.sha256(username)
-
-	# def get_user(self, username, uid=None):
-	# 	return self.collection(username, uid)
-
-	# def get_user_data(self, username, pointer):
-	# 	user_path = self.u_path(username)
-	# 	file_path = os.path.join(user_path, pointer+'.json')
-
-	# 	# if the data asked for is already there
-	# 	if os.path.exists(file_path):
-	# 		with open(file_path, 'r') as f:
-	# 			return json.load(f)
-
-	# 	return None
 
 	def create_user(self, username, password):
 		_hash = hashlib.sha256((username+password).encode('utf-8'))
@@ -306,7 +309,7 @@ class UserHandler:
 			"user_id": user["id"]
 		}
 
-	def get_user(self, username, temp=False):
+	def get_user(self, username, temp=False) -> User:
 		if username in self.users:
 			return self.users[username]
 		try:
@@ -319,14 +322,12 @@ class UserHandler:
 			return user
 		except:
 			traceback.print_exc()
-			return None
+			return NODict()
 
 
 	def server_verify(self, username, uid, return_user=False):
-		user = self.get_user(username)
+		user = self.collection(username, uid)
 		if not user:
-			return False
-		if user.get("id") != uid:
 			return False
 
 		user["last_active"] = datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
@@ -340,10 +341,34 @@ class UserHandler:
 
 	def collection(self, username:str, uid:str):
 		# verify uid from users collection
-		x = self.get_user(username)
-		if not x: return None
-		if x.get("id")!=uid: return None
-		return x
+		user = self.get_user(username)
+		if not user:
+			return False
+		if user.id != uid:
+			return False
+		return user
+	
+	def set_force_skin(self, username, uid, skin_link):
+		"""
+		Set force skin link for user, so that it will be used instead of online skin
+		"""
+		user = self.collection(username, uid)
+		if not user:
+			print("USER NOT FOUND")
+			return None
+		user.force_skin_link = skin_link
+		return True
+	
+	def reset_force_skin(self, username, uid):
+		"""
+		Reset force skin link for user, so that online skin will be used
+		"""
+		user = self.collection(username, uid)
+		if not user:
+			print("USER NOT FOUND")
+			return None
+		user.force_skin_link = None
+		return True
 
 	def get_skin_link(self, username="", uid="", user=None ,retry=0):
 
@@ -351,26 +376,31 @@ class UserHandler:
 		if not user:
 			print("USER NOT FOUND")
 			return None
+		
+		if user.get("force_skin_link"): # for test purpose
+			return user.force_skin_link
+		
 		character = user.get("bot_character") or user.get("bot_charecter") # typo
 		skin = user["bot_skin"]
 		mode = user["skin_mode"]
-		# print(user.loaded_skin)
-		# print(skin)
+		
 		print(user.get("skins") , user.get("c_skin_mode"),mode , user.loaded_skin , skin)
+
 		if user.get("skins") and user.get("c_skin_mode")==mode and user.loaded_skin == skin:
+			# if skins are already loaded
 			return user.skins[skin]
 
 		if mode == 0:
-			print("INVALID MODE (UNSUPPORTED)")
+			xprint("/y/OFFLINE MODE NOT SUPPORTED YET/=/")
 			return 0
-		elif mode == 1:
+		elif mode == 1: # online mode
 			try:
-				_skin = self.online_avatar.get_skin_link(character, skin)
-				user.skins = self.online_avatar.get_skins(character)
+				_skin = self.online_avatar.get_skin_link(character, skin) # get skin links from server, can be cached
+				user.skins = self.online_avatar.get_skins(character) # get all skins, is cached for reuse mentioned above
 				print("SKINS LOADED")
-				user.c_skin_mode = mode
-				user.loaded_skin = skin
-				return _skin
+				user.c_skin_mode = mode # offline/online mode
+				user.loaded_skin = skin # skin variant
+				return _skin # return skin link
 			except net_sys.NetErrors:
 				traceback.print_exc()
 				return None
@@ -379,11 +409,13 @@ class UserHandler:
 				if retry: #already retried
 					return None
 
+				# if things go wrong, use default skin and retry
 				user["bot_character"] = self.default_user["bot_character"]
 				user["bot_skin"] = self.default_user["bot_skin"]
 				user["skin_mode"] = self.default_user["skin_mode"]
 
-				self.get_skin_link(username, uid, 1)
+				# retry
+				self.get_skin_link(username, uid, retry=1)
 		return 0
 
 	def use_next_skin(self, username, uid):

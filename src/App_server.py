@@ -565,8 +565,8 @@ def chat(self: SH, *args, **kwargs):
 		})()"""]
 		return self.send_json(out)
 
-	user.user_client_time_offset = int(_time_offset)/1000
-	user.user_client_time = int(_time)/1000
+	user.browser_time_offset = int(_time_offset)/1000
+	user.browser_time = int(_time)/1000
 
 	# TODO: REMOVE THIS IN PRODUCTION
 	importlib.reload(Chat_raw2)

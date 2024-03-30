@@ -59,7 +59,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	],
 	(
 		Rchoice('The time is ', "It's ", "Current time is ", "The current time is ", "Currently its ") +
-		user.user_client_dt.strftime("%I:%M %p.") +
+		user.browser_dt.strftime("%I:%M %p.") +
 		Rchoice(" ⌚", blank=1)
 	),
 	"whats_the_time"

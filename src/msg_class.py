@@ -4,7 +4,7 @@ import re
 from bs4 import BeautifulSoup as bs, FeatureNotFound as bs_FeatureNotFound
 
 from user_handler import User
-
+from DS import NODict
 
 _parser = 'lxml'
 try:
@@ -46,7 +46,7 @@ def symbols_to_names(ui:str, user: User):
 
 
 class MessageObj(dict):
-	def __init__(self, user: User={}, ui: str="", ui_raw: str="", mid: int=0, test=False, *args, **kwargs):
+	def __init__(self, user: User=NODict(), ui: str="", ui_raw: str="", mid: int=0, test=False, *args, **kwargs):
 		super().__init__(message_dict.copy(), *args, **kwargs)
 
 		self.__dict__ = self
@@ -57,9 +57,9 @@ class MessageObj(dict):
 		self.mid = mid
 
 		if test:
-			intent = user.get("chat", {}).get("intent", [])
+			intent = user.chat.get("intent", [])
 		else:
-			if user=={}:
+			if not user:
 				raise ValueError("User object is required")
 			intent = user.chat.intent
 
@@ -79,17 +79,17 @@ class MessageObj(dict):
 	def trimmed(self):
 		out = {}
 		items = [
-			"status",
-			"message",
-			"script",
-			"render",
-			"expression",
-			"motion",
-			"voice",
+			"status",  # status of the message
+			"message", # message text
+			"script",  # script to be executed
+			"render",  # render type (innerText, innerHTML)
+			"expression", # expression to be displayed
+			"motion",  # motion of the bot
+			"voice",   # voice data link
 
-			"mid",
-			"rid",
-			"delay",
+			"mid",     # message id
+			"rid",     # response id
+			"delay",   # delay in seconds
 
 		]
 		for i in items:
