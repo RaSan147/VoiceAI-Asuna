@@ -49,7 +49,7 @@ class NODict(GETdict):
 		self.__dict__ = self
 
 	__setitem__ = Callable_dict.__setitem__
-	
+
 	def __setattr__(self, key, value):
 		try:
 			if self(key):

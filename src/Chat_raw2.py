@@ -300,7 +300,7 @@ def basic_output(INPUT, user: User = None, username: str = "") -> MessageObj:
 	"""
 	receive_time = time()
 
-	if user is None and username:
+	if not user and username:
 		user = user_handler.get_user(username)
 
 	if not user.flags.cli: # if user/admin/tester is not using COMMANDS

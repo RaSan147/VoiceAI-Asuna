@@ -5,6 +5,7 @@ import time, datetime
 import traceback
 # import inspect
 from collections import deque
+from typing import Union
 
 from PRINT_TEXT3 import xprint
 
@@ -254,7 +255,7 @@ class UserHandler:
 		"""update user data"""
 		if not user:
 			user = self.get_user(username)
-			if user is None:
+			if not user:
 				return False
 
 		# merge data
@@ -269,7 +270,7 @@ class UserHandler:
 
 	def server_signup(self, username, password):
 		# check if username is already taken
-		if self.get_user(username, temp=True) is not None:
+		if self.get_user(username, temp=True):
 			return {
 				"status": "error",
 				"message": "Username already taken"
@@ -286,7 +287,7 @@ class UserHandler:
 
 	def server_login(self, username, password):
 		user = self.get_user(username)
-		if user is None:
+		if not user:
 			return {
 				"status": "error",
 				"message": "User not found"
@@ -309,7 +310,7 @@ class UserHandler:
 			"user_id": user["id"]
 		}
 
-	def get_user(self, username, temp=False) -> User:
+	def get_user(self, username, temp=False) -> Union[User, NODict]:
 		if username in self.users:
 			return self.users[username]
 		try:
