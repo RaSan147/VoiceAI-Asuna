@@ -14,7 +14,7 @@ os_name = os_name()
 import socket
 import importlib.util
 
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 from IO_sys import delete_last_line
 
 

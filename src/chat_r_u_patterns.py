@@ -1,5 +1,6 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts, eos
 from basic_re_pattern import C, An___
+from COMPLEMENTS_ptrn import PRETTY___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -96,6 +97,10 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 
 	"are_you_lesb"
 ],
+
+
+
+
 
 
 

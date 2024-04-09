@@ -5,7 +5,7 @@ from re import compile as re_compile
 import traceback
 from DS import LimitedDict
 from typing import Union
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 
 class WEB_RE:
 	# compiled regex tool for getting homepage
@@ -168,11 +168,22 @@ re_search = re_tools.search
 
 eol = eos = r"(?:\n|$)"
 
+_TEST = True
+
 
 def C(pattern):
 	""" return re.compile of the pattern with ignore case flag
 	also add to to_bot_suffix so that it can capture calling by bot name or other nouns
 	"""
+	if _TEST:
+		p = re.sub(r"[^a-z0-9\s\|]", '', pattern, flags=re.I)
+		if '  ' in p:
+			def highlight(match):
+				return f" {'^' * len(match.group(1))} "
+			p = re.sub(r"[^a-z0-9\s\|]", '~', pattern, flags=re.I)
+			p = re.sub(r" (~+) ", highlight, p, flags=re.I)
+			raise Warning("Double SPACE in " +'\n' + pattern + '\n\nHIGHLIGHTED:\n' + p)
+
 	pattern = pattern.replace(" ?) ", " ?)") # to avoid double space catcher
 	pattern = pattern.replace(" ? ", " ?") # to avoid double space catcher
 	pattern = pattern.replace(" *) ", " *)") # to avoid double space catcher

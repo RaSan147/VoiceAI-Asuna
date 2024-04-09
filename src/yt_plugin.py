@@ -46,7 +46,7 @@ if os_name == "Windows":
 else:
 	use_mplay = False
 
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 import F_sys, IO_sys, DATA_sys
 import json
 import yt_dlp

@@ -38,6 +38,7 @@ CHANGE___ = r"(change|swap|switch)"
 PLEASE___ = r"((?:p[lw](?:ease|z|s)e?)|kindly)"
 WILL_U___ = rf"(will {YOU___}(?: eve(?:n|r))*)"
 CAN_U___ = rf"(can {YOU___}(?: eve(?:n|r))*)"
+CANT___ = r"(can[' ](?:no)t)"
 DO_U___ = rf"((?:do|did) {YOU___}(?: eve(?:n|r))*)"
 
 REQUESTING___ = "(" + '|'.join([WILL_U___, CAN_U___]) + ")"
@@ -243,31 +244,6 @@ li_QyuiNamePre = "can i call you ", 'may i call you'
 
 li_redo = 'redo my last command', 'retry my last command', 'redo last command', 'redo last command', 'redo'
 
-ip.created_program = [
-	C(
-		'(?P<action>' # save the action to use in reply
-			'created?|'
-			'program(med)?|'
-			'invent(ed)?|'
-			'design(ed)?|'
-			'ma(d|k)e'
-		') '
-		f'{YOU___}'
-	),
-	C(
-		"("
-			f"{YOUR___} "
-		")?"
-		" (?P<action>" #we only need the base verb
-			"creat|"
-			"programm?|"
-			"invent|"
-			"design|"
-			"mak"
-		")(o|e)?r"
-	)
-]
-
 ip.r_u_ok = [
 	C(
 		f"a?re? {YOU___}"
@@ -306,7 +282,7 @@ ip.who_are_you = [
 
 ip.whats_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(rf"{DEFINE_WHAT___} ?(?P<query>.*)"),
+	C(rf"{DEFINE_WHAT___} (?P<query>.*)"),
 ]
 
 ip.whos_ = [
@@ -584,7 +560,7 @@ ot.slur = (
 # start_parrot = "parrot", "repeat after me", "repeat what i say", "mimic", "mimic me", "parrot mode", "parrot on", "turn parrot on", "start parrot", "start mimic", "start mimicing", "start mimicing me", "start mimicing me", "reply what i say", 'reply what i send', "copy me"
 
 ip.start_parrot = [
-	C(r"(start )?parrot(mode )?( on)?"),
+	C(r"(start )?parrot( ?mode)?( on)?"),
 	C(r"mimic( me)?"),
 	C(r"start mimicking( me)?"),
 	C(r"(re(ply|peat)|say) what i (say|type|send|write)"),

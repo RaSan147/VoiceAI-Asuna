@@ -23,7 +23,7 @@ from headers_file import header_list
 
 import F_sys as Fsys
 from REGEX_TOOLS import web_re
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 from RESPONSE_CACHE import Cached_Response
 from CONFIG import appConfig
 NetErrors = (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError,

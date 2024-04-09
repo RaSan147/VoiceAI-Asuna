@@ -23,7 +23,7 @@ from http.cookies import SimpleCookie
 from CONFIG import appConfig
 from user_handler import User, user_handler
 from OS_sys import check_internet
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 from REGEX_TOOLS import web_re
 
 # PYROBOX SERVER MODULES

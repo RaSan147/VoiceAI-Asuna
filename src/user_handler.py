@@ -7,7 +7,7 @@ import traceback
 from collections import deque
 from typing import Union
 
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 
 import F_sys
 import net_sys

@@ -28,7 +28,7 @@ from bbc_news import bbc_news
 import F_sys
 from OS_sys import check_internet
 from REGEX_TOOLS import re_search, re_starts, re_check, re_fullmatch
-from PRINT_TEXT3 import xprint, remove_style
+from print_text3 import xprint, remove_style
 from DATA_sys import call_or_return
 
 import net_sys

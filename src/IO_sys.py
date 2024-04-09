@@ -2,7 +2,7 @@ import sys
 
 import basic_conv_pattern as Constants
 from OS_sys import os_name, os_system
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 from NUM_sys import flatten_array
 
 """ Contains Input and Output functions """

@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_re_pattern import C, WHAT___
+from basic_re_pattern import C, WHAT___, YOU___, CANT___, YOURE___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -78,7 +78,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU ARE BETTER THAN .*"),
+		C(rf"{YOU___} ARE BETTER THAN .*"),
 	],
 	(
 		Rchoice(
@@ -94,7 +94,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU ARE WORSE THAN .*"),
+		C(rf"{YOU___} ARE WORSE THAN .*"),
 	],
 	(
 		Rchoice(
@@ -107,8 +107,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU ARE (NOT |IM)MORTAL"),
-		C(rf"ARE YOU IMMORTAL"),
+		C(rf"{YOURE___} (NOT |IM)MORTAL"),
+		C(rf"a?re? {YOU___} IMMORTAL"),
 	],
 	(
 		Rchoice(
@@ -374,7 +374,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	(
 		Rchoice(
 			Rchoice(
-				"I'm not lying", 
+				"I'm try not to lie (unless I was taught to...)", 
 				"I don't lie"
 			) + 
 			Rchoice(
@@ -397,7 +397,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	[
 		C(rf"I (HOPE|WISH) THAT YOU DIE"),
 		C(rf"You should DIE"),
-		C(rf"You (better |should )+(DIE|KILL YOURSELF)"),
+		C(rf"You ((had|better|should) )+(DIED?|KILL(ED)? YOURSELF)"),
 	],
 	(
 		Rchoice(
@@ -426,7 +426,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"I (HAVE )?TALKED (with |to )?(chatgpt|openai)")
+		C(rf"I (HAVE )?TALK(?:ED)? (with |to )?(chatgpt|openai)")
 	],
 	(
 		Rchoice(

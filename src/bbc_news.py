@@ -93,7 +93,7 @@ class BBC_News:
 	def task(self, Topic):
 		if __name__ == '__main__':
 			if check_internet(bbc_topics[Topic]):
-				from PRINT_TEXT3 import xprint
+				from print_text3 import xprint
 				xprint(*self.news_report(Topic), wait_time= 0.03)
 				# print(*self.news_report(Topic))
 			else:

@@ -8,7 +8,7 @@ from queue import Queue
 from random import random
 
 import DATA_sys as Datasys
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 from REGEX_TOOLS import web_re
 
 def get_sep(path):  # fc=0601

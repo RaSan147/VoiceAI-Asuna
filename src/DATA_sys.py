@@ -6,7 +6,7 @@ from functools import reduce as functools_reduce
 from operator import iconcat as operator_iconcat
 
 
-from PRINT_TEXT3 import xprint
+from print_text3 import xprint
 
 
 """Data types and conversion functions"""
