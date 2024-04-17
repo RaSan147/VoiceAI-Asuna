@@ -472,6 +472,41 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 	# Most web servers default to HTTP 0.9, i.e. don't send a status line.
 	default_request_version = "HTTP/0.9"
 
+	allow_star_CORS = dict() # list of methods that can be accessed by any origin
+	# {
+	# 	"GET": '*',
+	# 	"POST": '/',
+	# }
+	# ALL will be used for all methods (not defaults)
+	# use allow_CORS to add a method to the list (and Override ALL)
+	# DEFAULT: None
+
+
+
+	@staticmethod
+	def allowed_CORS(method) -> Union[str, None]:
+		"""Check if the method is allowed by the server"""
+		self = __class__
+		cors = self.allow_star_CORS.get(method.upper(), None)
+
+		return cors or self.allow_star_CORS.get("ALL", None)
+
+
+	@staticmethod
+	def allow_CORS(method, origin):
+		"""Add a method to the allowed list"""
+		self = __class__
+		method = method.upper()
+		self.allow_star_CORS[method] = origin
+
+		if method == "HEAD":
+			self.allow_star_CORS["GET"] = origin
+
+		if method == "GET":
+			self.allow_star_CORS["HEAD"] = origin
+
+
+
 	def parse_request(self):
 		"""Parse a request (internal).
 
@@ -484,6 +519,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 
 		"""
 		self.command = ''  # set in case of error on the first line
+		self.method = ''  # set in case of error on the first line
 		self.request_version = version = self.default_request_version
 		self.close_connection = True
 		self.header_flushed = False # true when headers are flushed by self.flush_headers()
@@ -632,6 +668,8 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 				# An error code has been sent, just exit
 				return
 			mname = 'do_' + self.command
+			self.method = self.command
+
 			if not hasattr(self, mname):
 				self.send_error(
 					HTTPStatus.NOT_IMPLEMENTED,
@@ -665,6 +703,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 								 ]) + '\n' +
 						'+'*w + f' {self.req_hash} ' + '+'*w
 						)
+
 
 			try:
 				method()
@@ -754,6 +793,10 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			body = content.encode('UTF-8', 'replace')
 			self.send_header("Content-Type", error_content_type)
 			self.send_header('Content-Length', str(len(body)))
+
+			# if user Ovverides the CORS policy
+			self.method = "ERROR"
+
 		self.end_headers()
 
 		if self.command != 'HEAD' and body:
@@ -817,6 +860,11 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 
 	def end_headers(self):
 		"""Send the blank line ending the MIME headers."""
+		
+		CORS_POLICY = self.allowed_CORS(self.method)
+		if self.allowed_CORS(self.method):
+			self.send_header('Access-Control-Allow-Origin', CORS_POLICY)
+
 		if self.request_version != 'HTTP/0.9':
 			self._headers_buffer.append(b"\r\n")
 			self.flush_headers()
@@ -1337,6 +1385,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			# if f and not f.closed(): f.close()
 			raise
 
+		# finally:
+		# 	if file and not file.closed:
+		# 		file.close()
+
 	def send_file(self, path, filename=None, download=False, cache_control=''):
 		'''sends the head and file to client'''
 		file = self.return_file(path, filename, download, cache_control)
@@ -1357,7 +1409,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		to the outputfile by the caller unless the command was HEAD,
 		and must be closed by the caller under all circumstances), or
 		None, in which case the caller has nothing further to do.
-
 		"""
 
 		if 'Range' not in self.headers:
