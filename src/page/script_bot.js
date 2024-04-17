@@ -157,7 +157,19 @@ class Bot_{
 		// var volume = 1; //[Optional arg, can be null or empty] [0.0 - 1.0]
 		// var expression = 4; //[Optional arg, can be null or empty] [index|name of expression]
 
-		this.model4.motion(mtn_type, mtn_id, priority_number, {sound: audio, volume: volume, expression:expression})
+		this.model4.motion(
+			mtn_type, 
+			mtn_id, 
+			priority_number, 
+			{
+				sound: audio, 
+				volume: volume, 
+				expression:expression,
+				crossOrigin: "anonymous",
+				// onEnd: function () {
+				// 	console.log("Finished motion");
+				// }
+			})
 
 	}
 	
