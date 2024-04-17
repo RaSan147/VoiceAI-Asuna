@@ -95,6 +95,10 @@ def join_path(*paths:str):
 #             SERVER HANDLER                #
 #############################################
 
+######### UPDATE CORS POLICY #########
+
+SH.allow_CORS("GET", '*')
+
 ######### HANDLE GET REQUEST #########
 
 def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
@@ -137,7 +141,7 @@ def send_favico(self: SH, *args, **kwargs):
 @SH.on_req('GET', url_regex='/@fonts/.*')
 def send_font(self: SH, *args, **kwargs):
 	"""
-	re-direct font request to cloud to make server less file bloated
+	re-direct font request to specific directory
 	"""
 
 	file = web_re.gen_link_facts(self.path)["path"].split("/")[-1]
@@ -146,13 +150,27 @@ def send_font(self: SH, *args, **kwargs):
 		self.send_error(HTTPStatus.NOT_FOUND, "File not found")
 		return None
 
+	return self.return_file(pyrobox_config.ftp_dir+"/fonts/"+file)
+
+@SH.on_req('GET', url_regex='/@scripts/.*')
+def send_font(self: SH, *args, **kwargs):
+	"""
+	re-direct scripts request to specific directory
+	"""
+
+	file = web_re.gen_link_facts(self.path)["path"].split("/")[-1]
+	
+	if not os.path.exists(pyrobox_config.ftp_dir+"/scripts/"+file):
+		self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+		return None
+
 
 	if file.endswith(".css"):
-		with open(pyrobox_config.ftp_dir+"/fonts/"+file, "rb") as f:
+		with open(pyrobox_config.ftp_dir+"/scripts/"+file, "rb") as f:
 			file_data =	f.read()
 		return self.send_css(file_data)
 
-	return self.return_file(pyrobox_config.ftp_dir+"/fonts/"+file)
+	return self.return_file(pyrobox_config.ftp_dir+"/scripts/"+file)
 
 
 
