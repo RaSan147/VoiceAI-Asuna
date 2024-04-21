@@ -190,11 +190,13 @@ class ChatHandler{
 			await tools.sleep(json.delay * 1000)
 		}
 
+		
 
 		if (voice) {
-			bot.speak(voice, volume, expression)
+			// bot.speak(voice, volume, expression)
 			//alert(voice + volume + expression)
-			//bot.speak_mtn(motion, voice, volume, expression)
+			// motion = 'happy'
+			bot.speak_mtn(motion, voice, volume, expression)
 		}
 
 		return msg_ele
