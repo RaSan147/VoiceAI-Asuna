@@ -10,3 +10,4 @@ Unidecode
 Wikipedia-API
 edge_tts
 emoji
+exrex

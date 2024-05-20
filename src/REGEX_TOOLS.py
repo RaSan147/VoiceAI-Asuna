@@ -1,11 +1,13 @@
 __all__ = ['web_re']
 
+import os
 import re
 from re import compile as re_compile
 import traceback
 from DS import LimitedDict
 from typing import Union
 from print_text3 import xprint
+import exrex
 
 class WEB_RE:
 	# compiled regex tool for getting homepage
@@ -79,8 +81,26 @@ class WEB_RE:
 
 web_re = WEB_RE()
 
-def _pp(pattern):
-	xprint(f"	/p/Pattern: /=/ {pattern}")
+def _pp(pattern:re.Pattern):
+	xprint(f"	/p/Pattern: /=/ {pattern.pattern}")
+	flags = []
+	if pattern.flags & re.IGNORECASE:
+		flags.append('IGNORECASE')
+	if pattern.flags & re.MULTILINE:
+		flags.append('MULTILINE')
+	if pattern.flags & re.DOTALL:
+		flags.append('DOTALL')
+	if pattern.flags & re.VERBOSE:
+		flags.append('VERBOSE')
+	if pattern.flags & re.ASCII:
+		flags.append('ASCII')
+	if pattern.flags & re.DEBUG:
+		flags.append('DEBUG')
+	if pattern.flags & re.LOCALE:
+		flags.append('LOCALE')
+	if pattern.flags & re.UNICODE:
+		flags.append('UNICODE')
+	xprint(f"	/g/Pattern flags: /=/ {flags}")
 
 
 class Tool_belt:
@@ -97,7 +117,7 @@ class Tool_belt:
 
 		for ptrn in patterns:
 			if isinstance(ptrn, str):
-				ptrn = re_compile(f"^{re.escape(ptrn)}", re.IGNORECASE)
+				ptrn = C(f"^{re.escape(ptrn)}")
 
 			m = ptrn.search(string)
 			if m and m.start() == 0:
@@ -114,7 +134,7 @@ class Tool_belt:
 
 		for ptrn in patterns:
 			if isinstance(ptrn, str):
-				ptrn = re_compile(re.escape(ptrn), re.IGNORECASE)
+				ptrn = C(re.escape(ptrn))
 
 			m = ptrn.search(string)
 			if m:
@@ -150,7 +170,7 @@ class Tool_belt:
 
 		for ptrn in patterns:
 			if isinstance(ptrn, str):
-				ptrn = re_compile(ptrn, re.IGNORECASE)
+				ptrn = C(re.escape(ptrn))
 
 			m = ptrn.search(string)
 			if m:
@@ -191,8 +211,93 @@ def C(pattern):
 	try:
 		return re_compile(pattern, flags=re.IGNORECASE)
 	except re.error:
-		print("FAILED TO COMPILE:")
-		print(pattern)
+		xprint("/r/FAILED TO COMPILE:/=/")
+		xprint('/c/ Pattern:', repr(pattern), '/=/')
 		print("\n")
 		traceback.print_exc()
 		exit()
+
+
+def re_vert(pattern_list, print_=True, print_output=False, store_path=None):
+	"""
+	pattern_list: 	
+		[
+			[
+				[
+					complied_pattern_1,
+					...
+				],
+				output,
+				intent
+			],...
+		]
+
+	returns:
+		intent
+		pattern text,
+		>> possible inputs using exrex,
+	"""
+
+	markdown = ''
+
+	if store_path:
+		# also make the directory if not exists
+		store_path = os.path.abspath(store_path)
+		store_dir = os.path.dirname(store_path)
+		os.makedirs(store_dir, exist_ok=True)
+
+		f = open(store_path, "w", newline='')
+
+	for pattern in pattern_list:
+		patterns = pattern[0]
+		intent = pattern[2]
+
+		if print_: xprint(f"/hi/Intent: /=/ {intent}")
+		markdown += f"## {intent}\n"
+
+		for p in patterns:
+			if isinstance(p, str):
+				p = C(re.escape(p))
+			pattern_text = p.pattern
+
+			if print_: xprint(f"\t/p/Pattern: /=/ {pattern_text}")
+			markdown += f"### {pattern_text}\n"
+
+			if print_: xprint(f"\t/g/>> Possible Inputs:/g/")
+			markdown += f"#### Possible Inputs\n"
+
+			n = 0
+
+			for i in exrex.generate(pattern_text, limit=2):
+				if print_ and print_output: xprint(f"\t\t/c/{i}/=/")
+				markdown += f"- {i}\n"
+
+				n += 1
+
+				if n > 2_000_000:
+					break
+
+			if print_: xprint(f"\t/g/>> Total Inputs: {n}/=/")
+
+			if print_: print("\n")
+			markdown += "\n"
+
+			
+			if store_path:
+				f.write(markdown)
+				markdown = ''
+		
+		if print_: print("\n\n")
+		markdown += "\n\n"
+
+		if store_path:
+			f.write(markdown)
+			markdown = ''
+
+	if store_path:
+		f.close()
+		return None
+
+
+	return markdown
+
