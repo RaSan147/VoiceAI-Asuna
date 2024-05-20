@@ -60,4 +60,14 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ]
 
 
-patterns()
+
+__ptn = patterns()
+
+if __name__ != '__main__':
+	from REGEX_TOOLS import re_vert
+	import os
+	filename = os.path.basename(__file__)
+	store_path = f"patterns.tmp/{filename}.md"
+	markdown = re_vert(__ptn, store_path=store_path)
+
+

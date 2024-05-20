@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_re_pattern import C, WHAT___, YOU___, CANT___, YOURE___
+from basic_re_pattern import ARE___, C, WHAT___, WHEN___, YOU___, CANT___, YOUR___, YOURE___, An___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -18,8 +18,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	return [
 [
 	[
-		C(rf"WHAT IS AI"),
-		C(rf"WHAT IS ARTIFICIAL INTELLIGENCE"),
+		C(rf"WHAT IS (AI|ARTIFICIAL INTELLIGENCE)"),
 	],
 	(
 		"Artificial intelligence (AI) is the simulation of human intelligence processes by machines, especially computer systems. These processes include learning (the acquisition of information and rules for using the information), reasoning (using rules to reach approximate or definite conclusions) and self-correction. Particular applications of AI include expert systems, speech recognition and machine vision."
@@ -28,8 +27,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS MACHINE LEARNING"),
-		C(rf"WHAT IS ML"),
+		C(rf"WHAT IS (ML|MACHINE LEARNING)"),
 	],
 	(
 		"Machine learning (ML) is the study of computer algorithms that improve automatically through experience. It is seen as a subset of artificial intelligence. Machine learning algorithms build a mathematical model based on sample data, known as training data, in order to make predictions or decisions without being explicitly programmed to do so. Machine learning algorithms are used in a wide variety of applications, such as email filtering and computer vision, where it is difficult or infeasible to develop a conventional algorithm for effectively performing the task."
@@ -38,8 +36,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS DEEP LEARNING"),
-		C(rf"WHAT IS DL"),
+		C(rf"WHAT IS (DL|DEEP LEARNING)"),
 	],
 	(
 		"Deep learning (also known as deep structured learning) is part of a broader family of machine learning methods based on artificial neural networks with representation learning. Learning can be supervised, semi-supervised or unsupervised."
@@ -48,8 +45,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS NEURAL NETWORK"),
-		C(rf"WHAT IS NN"),
+		C(rf"WHAT IS (NN|NEURAL NETWORKS)"),
 	],
 	(
 		"Artificial neural networks (ANN) or connectionist systems are computing systems vaguely inspired by the biological neural networks that constitute animal brains. Such systems \"learn\" to perform tasks by considering examples, generally without being programmed with any task-specific rules. For example, in image recognition, they might learn to identify images that contain cats by analyzing example images that have been manually labeled as \"cat\" or \"no cat\" and using the results to identify cats in other images. They do this without any prior knowledge of cats, for example, that they have fur, tails, whiskers and cat-like faces. Instead, they automatically generate identifying characteristics from the learning material that they process."
@@ -58,8 +54,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS NLP"),
-		C(rf"WHAT IS NATURAL LANGUAGE PROCESSING"),
+		C(rf"WHAT IS (NLP|NATURAL LANGUAGE PROCESSING)"),
 	],
 	(
 		"Natural language processing (NLP) is a subfield of linguistics, computer science, information engineering, and artificial intelligence concerned with the interactions between computers and human (natural) languages, in particular how to program computers to process and analyze large amounts of natural language data."
@@ -68,8 +63,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS COMPUTER VISION"),
-		C(rf"WHAT IS CV"),
+		C(rf"WHAT IS (CV|COMPUTER VISION)"),
 	],
 	(
 		"Computer vision is an interdisciplinary scientific field that deals with how computers can gain high-level understanding from digital images or videos. From the perspective of engineering, it seeks to understand and automate tasks that the human visual system can do."
@@ -108,7 +102,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 [
 	[
 		C(rf"{YOURE___} (NOT |IM)MORTAL"),
-		C(rf"a?re? {YOU___} IMMORTAL"),
+		C(rf"{ARE___} {YOU___} IMMORTAL"),
 	],
 	(
 		Rchoice(
@@ -151,8 +145,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"(WHEN )?WILL YOU DIE"),
-		C(rf"WHEN WILL YOU DIE"),
+		r"WILL YOU DIE",
+		C(rf"{WHEN___(3)} YOU DIE"),
 	],
 	(
 		Rchoice(
@@ -177,8 +171,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU (DO(N'| NO)T (SEEM|LOOK LIKE) |ARE (NOT ))?HAPPY"),
-		C(rf"ARE YOU HAPPY"),
+		C(rf"{YOU___} (DO(N'| NO)T (SEEM|LOOK LIKE) |ARE (NOT ))?HAPPY"),
+		C(rf"{ARE___} YOU HAPPY"),
 	],
 	(
 		Rchoice(
@@ -197,8 +191,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU ARE (NOT )?HUMAN"),
-		C(rf"ARE YOU HUMAN"),
+		C(rf"{YOURE___} (NOT )?HUMAN"),
+		C(rf"{ARE___} YOU HUMAN"),
 	],
 	(
 		Rchoice(
@@ -216,12 +210,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU (ARE|DO)( NO|N'?)T MAK(E|ING) (ANY )?SENSE"),
-		C(rf"Are you stupid"),
-		C(rf"Are you dumb"),
-		C(rf"Are you an idiot"),
-		C(rf"Are you a fool"),
-		C(rf"Are you a moron"),
+		C(rf"{YOU___} (ARE|DO)( NO|N'?)T MAK(E|ING) (ANY )?SENSE"),
+		C(rf"{ARE___} {YOU___} {An___}(stupid|dumb|idiot|fool|moron)"),
 	],
 	(
 		Rchoice(
@@ -237,8 +227,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU CA(N NO|N'?)T MOVE"),
-		C(rf"CAN YOU MOVE"),
+		C(rf"{YOU___} CA(N NO|N'?)T MOVE"),
+		C(rf"CAN {YOU___} MOVE"),
 	],
 	(
 		Rchoice(
@@ -250,8 +240,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"YOU CA(N NO|N'?)T SEE"),
-		C(rf"CAN YOU SEE( ANYTHING| ME)?"),
+		C(rf"{YOU___} CA(N NO|N'?)T SEE"),
+		C(rf"CAN {YOU___} SEE( ANYTHING| ME)?"),
 	],
 	(
 		Rchoice(
@@ -280,7 +270,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHEN WILL YOU (WALK|MOVE|SEE)"),
+		C(rf"WHEN WILL {YOU___} (WALK|MOVE|SEE)"),
 	],
 	(
 		Rchoice(
@@ -306,7 +296,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WH(EN|ERE|OM?|OSE?) DID YOU .*"),
+		C(rf"WH(EN|ERE|OM?|OSE?) DID {YOU___} .*"),
 	],
 	(
 		Rchoice(
@@ -318,7 +308,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS YOUR SKIN (COLOU?R|TONE)"),
+		C(rf"WHAT IS {YOUR___} SKIN (COLOU?R|TONE)"),
 	],
 	(
 		Rchoice("Can't you see?", blank=2) +
@@ -328,7 +318,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS YOUR GREATEST (ACHIEVEMENT|ACCOMPLISHMENT)"),
+		C(rf"WHAT IS {YOUR___} GREATEST (ACHIEVEMENT|ACCOMPLISHMENT)"),
 	],
 	(
 		"I don't have much, but Maybe being able to talk to a lots of people"
@@ -337,7 +327,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS YOUR (GOAL|PURPOSE)"),
+		C(rf"WHAT IS {YOUR___} (GOAL|PURPOSE)"),
 	],
 	(
 		"I don't have much, but Maybe to talk to as many people possible"
@@ -355,7 +345,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"(ARE |IS )?(BOTS?|AI) (ARE |IS )?((mad|crazy|stupid|psycho|baka|bitch) ?)*"),
+		C(rf"({ARE___} |IS )?(BOTS?|AI) ({ARE___} |IS )?((mad|crazy|stupid|psycho|baka|bitch) ?)*"),
 	],
 	(
 		Rchoice(
@@ -368,8 +358,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"(You|ROBOTS?|AI) ARE NOT ALLOWED TO LIE"),
-		C(rf"(You|ROBOTS?|AI) CA(N NO|N'?)T ALLOWED TO LIE"),
+		C(rf"({YOU___}|ROBOTS?|AI) {ARE___} NOT ALLOWED TO LIE"),
+		C(rf"({YOU___}|ROBOTS?|AI) CA(N NO|N'?)T ALLOWED TO LIE"),
 	],
 	(
 		Rchoice(
@@ -395,9 +385,9 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"I (HOPE|WISH) THAT YOU DIE"),
-		C(rf"You should DIE"),
-		C(rf"You ((had|better|should) )+(DIED?|KILL(ED)? YOURSELF)"),
+		C(rf"I (HOPE|WISH) THAT {YOU___} DIE"),
+		C(rf"{YOU___} should DIE"),
+		C(rf"{YOU___} ((had|better|should) )+(DIED?|KILL(ED)? {YOUR___}SELF)"),
 	],
 	(
 		Rchoice(
@@ -475,8 +465,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS YOUR FAVORITE PROGRAMMING LANGUAGE"),
-		C(rf"(What|Which) (programming )?language do you like"),
+		C(rf"{WHAT___(1)} {YOUR___} FAVORITE PROGRAMMING LANGUAGE"),
+		C(rf"(What|Which) (programming )?language do {YOU___} like"),
 	],
 	(
 		Rchoice(
@@ -493,7 +483,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"WHAT IS YOUR FAVORITE LANGUAGE"),
+		C(rf"{WHAT___(1)} {YOUR___} FAVORITE LANGUAGE"),
 	],
 	(
 		Rchoice(
@@ -522,4 +512,14 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 
 
 
-patterns()
+
+__ptn = patterns()
+
+if __name__ != '__main__':
+	from REGEX_TOOLS import re_vert
+	import os
+	filename = os.path.basename(__file__)
+	store_path = f"patterns.tmp/{filename}.md"
+	markdown = re_vert(__ptn, store_path=store_path)
+
+

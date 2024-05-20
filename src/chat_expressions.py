@@ -1,6 +1,6 @@
 
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_re_pattern import C, AuxV___, YOU___, YOUR___, YOURE___
+from basic_re_pattern import ARE___, C, AuxV___, YOU___, YOUR___, YOURE___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -118,7 +118,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{YOU___} {AuxV___}? ?(rude|mean)"),
+		C(rf"{YOURE___} (rude|mean)"),
 		C(rf"{YOU___} hurt me"),
 	],
 	(
@@ -133,7 +133,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	}
 ],
 [
-	[C(rf"((a?re?) )?{YOU___} ((a?re?) )?(a )?((mad|crazy|stupid|psycho|baka|bitch) ?)+"),],
+	[C(rf"({ARE___} )?{YOU___} ({ARE___} )?(a )?((mad|crazy|stupid|psycho|baka|bitch) ?)+"),],
 	(
 		Rchoice("You meani...", "You baka...", "Huh..", "Whatt!!", blank=1) + "\n" +
 			Rchoice(
@@ -182,7 +182,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	}
 ],
 [
-	[C(rf"(thank|tnx|tnq|thx)s?( {YOU___})?( a ?lot|very much)?( for .+)?"),
+	[C(rf"(thank|tnx|tnq|thx)s?( {YOU___})?( a ?lot| very much)?( for )?"),
 	C(rf"((many )+|((a )?lots? of ))(thank|tnx|tnq|thx)s?( for( the)? \S+( me)?)?"),
 	],
 	( Rchoice(
@@ -345,4 +345,14 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 
 
 
-patterns()
+
+__ptn = patterns()
+
+if __name__ != '__main__':
+	from REGEX_TOOLS import re_vert
+	import os
+	filename = os.path.basename(__file__)
+	store_path = f"patterns.tmp/{filename}.md"
+	markdown = re_vert(__ptn, store_path=store_path)
+
+

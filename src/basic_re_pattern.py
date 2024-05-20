@@ -8,10 +8,12 @@ from DS import GETdict
 
 from CHAT_TOOLS import merge
 
-YOU___ = r"((?:yo)?u|y[ao])"
-YOUR___ = rf"({YOU___}([' ]?r))"
-YOURE___ = rf"({YOU___}[' ]?(a?re?)?)"
+IM___ = r"i(?:'?| a)m"
+ARE___ = r"(?:are|re?)"
 
+YOU___ = r"((?:yo)?u|y[ao])"
+YOUR___ = rf"({YOU___}r)"
+YOURE___ = rf"({YOU___}[' ]?{ARE___}?)"
 
 
 AuxV___ = (
@@ -19,10 +21,10 @@ AuxV___ = (
 		"'?(?:"
 			"m|s|re?|ll|ve"
 		")"
-		" "
+		""
 		"|"
 		" (?:"
-			"is|a?re?|was|were|am|will"
+			rf"is|{ARE___}|was|were|am|will"
 		")"
 	")"
 	"(?:"
@@ -32,17 +34,63 @@ AuxV___ = (
 		" be(?:en|ing)?"
 	")?"
 )
+
+AuxV1___ = (
+	"(?:"
+		"'?(?:"
+			"m|s|re?"
+		")"
+		""
+		"|"
+		" (?:"
+			rf"is|{ARE___}|am"
+		")"
+	")"
+)
+
+AuxV2___ = (
+	"(?:"
+		"'?(?:"
+			"re?"
+		")"
+		""
+		"|"
+		" (?:"
+			rf"w(?:as|ere)"
+		")"
+	")"
+)
+
+AuxV3___ = (
+	"(?:"
+		"'?(?:"
+			"ll"
+		")"
+		""
+		"|"
+		" (?:"
+			rf"will|shall"
+		")"
+	")"
+)
+
 An___ = r"(?:an?)"
 
 CHANGE___ = r"(change|swap|switch)"
 PLEASE___ = r"((?:p[lw](?:ease|z|s)e?)|kindly)"
-WILL_U___ = rf"(will {YOU___}(?: eve(?:n|r))*)"
-CAN_U___ = rf"(can {YOU___}(?: eve(?:n|r))*)"
+WILL_U___ = rf"(will {YOU___}(?: eve(?:n|r)){{0,2}})"
+CAN_U___ = rf"(can {YOU___}(?: eve(?:n|r)){{0,2}})"
 CANT___ = r"(can[' ](?:no)t)"
-DO_U___ = rf"((?:do|did) {YOU___}(?: eve(?:n|r))*)"
+DO_U___ = rf"((?:do|did) {YOU___}(?: eve(?:n|r)){{0,2}})"
 
 REQUESTING___ = "(" + '|'.join([WILL_U___, CAN_U___]) + ")"
 ASKING___ = "(" + '|'.join([CAN_U___, DO_U___, WILL_U___]) + ")"
+
+What___ = r"w(?:h|g)?[au]t"
+Who___ = r"w(?:h|g)?o"
+When___ = r"w(?:h|g)?en"
+How___ = r"how"
+Where___ = r"w(?:h|g)?ere"
 
 
 DEFINE_WHAT___ = (
@@ -52,60 +100,96 @@ DEFINE_WHAT___ = (
 			"|"
 			"define" # define this or that
 			"|"
-			"w(?:h|g)?[au]t" # what is ....
-			f"{AuxV___}?"
+			f"{What___}( {AuxV___})?" # what is ....
 		")"
 		"(?: the)?" #define the ..., what is the ..
 	")"
 )
 
-WHAT___ = (
+def AuxV(tense=0):
+	aux = AuxV1___ if tense==1 else AuxV2___ if tense==2 else AuxV3___ if tense==3 else AuxV___
+
+	return aux
+
+def WHAT___(tense=0):
+	aux = AuxV(tense)
+	return (
 	"("
-		"w(?:h|g)?[au]t" # what is ....
-		f"{AuxV___}?"
+		 # what is ....
+		f"( {aux})?"
 		"(?: the)?" #define the ..., what is the ..
 	")"
 )
 
-WHO___ = (
+
+def WHO___(tense=0):
+	aux = AuxV(tense)
+	return (
 	"("
-		"w(?:h|g)?o" # who typo wgo
-		f"{AuxV___}?"
-		"(?: the)?"
-	")"
-)
-WHEN___ = (
-	"("
-		"w(?:h|g)?en"
-		f"{AuxV___}?"
-		"(?: the)?"
-	")"
-)
-HOW___ = (
-	"("
-		"how"
-		f"{AuxV___}?"
-		"(?: the)?"
-	")"
-)
-WHERE___ = (
-	"("
-		"where"
-		f"{AuxV___}?"
+		f"{Who___}( {aux})?"
 		"(?: the)?"
 	")"
 )
 
 
+def WHEN___(tense=0):
+	aux = AuxV(tense)
+	return (
+	"("
+		f"{When___}( {aux})?"
+		"(?: the)?"
+	")"
+)
 
-WHO_WHAT___ = rf"({WHO___}|{WHAT___})"
-WHEN_WHAT___ = rf"({WHEN___}|{WHAT___})"
+
+def HOW___(tense=0):
+	aux = AuxV(tense)
+	return (
+	"("
+		f"{How___}( {aux})?"
+		"(?: the)?"
+	")"
+)
+
+
+def WHERE___(tense=0):
+	aux = AuxV(tense)
+	return (
+	"("
+		f"{Where___}( {aux})?"
+		"(?: the)?"
+	")"
+)
+
+
+# WHO_WHAT___ = rf"((who|what){AuxV___})(?: the)?" # who is, what is
+# WHEN_WHAT___ = rf"(when|what){AuxV___}(?: the)?" # when is, what is
+
+def WHO_WHAT___(tense=0):
+	aux = AuxV(tense)
+	return (
+	"("
+		f"{Who___}|{What___}"
+		f"{aux}?"
+		"(?: the)?"
+	")"
+)
+
+def WHEN_WHAT___(tense=0):
+	aux = AuxV(tense)
+	return (
+	"("
+		f"{When___}|{What___}"
+		f"{aux}?"
+		"(?: the)?"
+	")"
+)
 
 DRESS___ = r"(dress|cloth|skin|costume|wear)(?:e?s)?"
 ROOM___ = r"(room|place|location|background|bg)"
 
 YES___ = r"(y(?:e|a)(?:ah|s|p))"
-OKAY___ = r"(ok+(?:ay|h|eh)?)"
+OKAY___ = r"(ok(?:(?:a|e)y|h|eh|ie?)?|alright)"
 
 to_bot_suffix = C(
 	"("
@@ -246,7 +330,7 @@ li_redo = 'redo my last command', 'retry my last command', 'redo last command', 
 
 ip.r_u_ok = [
 	C(
-		f"a?re? {YOU___}"
+		f"{ARE___} {YOU___}"
 		"(?: feeling)?"
 		" (?P<OK___>" # can be used in reply
 			"fine"
@@ -273,10 +357,10 @@ ip.thanks = [
 ]
 
 ip.r_u = [
-	C(rf"a?re? {YOU___}"),
+	C(rf"{ARE___} {YOU___}"),
 ]
 ip.who_are_you = [
-	C(rf"who ?a?re? {YOU___}"),  # who are u
+	C(rf"who[' ]?{ARE___} {YOU___}"),  # who are u
 ]
 
 
@@ -287,24 +371,24 @@ ip.whats_ = [
 
 ip.whos_ = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what ?(s|re|is|are|was|were)? )(the )?(?P<query>.*)"),
-	C(rf"{WHO___}(?P<query>.*)"),
+	C(rf"{WHO___()}(?P<query>.*)"),
 ]
 
 ip.whens_ = [
-	C(rf"{WHEN___}(?P<query>.*)"),
+	C(rf"{WHEN___()}(?P<query>.*)"),
 ]
 
 ip.hows_ = [
-	C(rf"{HOW___}(?P<query>.*)"),
+	C(rf"{HOW___()}(?P<query>.*)"),
 ]
 
 ip.wheres_ = [
-	C(rf"{WHERE___}(?P<query>.*)"),
+	C(rf"{WHERE___()}(?P<query>.*)"),
 ]
 
 ip.whats_your_name = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o)) know )?(what(s|re| (is|are|was|were))? )?((yo)?u|y(a|o))(r|re)? name"),
-	C(rf"({WHAT___})?{YOUR___} name"),
+	C(rf"({WHAT___()})?{YOUR___} name"),
 	# C(r"((((can|will) ((yo)?u|y(a|o)) )?(please )?)?(tell|speak|say) (me )?)?what should i call ((yo)?u|y(a|o))( by)?")
 
 ]
@@ -312,7 +396,7 @@ ip.whats_your_name = [
 
 
 ip.what_to_call_you = [
-	C(rf"{WHAT___} should i call {YOU___}( by)?"),
+	C(rf"{WHAT___()} should i call {YOU___}( by)?"),
 ]
 
 ip.what_time = [
@@ -320,7 +404,7 @@ ip.what_time = [
 	C(
 		"("
 			"(?:"
-				f"{WHAT___}{AuxV___}? ?"
+				f"{WHAT___()} ?"
 			")?"
 			"(?:the )?"
 			"(?:current )?"
@@ -338,8 +422,7 @@ ip.what_date = [
 	# C(r"((can ((yo)?u|y(a|o)) )?(please )?((tell|speak|say)( me)? )|((do|did) )?((yo)?u|y(a|o))( even)? know )?(what(s|re| (is|are|was|were))? )?(the )?(current )?time( is| it)*( now)?( please)?"),
 	C(
 		'('
-			"(?:{WHAT___}{AuxV___}? )?"
-			"(?:the )?"
+			f"(?:{WHAT___()} )?"
 			"(?:current )?"
 			"date"
 			f'{eos}'

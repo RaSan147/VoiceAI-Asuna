@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_re_pattern import C, happy_emj, sad_emj, AuxV___, YOURE___, YOUR___, YOU___, PLEASE___, WHAT___, WHAT___, WHEN_WHAT___, WHO_WHAT___, WHEN___, eos, DEFINE_WHAT___, eol
+from basic_re_pattern import C, What___, happy_emj, sad_emj, AuxV___, YOURE___, YOUR___, YOU___, PLEASE___, WHAT___, WHAT___, WHEN_WHAT___, WHO_WHAT___, WHEN___, eos, DEFINE_WHAT___, eol
 
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
@@ -19,7 +19,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	return [
 [
 	[
-		C(rf"{WHAT___}?{YOUR___} (nick|first)? ?name"),
+		C(rf"({WHAT___(1)} )?{YOUR___} (nick|first)? ?name"),
 	],
 	(
 		Rchoice("My name is ", "I am ",
@@ -31,7 +31,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{WHAT___}?{YOUR___} full[\- ]?name"),
+		C(rf"({WHAT___(1)} )?{YOUR___} full[\- ]?name"),
 	],
 	(
 		Rchoice("My name is ", "I am ", "My full name is ") +
@@ -42,7 +42,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{WHAT___}(should|can) i call {YOU___}( by)?"),
+		C(rf"{What___} (should|can) i call {YOU___}( by)?"),
 	],
 	(
 		Rchoice("You can call me", "Call me", "Its", "Please call me", "My name is") + " " +
@@ -53,7 +53,8 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{WHAT___}( my )?(current )?(time|date)((?!s)| |$)(is|it)* ?(now)?"),
+		C(rf"{WHAT___(1)} (current )?(time|date)"),
+		C(rf"{What___} (time|date)((?!s)| |$)(is|it){{0,2}} ?(now)?"),
 		'clock',
 		'time',
 	],
@@ -88,7 +89,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[	
-		C(rf"{WHO_WHAT___}{YOUR___} (creator|maker|invertor|programmer|engineer|coder)")
+		C(rf"{WHO_WHAT___(1)} {YOUR___} (creator|maker|invertor|programmer|engineer|coder)")
 	],
 	(
 		Rchoice(
@@ -104,7 +105,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{WHO_WHAT___}{YOURE___}( ?self)?( really)?{eol}")
+		C(rf"{WHO_WHAT___(1)} {YOUR___}( ?self)?( really)?{eol}")
 	],
 	(
 		Rchoice('I am your virtual partner. My name is <:ai_name> and I was made by <a href="https://github.com/RaSan147" target="_blank">RaSan147</a>',
@@ -115,9 +116,9 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{WHO_WHAT___} me( to {YOU___})?{eos}"),
-		C(rf"{WHO_WHAT___} my ?self( to {YOU___})?{eos}"),
-		C(rf"{WHO_WHAT___} i( to {YOU___})?{eos}")
+		C(rf"{WHO_WHAT___(1)} me( to {YOU___})?{eos}"),
+		C(rf"{WHO_WHAT___(1)} my ?self( to {YOU___})?{eos}"),
+		C(rf"{WHO_WHAT___(1)} i( to {YOU___})?{eos}")
 	],
 	(
 		Rchoice("Your are ", "You are ", "You're ") +
@@ -153,8 +154,8 @@ Your my husband are you not?"""),
 ],
 [
 	[
-		C(rf"{WHEN_WHAT___}{YOUR___} (birth|b) ?da(y|te)"),
-		C(rf"{WHEN___}{YOURE___} born"),
+		C(rf"{WHEN_WHAT___(1)} {YOUR___} (birth|b) ?da(y|te)"),
+		C(rf"{WHEN___(2)} {YOURE___} born"),
 	],
 	(
 		Rchoice("It's", "My birthday is") + " " +
@@ -168,4 +169,14 @@ Your my husband are you not?"""),
 
 
 
-patterns()
+
+__ptn = patterns()
+
+if __name__ != '__main__':
+	from REGEX_TOOLS import re_vert
+	import os
+	filename = os.path.basename(__file__)
+	store_path = f"patterns.tmp/{filename}.md"
+	markdown = re_vert(__ptn, store_path=store_path)
+
+

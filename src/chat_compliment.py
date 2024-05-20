@@ -1,6 +1,6 @@
 
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_re_pattern import C, YOURE___, YOU___
+from basic_re_pattern import C, IM___, YOUR___, YOURE___, YOU___
 
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
@@ -50,13 +50,15 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{YOU___} (so|(real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*{PRETTY___} {ODD_APPEARANCE___}"),
+		C(rf"(i )?((real|absolute)ly )?(f(e|a)ll in )?(love|luv|wuv|like) (with )?(the )?(shape of )?{YOURE___}? {PRETTY___}? ?{ODD_APPEARANCE___}"),
+		C(rf"(i )?((real|absolute)ly )?(love|luv|wuv|like) (the )?(shape of )?{YOUR___}? {PRETTY___}? ?{ODD_APPEARANCE___}( so much| a lot)?"),
 		# you have amazing body
-		C(rf"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?{YOURE___}? {PRETTY___}? ?{ODD_APPEARANCE___}( so much| a lot)?"),
 		# i fell in love with your beautiful body
 		# i love your beautiful body so much
 		# i love the shape of your body
-		C(rf"{YOURE___}? {ODD_APPEARANCE___} (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so |(real|absolute)ly )?(very )*{PRETTY___}"),
+		C(rf"{IM___} ((real|absolute)ly )?in (love|luv|wuv|like) (with )?(the )?(shape of )?({YOUR___} )?{PRETTY___}? ?{ODD_APPEARANCE___}"),
+
+		C(rf"{YOUR___}? {ODD_APPEARANCE___} (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so |(real|absolute)ly )?(very )*{PRETTY___}"),
 		# your body is beautiful
 		# your body looks beautiful
 	],
@@ -86,11 +88,14 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	[
 		C(rf"{YOU___} ((real|absolute)ly )?have (so|(real|absolute)ly )?(an? )?(very )*{PRETTY___} {APPEARANCE___}"),
 		# you have amazing body
-		C(rf"(i )?(so|(real|absolute)ly )?(f(e|a)(l|e)l in )?(love|luv|wuv|like) (with )?(the )?(shape of )?{YOURE___}? {PRETTY___}? ?{APPEARANCE___}( so much| a lot)?"),
+		C(rf"{IM___} ((real|absolute)ly )?in (love|luv|wuv|like) (with )?(the )?(shape of )?({YOUR___} )?{PRETTY___}? ?{APPEARANCE___}"),
+		C(rf"(i )?((real|absolute)ly )?(f(e|a)ll in )?(love|luv|wuv|like) (with )?(the )?(shape of )?{YOUR___}? {PRETTY___}? ?{APPEARANCE___}"),
+		C(rf"(i )?((real|absolute)ly )?(love|luv|wuv|like) (the )?(shape of )?{YOUR___}? {PRETTY___}? ?{APPEARANCE___}( so much| a lot)?"),
+
 		# i fell in love with your beautiful eyes
 		# i love your beautiful eyes so much
 		# i love the shape of your smile
-		C(rf"{YOURE___}? {APPEARANCE___} (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so|(real|absolute)ly )?(very )*{PRETTY___}"),
+		C(rf"{YOUR___}? {APPEARANCE___} (is|are|r|looks?|(f(e|a)(l|e)l)s?|seems?) (so|(real|absolute)ly )?(very )*{PRETTY___}"),
 		# your eyes are beautiful
 		# your eyes look beautiful
 		C(rf"(what|how) (an? )?{PRETTY___} {APPEARANCE___} {YOU___} (have|got|have got|have gotten|have gotten)")
@@ -128,4 +133,14 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ][::-1]
 
 
-patterns()
+
+__ptn = patterns()
+
+if __name__ != '__main__':
+	from REGEX_TOOLS import re_vert
+	import os
+	filename = os.path.basename(__file__)
+	store_path = f"patterns.tmp/{filename}.md"
+	markdown = re_vert(__ptn, store_path=store_path)
+
+
