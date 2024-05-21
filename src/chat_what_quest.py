@@ -172,7 +172,7 @@ Your my husband are you not?"""),
 
 __ptn = patterns()
 
-if __name__ != '__main__':
+if __name__ == '__main__':
 	from REGEX_TOOLS import re_vert
 	import os
 	filename = os.path.basename(__file__)

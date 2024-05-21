@@ -4,9 +4,11 @@
 
 __version__ = "0.3"
 
+import datetime
 import os
 import sys
 import shutil
+import tempfile
 from typing import Dict, Tuple, List, Union, Any, Callable
 import urllib.parse
 import urllib.request
@@ -95,13 +97,22 @@ def join_path(*paths:str):
 #             SERVER HANDLER                #
 #############################################
 
+######### Exception Handling #########
+
+# class 
+
 ######### UPDATE CORS POLICY #########
 
 SH.allow_CORS("GET", '*')
 
 ######### HANDLE GET REQUEST #########
 
-def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
+def handle_user_cookie(self: SH, on_ok="/", on_fail="/login") -> Tuple[Union[User, int], Union[str, int]]:
+	"""
+		Handle user cookie
+		- if user is logged in, (if on_ok: redirect to on_ok n return 0,0) else return user, uid
+		- if user is not logged in, (if on_fail: redirect to on_fail n return 0,0) else return -1,-1
+	"""
 	cookie = self.cookie
 	#print(cookie)
 	def get(k):
@@ -112,22 +123,25 @@ def handle_user_cookie(self: SH, on_ok="/", on_fail="/login"):
 	username = get("uname")
 	uid = get("uid")
 
-	validity, user = auth_uname_pass_data(username, uid, 40), None
+	user = None
+	validity = auth_uname_pass_data(username, uid, 40)
 	if validity == True:
 		user = user_handler.server_verify(username, uid)
 
 	# print([user, validity])
-	if not (user and validity==True):
+	if not (user and validity):
 		if on_fail:
-
 			self.redirect(on_fail)
-			return True
+			return 0, 0
 
-	elif on_ok:
-		self.redirect(on_ok)
-		return True
+	else:
+		if on_ok:
+			self.redirect(on_ok)
+			return 0, 0
+			
+		return user, uid
 
-	return None
+	return -1, -1
 
 @SH.on_req('GET', '/favicon.ico')
 def send_favico(self: SH, *args, **kwargs):
@@ -150,7 +164,7 @@ def send_font(self: SH, *args, **kwargs):
 		self.send_error(HTTPStatus.NOT_FOUND, "File not found")
 		return None
 
-	return self.return_file(pyrobox_config.ftp_dir+"/fonts/"+file)
+	return self.send_file(pyrobox_config.ftp_dir+"/fonts/"+file)
 
 @SH.on_req('GET', url_regex='/@scripts/.*')
 def send_font(self: SH, *args, **kwargs):
@@ -170,7 +184,7 @@ def send_font(self: SH, *args, **kwargs):
 			file_data =	f.read()
 		return self.send_css(file_data)
 
-	return self.return_file(pyrobox_config.ftp_dir+"/scripts/"+file)
+	return self.send_file(pyrobox_config.ftp_dir+"/scripts/"+file)
 
 
 
@@ -179,13 +193,13 @@ def send_homepage(self: SH, *args, **kwargs):
 	"""
 	returns the main page as home
 	"""
-	cookie_check = handle_user_cookie(self, on_ok="", on_fail="/signup")
+	user, uid = handle_user_cookie(self, on_ok="", on_fail="/signup")
 	#print(cookie_check)
-	if cookie_check is True:
+	if (user, uid) == (0, 0):
 		return None
 
 
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
+	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
 
 @SH.on_req('GET', '/login')
 def send_login(self: SH, *args, **kwargs):
@@ -193,12 +207,12 @@ def send_login(self: SH, *args, **kwargs):
 	returns login.html on login request
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
-	cookie_check = handle_user_cookie(self, on_fail="")
+	user, uid  = handle_user_cookie(self, on_fail="")
 
-	if cookie_check:
+	if (user, uid) == (0, 0):
 		return None
 
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-store")
+	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-store")
 
 @SH.on_req('GET', '/signup')
 def send_signup(self: SH, *args, **kwargs):
@@ -206,11 +220,13 @@ def send_signup(self: SH, *args, **kwargs):
 	returns signup.html on signup request
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
-	cookie_check = handle_user_cookie(self, on_fail="")
-	if cookie_check:
+	user, uid  = handle_user_cookie(self, on_fail="")
+	if (user, uid) == (0, 0):
 		return None
 
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+
+
 
 
 @SH.on_req('GET', '/test')
@@ -219,8 +235,8 @@ def send_test_page(self: SH, *args, **kwargs):
 	returns signup.html on signup request
 	js will redirect here or to home based on wheather user is logged in or not
 	"""
-	cookie_check = handle_user_cookie(self, on_ok="/", on_fail=None)
-	if cookie_check:
+	user, uid  = handle_user_cookie(self, on_ok="/", on_fail=None)
+	if (user, uid) == (0, 0):
 		return None
 
 
@@ -235,15 +251,38 @@ def send_test_page(self: SH, *args, **kwargs):
 	self.send_response(200)
 	self.send_header_string(cookie.output())
 
-	return self.return_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
+	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
 
-	#return self.return_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+	#return self.send_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+
+@SH.on_req('GET', '/dl_data')
+def send_dl_data(self: SH, *args, **kwargs):
+	user, uid  = handle_user_cookie(self, on_fail="/signup", on_ok="")
+	if (user, uid) == (0, 0):
+		return None
+
+	if not appConfig.allow_dl_data:
+		return self.send_error(HTTPStatus.NOT_FOUND)
+
+	# use shutil zip to compress data folder and send
+	temp = tempfile.NamedTemporaryFile(delete=False)
+	YYYY_MM_DD_HH_MM = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+	file_name = f"Asuna_Data_{YYYY_MM_DD_HH_MM}.zip"
+
+	file = shutil.make_archive(temp.name, 'zip', appConfig.main_data_dir)
+
+	return self.send_file(
+		file, 
+		cache_control="no-store", 
+		download=True, 
+		filename=file_name
+	)
 
 
 @SH.on_req('GET', '/voice')
 def send_voice(self: SH, *args, **kwargs):
-	cookie_check = handle_user_cookie(self, on_fail="/signup", on_ok="")
-	if cookie_check:
+	user, uid = handle_user_cookie(self, on_fail="/signup", on_ok="")
+	if (user, uid) == (0, 0):
 		return None
 
 	# print(self.query)
@@ -257,7 +296,7 @@ def send_voice(self: SH, *args, **kwargs):
 	# print(path)
 
 
-	return self.return_file(path)
+	return self.send_file(path)
 
 @SH.on_req('GET')
 def send_default(self: SH, *args, **kwargs):
@@ -272,17 +311,17 @@ def send_default(self: SH, *args, **kwargs):
 
 
 	if os.path.isdir(path):
-		parts = urllib.parse.urlsplit(self.path)
-		if not parts.path.endswith('/'):
-			# redirect browser - doing basically what apache does
-			self.send_response(HTTPStatus.MOVED_PERMANENTLY)
-			new_parts = (parts[0], parts[1], parts[2] + '/',
-							parts[3], parts[4])
-			new_url = urllib.parse.urlunsplit(new_parts)
-			self.send_header("Location", new_url)
-			self.send_header("Content-Length", "0")
-			self.end_headers()
-			return None
+		# parts = urllib.parse.urlsplit(self.path)
+		# if not parts.path.endswith('/'):
+		# 	# redirect browser - doing basically what apache does
+		# 	self.send_response(HTTPStatus.MOVED_PERMANENTLY)
+		# 	new_parts = (parts[0], parts[1], parts[2] + '/',
+		# 					parts[3], parts[4])
+		# 	new_url = urllib.parse.urlunsplit(new_parts)
+		# 	self.send_header("Location", new_url)
+		# 	self.send_header("Content-Length", "0")
+		# 	self.end_headers()
+		# 	return None
 		for index in "index.html", "index.htm":
 			index = os.path.join(path, index)
 			if os.path.exists(index):
@@ -306,7 +345,7 @@ def send_default(self: SH, *args, **kwargs):
 
 	# else:
 
-	return self.return_file(path, cache_control="no-cache")
+	return self.send_file(path, cache_control="no-cache")
 
 
 
@@ -432,6 +471,9 @@ def do_login(self: SH, *args, **kwargs):
 	3rd sends username pass to user_handler and the handler will return if the action was successful or not and a message
 	"""
 	post = DPD(self)
+
+	# check cookie
+
 
 	AUTHORIZE_POST(self, post, 'login')
 

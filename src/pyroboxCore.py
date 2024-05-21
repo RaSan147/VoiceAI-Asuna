@@ -1277,7 +1277,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		self.copyfile(file, self.wfile)
 		file.close()
 
-	def return_file(self, path, filename=None, download=False, cache_control=""):
+	def _return_file(self, path, filename=None, download=False, cache_control=""):
 		file = None
 		is_attachment = "attachment;" if (self.query("dl") or download) else ""
 
@@ -1391,10 +1391,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 	def send_file(self, path, filename=None, download=False, cache_control=''):
 		'''sends the head and file to client'''
-		file = self.return_file(path, filename, download, cache_control)
-		if self.command == "HEAD":
-			return  # to avoid sending file on get request
+		file = self._return_file(path, filename, download, cache_control)
+
 		try:
+			if self.command == "HEAD":
+				return  # to avoid sending file on get request
 			self.copyfile(file, self.wfile)
 		finally:
 			file.close()
