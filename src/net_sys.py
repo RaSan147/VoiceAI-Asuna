@@ -122,18 +122,17 @@ def get_link(i, current_link, homepage=None):  # UPDATED
 			else:
 				i = 'http:' + i
 
-	elif i.startswith('../'):
-		_temp = gen_link_facts(current_link)["path"]
+	if i.startswith('../'):
+		_temp = current_link
 		while i.startswith('../'):
 			_temp = Fsys.go_prev_dir(_temp)
 			i = i.replace('../', '', 1)
 		i = _temp + i # new path
-		i = get_link(i, homepage)
 
-	elif i.startswith('/'):
+	if i.startswith('/'):
 		i = homepage + i
 
-	elif i.startswith('./'):
+	if i.startswith('./'):
 		_current_link = gen_link_facts(current_link)["noQuery"]
 		path = gen_link_facts(_current_link)["path"]
 		if _current_link.endswith('/'):
@@ -143,19 +142,6 @@ def get_link(i, current_link, homepage=None):  # UPDATED
 			i = get_link(i[2:], prev_dir, homepage)
 
 
-	else:
-		_current_link = gen_link_facts(current_link)["noQuery"]
-		path = gen_link_facts(_current_link)["path"]
-
-		prev_dir = get_link("../", _current_link, homepage)
-		if _current_link.endswith('/'):
-			i = current_link + i
-		else:
-			i = _current_link + '/' + i
-
-
-
-	# i = i.partition('#')[0]  # removes the fragment
 
 	if '//' not in i:
 		temp = homepage
@@ -227,14 +213,14 @@ def check_network_available(self):
 
 
 
-def run_in_local_server(port, host_dir=''):  # fc=0809
+def open_local_page(port, path=''):  # fc=0809
 	"""opens a directory or a file in localhost server using browser
 
 	args:
 	-----
 		port : port number
 		host_dir : desired file or folder directory"""
-	webbrowser.open_new_tab('http://localhost:%i/%s' % (port, host_dir))
+	webbrowser.open_new_tab(f'http://localhost:{port}/{path}')
 
 
 def remove_noscript(content):  # fc=080B

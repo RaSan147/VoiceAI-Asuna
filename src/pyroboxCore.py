@@ -29,10 +29,12 @@ from queue import Queue
 import logging
 import atexit
 import os
-#from session_mgmt import MachineSession
 
-__version__ = "0.8.1"
+__version__ = "0.9.6"
 enc = "utf-8"
+DEV_MODE = True
+
+
 __all__ = [
 	"HTTPServer", "ThreadingHTTPServer", "BaseHTTPRequestHandler",
 	"SimpleHTTPRequestHandler",
@@ -55,8 +57,11 @@ F = f = false = False  # too lazy to type
 
 class Config:
 	def __init__(self):
+		self.server_init = False # if server is initialized
+		self.server_runner = None # server runner
 		# DEFAULT DIRECTORY TO LAUNCH SERVER
 		self.ftp_dir = "."  # DEFAULT DIRECTORY TO LAUNCH SERVER
+		self.bind = None # DEFAULT BIND ADDRESS
 
 		self.IP = None  # will be assigned by checking
 		self.protocol = "http"  # DEFAULT PROTOCOL TO LAUNCH SERVER
@@ -90,7 +95,7 @@ class Config:
 
 		# RUNNING SERVER STATS
 		self.ftp_dir = self.get_default_dir()
-		self.dev_mode = True
+		self.dev_mode = DEV_MODE
 		self.ASSETS = False  # if you want to use assets folder, set this to True
 		self.ASSETS_dir = os.path.join(self.MAIN_FILE_dir, "/../assets/")
 		self.reload = False
@@ -169,27 +174,27 @@ class Config:
 
 		parser.add_argument('--bind', '-b',
 							metavar='ADDRESS', default=bind,
-							help='Specify alternate bind address '
+							help='[xxx.xxx.xxx.xxx] Specify alternate bind address '
 								'[default: all interfaces]')
 		parser.add_argument('--directory', '-d', default=directory,
-							help='Specify alternative directory '
+							help='[Value] Specify alternative directory '
 								'[default: current directory]')
 		parser.add_argument('port', action='store',
 							default=port, type=int,
 							nargs='?',
-							help=f'Specify alternate port [default: {port}]')
+							help=f'[Value] Specify alternate port [default: {port}]')
 		parser.add_argument('--version', '-v', action='version',
 							version=__version__)
 
 		parser.add_argument('-h', '--help', action='help',
 								default='==SUPPRESS==',
-								help=('show this help message and exit'))
+								help=('[Option] show this help message and exit'))
 
 
 		parser.add_argument('--no-extra-log', '-nxl',
 							action='store_true',
 							default=False,
-							help="Disable file path and [= + - #] based logs (default: %(default)s)")
+							help="[Flag] Disable file path and [= + - #] based logs (default: %(default)s)")
 
 
 		args = parser.parse_known_args()[0]
@@ -392,7 +397,7 @@ def URL_MANAGER(url: str):
 	returns a tuple of (`path`, `query_dict`, `fragment`)\n
 
 	`url` = `'/store?page=10&limit=15&price=ASC#dskjfhs'`\n
-	`path` = `'/store'`\n
+	`path` = `'/store'` or `/`\n
 	`query_dict` = `{'page': ['10'], 'limit': ['15'], 'price': ['ASC']}`\n
 	`fragment` = `dskjfhs`\n
 	"""
@@ -400,10 +405,14 @@ def URL_MANAGER(url: str):
 	# url = '/store?page=10&limit=15&price#dskjfhs'
 	parse_result = urllib.parse.urlparse(url)
 
+	path = parse_result.path
+	if path == '':
+		path = '/'
+
 	dict_result = Callable_dict(urllib.parse.parse_qs(
 		parse_result.query, keep_blank_values=True))
 
-	return (parse_result.path, dict_result, parse_result.fragment)
+	return (path, dict_result, parse_result.fragment)
 
 
 
@@ -704,7 +713,6 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 						'+'*w + f' {self.req_hash} ' + '+'*w
 						)
 
-
 			try:
 				method()
 			except Exception:
@@ -732,7 +740,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		while not self.close_connection:
 			self.handle_one_request()
 
-	def send_error(self, code, message=None, explain=None, error_message_format: Template = None):
+	def send_error(self, code, message=None, explain=None, error_message_format: Template = None, cookie:Union[SimpleCookie, str]=None):
 		"""Send and log an error reply.
 
 		Arguments are
@@ -772,6 +780,9 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			explain = longmsg
 		self.log_error("code", code, "message", message)
 		self.send_response(code, message)
+
+		self._send_cookie(cookie=cookie)
+
 		self.send_header('Connection', 'close')
 
 		# Message body is omitted for cases described in:
@@ -844,6 +855,17 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self.send_header(tag.strip(), msg.strip())
 
 
+	def _send_cookie(self, cookie:Union[SimpleCookie, str]=None):
+		"""Must send cookie after self.send_response(XXX)"""
+		if cookie is not None:
+			if isinstance(cookie, SimpleCookie):
+				cookie = cookie.output()
+
+			self.send_header_string(cookie)
+
+
+
+
 	def send_header(self, keyword, value):
 		"""Send a MIME header to the headers buffer."""
 		if self.request_version != 'HTTP/0.9':
@@ -893,7 +915,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			code = code.value
 		self.log_message(f'"{self.requestline}"', code, size)
 
-	def log_error(self, *args):
+	def log_error(self, *args, **kwargs):
 		"""Log an error. [ERROR PRIORITY]
 
 		This is called when a request cannot be fulfilled.  By
@@ -904,19 +926,19 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		XXX This should go to the separate error log.
 
 		"""
-		self.log_message(args, error=True)
+		self.log_message(*args, **kwargs, error=True)
 
-	def log_warning(self, *args):
+	def log_warning(self, *args, **kwargs):
 		"""Log a warning message [HIGH PRIORITY]"""
-		self.log_message(args, warning=True)
+		self.log_message(*args, **kwargs, warning=True)
 
-	def log_debug(self, *args, write=True):
+	def log_debug(self, *args, write=True, **kwargs):
 		"""Log a debug message [LOWEST PRIORITY]"""
-		self.log_message(args, debug=True, write=write)
+		self.log_message(*args, **kwargs, debug=True, write=write)
 
-	def log_info(self, *args, write=False):
+	def log_info(self, *args, write=False, **kwargs):
 		"""Default log message [MEDIUM PRIORITY]"""
-		self.log_message(args, write=write)
+		self.log_message(*args, **kwargs, write=write)
 
 	def _log_writer(self, message):
 		os.makedirs(config.log_location, exist_ok=True)
@@ -924,7 +946,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			f.write(
 				(f"#{self.req_hash} by [{self.address_string()}] at [{self.log_date_time_string()}]|=> {message}\n"))
 
-	def log_message(self, *args, error=False, warning=False, debug=False, write=True):
+	def log_message(self, *args, error=False, warning=False, debug=False, write=True, **kwargs):
 		"""Log an arbitrary message.
 
 		This is used by all other logging functions.  Override
@@ -934,8 +956,13 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		every message.
 
 		"""
+		if not args:
+			return
 
-		message = ' '.join(map(str, args))
+		sep = kwargs.get('sep', ' ')
+		end = kwargs.get('end', '\n')
+
+		message = sep.join(map(str, args)) + end
 
 		message = f"# {self.req_hash} by [{self.address_string()}] at [{self.log_date_time_string()}]|=> {message}\n"
 
@@ -1042,7 +1069,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			'.ogv': 'video/ogg',
 			'.ogg': 'application/ogg',
-			'm4a': 'audio/mp4',
+			'.m4a': 'audio/mp4',
 	})
 
 	handlers = {
@@ -1178,7 +1205,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 				if self.test_req(*case):
 					try:
 						resp = func(self, url_path=url_path, query=query,
-								 fragment=fragment, path=path, spathsplit=spathsplit)
+								fragment=fragment, path=path, spathsplit=spathsplit)
 					except PostError:
 						traceback.print_exc()
 						# break if error is raised and send BAD_REQUEST (at end of loop)
@@ -1205,14 +1232,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			self.send_error(500, str(e))
 			return
 
-	def redirect(self, location):
+	def redirect(self, location, cookie:Union[SimpleCookie, str]=None):
 		'''redirect to location'''
 		print("REDIRECT ", location)
 		self.send_response(302)
 		self.send_header("Location", location)
+		self._send_cookie(cookie)
 		self.end_headers()
 
-	def return_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8"):
+
+
+	def return_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''returns only the head to client
 		and returns a file object to be used by copyfile'''
 		self.log_debug(f'[RETURNED] {code} to client')
@@ -1233,51 +1263,56 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		box.seek(0)
 
 		self.send_response(code)
+
+		self._send_cookie(cookie)
+
+
+
 		self.send_header("Content-Type", content_type)
 		self.send_header("Content-Length", str(len(encoded)))
 		self.end_headers()
 		return box
 
-	def send_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8"):
+	def send_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''sends the head and file to client'''
-		file = self.return_txt(msg, code, content_type)
+		file = self.return_txt(msg, code, content_type, cookie)
 		if self.command == "HEAD":
 			return  # to avoid sending file on get request
 		self.copyfile(file, self.wfile)
 		file.close()
 
-	def send_text(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8"):
+	def send_text(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''proxy to send_txt'''
-		self.send_txt(msg, code, content_type)
+		self.send_txt(msg, code, content_type, cookie)
 
-	def return_script(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/javascript; charset=utf-8"):
+	def return_script(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/javascript; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''proxy to send_txt'''
-		return self.return_txt(msg, code, content_type)
+		return self.return_txt(msg, code, content_type, cookie)
 
 	def send_script(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/javascript; charset=utf-8"):
 		'''proxy to send_txt'''
 		return self.send_txt(msg, code, content_type)
 
-	def return_css(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/css; charset=utf-8"):
+	def return_css(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/css; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''proxy to send_txt'''
-		return self.return_txt(msg, code, content_type)
+		return self.return_txt(msg, code, content_type, cookie)
 
 	def send_css(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/css; charset=utf-8"):
 		'''proxy to send_txt'''
 		return self.send_txt(msg, code, content_type)
 
-	def send_json(self, obj:Union[object, str, bytes], code=200):
+	def send_json(self, obj:Union[object, str, bytes], code=200, cookie:Union[SimpleCookie, str]=None):
 		"""send object as json
 		obj: json-able object or json.dumps() string"""
 		if not isinstance(obj, str):
 			obj = json.dumps(obj, indent=1)
-		file = self.return_txt(obj, code, content_type="application/json")
+		file = self.return_txt(obj, code, content_type="application/json", cookie=cookie)
 		if self.command == "HEAD":
 			return  # to avoid sending file on get request
 		self.copyfile(file, self.wfile)
 		file.close()
 
-	def _return_file(self, path, filename=None, download=False, cache_control=""):
+	def return_file(self, path, filename=None, download=False, cache_control="", cookie:Union[SimpleCookie, str]=None):
 		file = None
 		is_attachment = "attachment;" if (self.query("dl") or download) else ""
 
@@ -1285,8 +1320,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		C_encoding = None
 
+		filename = filename or os.path.basename(path)
+
 		try:
-			ctype = self.guess_type(path)
+			ctype = self.guess_type(filename)
 
 			# make sure texts are sent as utf-8
 			if ctype.startswith("text/"):
@@ -1338,10 +1375,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 					last = file_len - 1
 
 				if first >= file_len:  # PAUSE AND RESUME SUPPORT
-					self.send_error(416, 'Requested Range Not Satisfiable')
+					self.send_error(416, 'Requested Range Not Satisfiable', cookie=cookie)
 					return None
 
 				self.send_response(206)
+				self._send_cookie(cookie=cookie)
+
 				self.send_header('Accept-Ranges', 'bytes')
 
 				response_length = last - first + 1
@@ -1352,6 +1391,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			else:
 				self.send_response(HTTPStatus.OK)
+				self._send_cookie(cookie)
 
 				self.send_header("Content-Length", str(file_len))
 
@@ -1365,18 +1405,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			if C_encoding:
 				self.send_header("Content-Encoding", C_encoding)
 
-			self.send_header("Content-Disposition", is_attachment+' filename="%s"' %
-							(os.path.basename(path) if filename is None else filename))
+			self.send_header("Content-Disposition", f'{is_attachment} filename="{filename}"')
 			self.end_headers()
 
 			return file
 
 		except PermissionError:
-			self.send_error(HTTPStatus.FORBIDDEN, "Permission denied")
+			self.send_error(HTTPStatus.FORBIDDEN, "Permission denied", cookie)
 			return None
 
 		except OSError:
-			self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+			self.send_error(HTTPStatus.NOT_FOUND, "File not found", cookie)
 			return None
 
 		except Exception:
@@ -1385,17 +1424,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			# if f and not f.closed(): f.close()
 			raise
 
-		# finally:
-		# 	if file and not file.closed:
-		# 		file.close()
-
-	def send_file(self, path, filename=None, download=False, cache_control=''):
+	def send_file(self, path, filename=None, download=False, cache_control='', cookie:Union[SimpleCookie, str]=None):
 		'''sends the head and file to client'''
-		file = self._return_file(path, filename, download, cache_control)
-
+		file = self.return_file(path, filename, download, cache_control, cookie=cookie)
+		if self.command == "HEAD":
+			return  # to avoid sending file on get request
 		try:
-			if self.command == "HEAD":
-				return  # to avoid sending file on get request
 			self.copyfile(file, self.wfile)
 		finally:
 			file.close()
@@ -1410,6 +1444,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		to the outputfile by the caller unless the command was HEAD,
 		and must be closed by the caller under all circumstances), or
 		None, in which case the caller has nothing further to do.
+
 		"""
 
 		if 'Range' not in self.headers:
@@ -1454,8 +1489,37 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		return displaypath
 
 	def get_rel_path(self, filename):
-		"""Return the relative path to the file, FOR OS."""
+		"""Return the relative path to the file, FOR WEB."""
 		return urllib.parse.unquote(posixpath.join(self.url_path, filename), errors='surrogatepass')
+	
+	def get_web_path(self, path:str, times=1):
+		"""replace current directory with /"""
+		return path.replace(self.directory, "/", times)
+	
+	def path_safety_check(self, paths:Union[str, list], *more_paths:Union[str, list]):
+		"""check if path is safe
+		paths: list of paths to check"""
+		if isinstance(paths, str):
+			paths = [paths]
+
+		if more_paths:
+			for path in more_paths:
+				if isinstance(path, str):
+					paths.append(path)
+				elif isinstance(path, (list, tuple, set)):
+					paths += more_paths
+				else:
+					raise TypeError(f"Invalid type {type(path)} for path")
+
+
+		for path in paths:
+			if path.startswith(('../', '..\\', '/../', '\\..\\')) or '/../' in path or '\\..\\' in path or path.endswith(('/..', '\\..')):
+				return False
+			
+		return True
+
+
+		
 
 	def translate_path(self, path):
 		"""Translate a /-separated PATH to the local filename syntax.
@@ -2013,6 +2077,66 @@ def get_ip(bind=None):
 	return IP
 
 
+
+_bind = None
+
+
+def _get_details():
+	if not config.server_init:
+		logger.warning("Server not initialized")
+		return
+
+	device_ip = _bind or "127.0.0.1"
+	# bind can be None (=> 127.0.0.1) or a string (=> 127.0.0.DDD)
+
+	# host, port = httpd.socket.getsockname()[:2]
+	# url_host = f'[{host}]' if ':' in host else host
+	hostname = socket.gethostname()
+	local_ip = config.IP if config.IP else get_ip(device_ip)
+	config.IP = local_ip
+
+	on_network = local_ip != (device_ip)
+
+	data = {
+		'port': config.port,
+		'hostname': hostname,
+		'local_ip': local_ip,
+		'on_network': on_network,
+		'network_address': config.address() # f"http://{IP}:{port}"
+	}
+
+	return data
+
+
+
+def _log_details():	
+	data = _get_details()
+
+	port = data['port'] # same as config.port
+	hostname = data['hostname']
+	local_ip = data['local_ip']
+	on_network = data['on_network']
+	network_address = data['network_address'] # f"http://{IP}:{port}" or config.address()
+
+
+
+
+	logger.info(tools.text_box(
+		# TODO: need to check since the output is "Serving HTTP on :: port 6969"
+		# f"Serving HTTP on {host} port {port} \n",
+		# TODO: need to check since the output is "(http://[::]:6969/) ..."
+		# f"(http://{url_host}:{port}/) ...\n",
+		f"Serving HTTP on port {port} \n",
+		f"Server is probably running on\n",
+		(f"[over NETWORK] {network_address}\n" if on_network else ""),
+		f"[on DEVICE] http://localhost:{port} & http://{local_ip}:{port}", 
+		
+		style="star", sep=""
+	)
+	)
+
+
+
 def test(HandlerClass=BaseHTTPRequestHandler,
 		 ServerClass=ThreadingHTTPServer,
 		 protocol="HTTP/1.0", port=8000, bind=None):
@@ -2022,35 +2146,14 @@ def test(HandlerClass=BaseHTTPRequestHandler,
 
 	"""
 
-	global httpd
 	if sys.version_info >= (3, 8):  # BACKWARD COMPATIBILITY
 		ServerClass.address_family, addr = _get_best_family(bind, port)
 	else:
 		addr = (bind if bind != None else '', port)
 
-	device_ip = bind or "127.0.0.1"
-	# bind can be None (=> 127.0.0.1) or a string (=> 127.0.0.DDD)
-
 	HandlerClass.protocol_version = protocol
 	httpd = ServerClass(addr, HandlerClass)
-	host, port = httpd.socket.getsockname()[:2]
-	url_host = f'[{host}]' if ':' in host else host
-	hostname = socket.gethostname()
-	local_ip = config.IP if config.IP else get_ip(device_ip)
-	config.IP = local_ip
 
-	on_network = local_ip != (device_ip)
-
-	logger.info(tools.text_box(
-		# TODO: need to check since the output is "Serving HTTP on :: port 6969"
-		f"Serving HTTP on {host} port {port} \n",
-		# TODO: need to check since the output is "(http://[::]:6969/) ..."
-		f"(http://{url_host}:{port}/) ...\n",
-		f"Server is probably running on\n",
-		(f"[over NETWORK] {config.address()}\n" if on_network else ""),
-		f"[on DEVICE] http://localhost:{config.port} & http://127.0.0.1:{config.port}", style="star", sep=""
-	)
-	)
 	try:
 		httpd.serve_forever(poll_interval=0.1)
 	except KeyboardInterrupt:
@@ -2080,7 +2183,11 @@ class DualStackServer(ThreadingHTTPServer):  # UNSUPPORTED IN PYTHON 3.7
 								 directory=config.ftp_dir)
 
 
-def run(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequestHandler):
+def init_server(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequestHandler, log_details=True):
+	global _bind
+
+	if config.server_init:
+		return config.server_runner
 
 	if arg_parse:
 		args = config.parse_default_args(
@@ -2089,6 +2196,7 @@ def run(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequest
 		port = args.port
 		directory = args.directory
 		bind = args.bind
+
 
 	logger.info(tools.text_box("Running pyroboxCore: ",
 				config.MAIN_FILE, "Version: ", __version__))
@@ -2101,30 +2209,57 @@ def run(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequest
 	handler_class = partial(handler,
 							directory=directory)
 
-	config.port = port
 	if port > 65535 or port < 0:
 		raise ValueError("Port must be between 0 and 65535")
 
+	config.port = port
 	config.ftp_dir = directory
+	config.bind = bind
 
-	if not config.reload:
-		if sys.version_info > (3, 8):
-			test(
-				HandlerClass=handler_class,
-				ServerClass=DualStackServer,
-				port=port,
-				bind=bind,
-			)
-		else:  # BACKWARD COMPATIBILITY
-			test(
-				HandlerClass=handler_class,
-				ServerClass=ThreadingHTTPServer,
-				port=port,
-				bind=bind,
-			)
+	class ServerRunner:
 
-	if config.reload == True:
-		reload_server()
+		@staticmethod
+		def run():
+			if not config.reload:
+				if sys.version_info > (3, 8):
+					test(
+						HandlerClass=handler_class,
+						ServerClass=DualStackServer,
+						port=port,
+						bind=bind,
+					)
+				else:  # BACKWARD COMPATIBILITY
+					test(
+						HandlerClass=handler_class,
+						ServerClass=ThreadingHTTPServer,
+						port=port,
+						bind=bind,
+					)
+
+			if config.reload == True:
+				reload_server()
+
+	config.server_runner = ServerRunner()
+	config.server_init = True
+
+	if log_details:
+		_log_details()
+
+	return config.server_runner
+
+
+
+
+def run(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequestHandler):
+	server_runner = init_server(
+		port=port,
+		directory=directory,
+		bind=bind,
+		arg_parse=arg_parse,
+		handler=handler
+	)
+
+	server_runner.run()
 
 
 if __name__ == '__main__':

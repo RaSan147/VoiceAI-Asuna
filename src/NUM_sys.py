@@ -109,7 +109,7 @@ def dec2base(n,base):
 
 
 
-def base2dec(n, base, _type:type=int):
+def base2dec(n, base, _type=int):
 	if n =='':
 		return ''
 	out=0
@@ -138,6 +138,8 @@ def compressed_dt(_dt= ''):
 	# OLD VERSION# dt_now= int((dt_() if _dt is None else _dt).replace('-','').replace(' ','').replace('.','').replace(':',''))
 	_dt = str(time.time()) if _dt is None else _dt
 	xtime = _dt.split('.')
+	if len(xtime)==1:
+		xtime.append('0')
 	return dec2base(xtime[0], 63) +'.'+ dec2base(xtime[1], 63)
 	# return dec2base(dt_now,63)
 
