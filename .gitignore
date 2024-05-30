@@ -161,3 +161,4 @@ cython_debug/
 .idea/
 src/log.txt
 /src/patterns.tmp
+/API/*.zip

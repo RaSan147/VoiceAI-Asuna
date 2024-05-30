@@ -9,9 +9,7 @@ import os
 import sys
 import shutil
 import tempfile
-from typing import Dict, Tuple, List, Union, Any, Callable
-import urllib.parse
-import urllib.request
+from typing import Tuple, Union
 # import time
 from http import HTTPStatus
 import json
@@ -31,7 +29,7 @@ from REGEX_TOOLS import web_re
 # PYROBOX SERVER MODULES
 
 from pyroboxCore import SimpleHTTPRequestHandler as SH
-from pyroboxCore import run as run_server
+from pyroboxCore import runner as pyrobox_runner
 from pyroboxCore import config as pyrobox_config
 from pyroboxCore import DealPostData as DPD
 from pyroboxCore import PostError
@@ -265,7 +263,7 @@ def send_dl_data(self: SH, *args, **kwargs):
 		return self.send_error(HTTPStatus.NOT_FOUND)
 
 	# use shutil zip to compress data folder and send
-	temp = tempfile.NamedTemporaryFile(delete=False)
+	temp = tempfile.NamedTemporaryFile()
 	YYYY_MM_DD_HH_MM = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 	file_name = f"Asuna_Data_{YYYY_MM_DD_HH_MM}.zip"
 
@@ -461,7 +459,7 @@ def add_user_cookie(user_name, uid):
 	return cookie
 
 
-@SH.on_req('POST', hasQ='do_login')
+@SH.on_req('POST', url='/login', hasQ='do_login')
 def do_login(self: SH, *args, **kwargs):
 	"""
 	handle log in post request.
@@ -494,7 +492,7 @@ def do_login(self: SH, *args, **kwargs):
 
 
 
-@SH.on_req('POST', hasQ='do_signup')
+@SH.on_req('POST', url='/signup', hasQ='do_signup')
 def do_signup(self: SH, *args, **kwargs):
 	"""
 	signup user
@@ -666,10 +664,12 @@ def main():
 		pass # now works
 		xprint("/rh/No internet connection!\nPlease connect to the internet and try again.\n\n/=//hu/THIS APP IS HIGHLY DEPENDENT ON INTERNET CONNECTION!/=/")
 		sys.exit(1)
-	run_server(port= 45454,
+	server_runner = pyrobox_runner(port= 45454,
 		directory=appConfig.ftp_dir,
 		bind="", # bind to all interfaces
 		handler=SH)
+
+	server_runner.run()
 
 if __name__ == '__main__':
 	main()
