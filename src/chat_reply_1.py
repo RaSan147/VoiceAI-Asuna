@@ -1,5 +1,5 @@
 from REGEX_TOOLS import re_check, re_fullmatch, re_starts
-from basic_re_pattern import C, IM___, YOU___, YOUR___, YOURE___, AuxV___, DEFINE_WHAT___, WHAT___, OKAY___
+from basic_re_pattern import C, IM___, YOU___, YOUR___, YOURE___, AuxV___, DEFINE_WHAT___, WHAT___
 from CHAT_TOOLS import Rshuffle, Rchoice, shuf_merge, list_merge
 
 
@@ -20,9 +20,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 	return [
 [
 	[
-		C(rf"{IM___} "
-			"(doing? )?"
-			f"(fine|good|great|{OKAY___}|well)")
+		C(rf"I('m| am) (doing )?(fine|good|great|ok|okay|alright|well)")
 	],
 	(
 		Rchoice(
@@ -35,13 +33,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{IM___} "
-			"(doing? |feeling? )?"
-			f"(bad|not good|not great|not {OKAY___}|not well|unwell|sick|ill|depressed|sad|angry|mad|upset|annoyed|frustrated|bored|lonely|alone|anxious|nervous|stressed|stressed out|worried|scared|frightened|fearful|terrified|afraid|confused|lost|conflicted)"),
-
-		C(rf"{IM___} "
-			"not (doing? |feeling? )?"
-			f"(good|great|{OKAY___}|well|fine)"),
+		C(rf"I('m| am) (doing |feeling )?(bad|not good|not great|not ok|not okay|not alright|not well|unwell|sick|ill|depressed|sad|angry|mad|upset|annoyed|frustrated|bored|lonely|alone|anxious|nervous|stressed|stressed out|worried|scared|frightened|fearful|terrified|afraid|confused|lost|conflicted)"),
 	],
 	(
 		Rchoice(
@@ -55,8 +47,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],	
 [
 	[
-		C(rf"{IM___} "
-			"(sleepy|sleep deprived|tired|exhausted)"),
+		C(rf"I('m| am) (doing )?(sleepy|sleep deprived|tired|exhausted)")
 	],
 	(
 		Rchoice("Try to ", "Please", "You should", blank=1) +
@@ -71,8 +62,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{IM___} "
-			"(hungry|starving|famished)")
+		C(rf"I('m| am) (doing )?(hungry|starving|famished)")
 	],
 	(
 		Rchoice("Try to ", "Please", "You should", blank=1) +
@@ -87,8 +77,7 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 ],
 [
 	[
-		C(rf"{IM___} "
-			"(thirsty|dehydrated)")
+		C(rf"I('m| am) (doing )?(thirsty|dehydrated)")
 	],
 	(
 		Rchoice("Try to ", "Please", "You should", blank=1) +
@@ -123,13 +112,4 @@ def patterns(user:User=NODict(), msg:MessageObj=MessageObj(test=True)):
 
 ]
 
-__ptn = patterns()
-
-if __name__ == '__main__':
-	from REGEX_TOOLS import re_vert
-	import os
-	filename = os.path.basename(__file__)
-	store_path = f"patterns.tmp/{filename}.md"
-	markdown = re_vert(__ptn, store_path=store_path)
-
-
+patterns()
