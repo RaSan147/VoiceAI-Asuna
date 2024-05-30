@@ -11,3 +11,4 @@ Wikipedia-API
 edge_tts
 emoji
 exrex
+requests_toolbelt
