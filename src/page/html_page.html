@@ -1,36 +1,38 @@
 <!DOCTYPE HTML>
 <!-- test1 -->
 <html lang="en">
+
 <head>
 
 
-<meta charset="UTF-8">
-<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
 
-<meta  property="og:title" content="VoiceAI Asuna: Home" />
+	<meta property="og:title" content="VoiceAI Asuna: Home" />
 
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/RaSan147/voiceAI-skins@9a22a42/SEO/asuna%20cover.png" />
-
-
-
-
-<meta id="seoDescription" name="description" content="Demo webpage for VoiceAI Asuna server.">
+	<meta property="og:image"
+		content="https://cdn.jsdelivr.net/gh/RaSan147/voiceAI-skins@9a22a42/SEO/asuna%20cover.png" />
 
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
-<title>Project Asuna</title>
-
-<link rel="stylesheet" href="./style_page.css">
-<link rel="stylesheet" href="./style_anime.css">
-<link rel="stylesheet" href="./style_chat.css">
 
 
-<link rel="icon" href="/icons/icon-512x512.png" type="image/png">
-<link rel="apple-touch-icon" href="/icons/icon-512x512.png">
+	<meta id="seoDescription" name="description" content="Demo webpage for VoiceAI Asuna server.">
 
-<link rel="manifest" href="/manifest.webmanifest">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+	<title>Project Asuna</title>
+
+	<link rel="stylesheet" href="./style_page.css">
+	<link rel="stylesheet" href="./style_anime.css">
+	<link rel="stylesheet" href="./style_chat.css">
+
+
+	<link rel="icon" href="/icons/icon-512x512.png" type="image/png">
+	<link rel="apple-touch-icon" href="/icons/icon-512x512.png">
+
+	<link rel="manifest" href="/manifest.webmanifest">
 
 
 
@@ -38,162 +40,176 @@
 
 <body>
 
-<noscript>
-	<style>
-		.jsonly {
-			display: none !important
-		}
+	<noscript>
+		<style>
+			.jsonly {
+				display: none !important
+			}
 		</style>
-</noscript>
+	</noscript>
 
-<script src="./script_global.js"></script>
-<script src="./script_user.js"></script>
+	<script src="./script_global.js"></script>
+	<script src="./script_user.js"></script>
 
-<script>
-	user.get_local_data(); // redirect to login if not logged in
-	//user.verify_login(true, true);
-</script>
-
-
+	<script>
+		user.get_local_data(); // redirect to login if not logged in
+		//user.verify_login(true, true);
+	</script>
 
 
-<!-- <div id="brightness"></div>
+
+
+	<!-- <div id="brightness"></div>
 <div id="popup-container"></div> -->
 
-<div id='TopBar' class='top_bar inactive'>
+	<div id='TopBar' class='top_bar inactive'>
 
-	<div class="open-sidebar-btn" onclick="pages.to_anime()" style='float: left;'>
-		<span class="fa fa-light fa-arrow-left">&#8592;</span >
-	</div>
-
-	
-	<div id="app_header" class="disable_selection">
-		<span id="app_name_container">
-			<img id="profile_pic" class="profile_pic" alt="profile_pic">
-			<a id='app_name'></a> <span id="app_status"> &bull; </span>
-		</span>
-	</div>
-	
-
-	<div class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span>
-		<span class='nav-btn-text'>Menu</span> <span class="fa fa-thin fa-ellipsis-stroke-vertical">&vellip;</span></span>
-	</div>
-		
-	<div class="open-sidebar-btn" onclick="chat.minimize()" style='float: right;'>
-		<span class="fa fa-light fa-volume"><b>🔊</b></span >
-	</div>
-
-</div>
-
-<div id="sidebar_bg"></div> <!-- trigger to close Sidebar-->
+		<div class="open-sidebar-btn" onclick="pages.to_anime()" style='float: left;'>
+			<span class="fa fa-light fa-arrow-left">&#8592;</span>
+		</div>
 
 
-
-<div id="mySidebarR" class="sidebar sidebarR theme-tools">
-
-	<span style='right:0; text-align:right;margin-right: 20px;' class="close-sidebar disable_selection"
-
-		id="close-sidebarR" onclick = "sidebar_control.closeNavR()">&times;</span> <!-- × -->
-
-	<div>
-		<div id="note_button" class="accordion accordion-button" onclick="appConfig.show_author_note()">Author Note</div>
-		<div id="commands_button" class="accordion accordion-button" onclick="appConfig.show_help_note()">Sample message</div>
-	</div>
-	
-	
-	<div class='sidebar-end'></div>
+		<div id="app_header" class="disable_selection">
+			<span id="app_name_container">
+				<img id="profile_pic" class="profile_pic" alt="profile_pic">
+				<a id='app_name'></a> <span id="app_status"> &bull; </span>
+			</span>
+		</div>
 
 
-	
-</div>
+		<div class="open-sidebar-btn" onclick="sidebar_control.toggleNavR()" style='float: right;'><span>
+				<span class='nav-btn-text'>Menu</span> <span
+					class="fa fa-thin fa-ellipsis-stroke-vertical">&vellip;</span></span>
+		</div>
 
-<div id="anime-page">
-	<div style="display: flex; justify-content: center;">
-		<!-- <img id="character" src="https://i.ibb.co/GxL5MVx/3ba11453170aeb8f83b28599ffbb2b8e-CUnet-noise-scale-Level2-tta-x2-000000-Photo-noise-Level2-tta-CUnet.webp"> -->
-
-		<canvas id="canvas" class="character" style="height: 75%;width: auto;"></canvas>
-	</div>
-	
-	<div id="to-chat" class="disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-light fa-paper-plane">&#9010;</span> Chat</div>
-	
-	<div id="maximize-page" class="invisible disable_selection home-btns" onclick="pages.to_chat()"><span class="fa fa-regular fa-arrows-maximize">&#x26F6;</span></div>
-	
-		<div id="to-install" class="disable_selection home-btns"><span class="fa fa-light fa-disc-drive">&#9019;</span> Install</div>
-		
-		<div id="to-open-pwa" class="disable_selection home-btns">&#9004; Open App</div>
-</div>
-
-<div id="chat-page" class="inactive">
-
-
-	<div id="chat_input_container" class="chat_input_container">
-		<!-- multi line input -->
-
-		<textarea id="chat_input" class="chat_input"
-		type="text" maxlength="512" placeholder="Type a message..."></textarea>
-
-		<div id="chat_send" class="chat_send" onclick="chat.send_message()"><span class="fa fa-solid fa-paper-plane-top">➡️</span></div>
-
-	</div>
-
-	<div id="chats" class="chats">
-
-		<div id="help-notice">
-			<div class="markdown">
-				<b> SAMPLE MESSAGES (but not limited to)</b>
-
-				<ul>
-					<li>  Basic <span>hiiii</span>, <span>hello</span>
-					</li> <li>  <span>What's your/my name</span> / <span>how're u</span>
-					</li> <li>  <span>Whats the time</span> / <span>tell time</span>
-					</li> <li>  <ins><b>Static Q/A</b></ins>, like <span>whats newtons 3rd law</span> / <span>whos the president of canada</span> / <span>whats root(69+420)</span>
-					</li> <li>  <span>Whats the latest news</span> / <span>news highlights</span>
-					</li> <li>  <span>Tell me about yourself</span> / <span>... your hobby/favorite game/anime</span>
-					</li> <li>  <span>Love ya</span>
-					</li> <li>  <span>Repeat after me</span> → will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
-					</li> <li>  <span>change dress</span> to change costumes and <span>change room</span> to switch background 
-					</li> <li>  <b>many more...</b> and tons of updates coming every day (if if she doesn't understand, she'll soon. So keep speaking)
-					</li> <li>  <b>To recheck, go to MENU &vellip; &gt; Sample message</b>
-					</li> 
-					<br>
-					<li> <b>IMPORTANT: since its still demo, SHE CAN'T LISTEN OR SPEAK (coming soon...)</b></li>
-				</ul>
-			</div>
+		<div class="open-sidebar-btn" onclick="chat.minimize()" style='float: right;'>
+			<span class="fa fa-light fa-volume"><b>🔊</b></span>
 		</div>
 
 	</div>
 
-	<!-- <div id="chat-items" class="chat-items">
+	<div id="sidebar_bg"></div> <!-- trigger to close Sidebar-->
+
+
+
+	<div id="mySidebarR" class="sidebar sidebarR theme-tools">
+
+		<span style='right:0; text-align:right;margin-right: 20px;' class="close-sidebar disable_selection"
+			id="close-sidebarR" onclick="sidebar_control.closeNavR()">&times;</span> <!-- × -->
+
+		<div>
+			<div id="note_button" class="accordion accordion-button" onclick="appConfig.show_author_note()">Author Note
+			</div>
+			<div id="commands_button" class="accordion accordion-button" onclick="appConfig.show_help_note()">Sample message</div>
+		</div>
+
+
+		<div class='sidebar-end'></div>
+
+	</div>
+
+	<div id="anime-page">
+		<div style="display: flex; justify-content: center;">
+			<!-- <img id="character" src="https://i.ibb.co/GxL5MVx/3ba11453170aeb8f83b28599ffbb2b8e-CUnet-noise-scale-Level2-tta-x2-000000-Photo-noise-Level2-tta-CUnet.webp"> -->
+
+			<canvas id="canvas" class="character" style="height: 75%;width: auto;"></canvas>
+		</div>
+
+		<div id="to-chat" class="disable_selection home-btns" onclick="pages.to_chat()"><span
+				class="fa fa-light fa-paper-plane">&#9010;</span> Chat</div>
+
+		<div id="maximize-page" class="invisible disable_selection home-btns" onclick="pages.to_chat()"><span
+				class="fa fa-regular fa-arrows-maximize">&#x26F6;</span></div>
+
+		<div id="to-install" class="disable_selection home-btns"><span class="fa fa-light fa-disc-drive">&#9019;</span>
+			Install</div>
+
+		<div id="to-open-pwa" class="disable_selection home-btns">&#9004; Open App</div>
+	</div>
+
+	<div id="chat-page" class="inactive">
+
+
+		<div id="chat_input_container" class="chat_input_container">
+			<!-- multi line input -->
+
+			<textarea id="chat_input" class="chat_input" type="text" maxlength="512"
+				placeholder="Type a message..."></textarea>
+
+			<div id="chat_send" class="chat_send" onclick="chat.send_message()"><span
+					class="fa fa-solid fa-paper-plane-top">➡️</span></div>
+
+		</div>
+
+		<div id="chats" class="chats">
+
+			<div id="help-notice">
+				<div class="markdown">
+					<b> SAMPLE MESSAGES (but not limited to)</b>
+
+					<ul>
+						<li> Basic <span>hiiii</span>, <span>hello</span>
+						</li>
+						<li> <span>What's your/my name</span> / <span>how're u</span>
+						</li>
+						<li> <span>Whats the time</span> / <span>tell time</span>
+						</li>
+						<li> <ins><b>Static Q/A</b></ins>, like <span>whats newtons 3rd law</span> / <span>whos the president of canada</span> / <span>whats root(69+420)</span>
+						</li>
+						<li> <span>Whats the latest news</span> / <span>news highlights</span>
+						</li>
+						<li> <span>Tell me about yourself</span> / <span>... your hobby/favorite game/anime</span>
+						</li>
+						<li> <span>Love ya</span>
+						</li>
+						<li> <span>Repeat after me</span> → will reply whatever you say next. Say <span>stop/stop repeating</span> to stop
+						</li>
+						<li> <span>change dress</span> to change costumes and <span>change room</span> to switch background
+						</li>
+						<li> <b>many more...</b> and tons of updates coming every day (if if she doesn't understand, she'll soon. So keep speaking)
+						</li>
+						<li> <b>To recheck, go to MENU &vellip; &gt; Sample message</b>
+						</li>
+						<br>
+						<li> <b>IMPORTANT: since its still demo, SHE CAN'T LISTEN OR SPEAK (coming soon...)</b></li>
+					</ul>
+				</div>
+			</div>
+
+		</div>
+
+		<!-- <div id="chat-items" class="chat-items">
 		<div id="chat-items-container" class="chat-items-container"></div>
 	</div> -->
 
-</div>
+	</div>
 
-<script src="./script_installer.js"></script>
+	<script src="./script_installer.js"></script>
 
-<!-- <script src="./script_global.js"></script> -->
-<script src="./script_app.js"></script>
-
-
-<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script> -->
-<!-- <script src="/live2d_test.js"></script> -->
-<script src="https://cdn.jsdelivr.net/gh/RaSan147/pixi-live2d-display@v0.4.0-ls-4/dist/index.min.js"></script>
-<!-- <script src="/@scripts/live2d-lipsync-index.js"></script> -->
-
-<script src="./script_bot.js"></script>
-<script src="./script_chat.js"></script>
-<script src="./script_anime.js"></script>
-<script src="./script_page_handler.js"></script>
-<script src="./script_pwa.js"></script>
-<script>
-	user.get_skin_link()
-</script>
+	<!-- <script src="./script_global.js"></script> -->
+	<script src="./script_app.js"></script>
 
 
-<link href="/@fonts/Didot_Italic.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,530;1,530&display=swap" rel="stylesheet">
+	<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script> -->
+	<!-- <script src="/live2d_test.js"></script> -->
+	<script src="https://cdn.jsdelivr.net/gh/RaSan147/pixi-live2d-display@v0.4.0-ls-4/dist/index.min.js"></script>
+	<!-- <script src="/@scripts/live2d-lipsync-index.js"></script> -->
+
+	<script src="./script_bot.js"></script>
+	<script src="./script_chat.js"></script>
+	<script src="./script_anime.js"></script>
+	<script src="./script_page_handler.js"></script>
+	<script src="./script_pwa.js"></script>
+	<script>
+		user.get_skin_link()
+	</script>
+
+
+	<link href="/@fonts/Didot_Italic.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,530;1,530&display=swap" rel="stylesheet">
 </body>
+
 </html>
