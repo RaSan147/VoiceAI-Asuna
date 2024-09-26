@@ -10,9 +10,9 @@ class Bot_{
 		this.canvas.style.height = "auto";	
 		this.app = null;
 		this.cubism4Model = `/live2d.bak/asuna/asuna_${user.bot_skin}/asuna_${user.bot_skin}.model.json`
-		// "https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json"
-		// "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json";
-
+		// this.cubism4Model =  "https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json"
+		// this.cubism4Model =  "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json";
+		
 		this.motions = {
 			"idle": ["idle",undefined],
 			"happy": ["", 0],
@@ -36,14 +36,14 @@ class Bot_{
 		top_bar.set_title(this.AI_NAME);
 		top_bar.set_profile_pic(this.avatar);
 	}
-
+	
 	get_user_pref_skin(skin){
 		user.bot_skin = skin;
 		user.set_local_data();
 		popup_msg.createPopup("Skin changed. Please refresh", "<a class='pagination' onclick='tools.refresh()'>Refresh</a>");
 		popup_msg.show();
 	}
-
+	
 	set_status(status){
 		this.active = status;
 		if (status){
@@ -52,7 +52,7 @@ class Bot_{
 			this.status_bull.style.color = "#ff0000";
 		}
 	}
-
+	
 	async anim_loader() {
 		this.app = new PIXI.Application({
 			view: document.getElementById("canvas"),
@@ -61,9 +61,12 @@ class Bot_{
 			backgroundAlpha:0,
 			backgroundColor: 0x000000,
 		});
-	
+		
+		// this.cubism4Model = 'http://127.0.0.1:6060/modelll.model3.json'
+		console.log(this.cubism4Model)
+
 		this.model4 = await PIXI.live2d.Live2DModel.from(this.cubism4Model);
-	
+		
 		this.app.stage.addChild(this.model4);
 	
 		this.set_size();
@@ -180,6 +183,8 @@ class Bot_{
 }
 
 var bot = new Bot_();
+
+console.log(bot.cubism4Model)
 
 
 

@@ -30,6 +30,8 @@ import logging
 import atexit
 import os
 
+from typing import Type
+
 __version__ = "0.9.6"
 enc = "utf-8"
 DEV_MODE = True
@@ -240,6 +242,14 @@ class Tools:
 		"""
 		letters = string.ascii_lowercase
 		return ''.join(random.choice(letters) for i in range(length))
+
+	@staticmethod
+	def xpath(*path):
+		path:str = os.path.join(*path)
+		path = path.replace("\\", "/")
+		path = re.sub(r"/+", "/", path)
+
+		return path
 
 
 tools = Tools()
@@ -492,8 +502,8 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 
 
 
-	@staticmethod
-	def allowed_CORS(method) -> Union[str, None]:
+	@classmethod
+	def allowed_CORS(self, method) -> Union[str, None]:
 		"""Check if the method is allowed by the server"""
 		self = __class__
 		cors = self.allow_star_CORS.get(method.upper(), None)
@@ -501,9 +511,13 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		return cors or self.allow_star_CORS.get("ALL", None)
 
 
-	@staticmethod
-	def allow_CORS(method, origin):
-		"""Add a method to the allowed list"""
+	@classmethod
+	def allow_CORS(self, method, origin):
+		"""Add a method to the allowed list
+		
+		`method` = `GET`, `POST`, `PUT`, `DELETE`, `HEAD`, `OPTIONS`, `PATCH`\n
+		`origin` = `*`, `http://example.com`, `https://example.com`, `http://example.com:8080`, `https://example.com:8080`
+		"""
 		self = __class__
 		method = method.upper()
 		self.allow_star_CORS[method] = origin
@@ -513,8 +527,6 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 
 		if method == "GET":
 			self.allow_star_CORS["HEAD"] = origin
-
-
 
 	def parse_request(self):
 		"""Parse a request (internal).
@@ -778,7 +790,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			message = shortmsg
 		if explain is None:
 			explain = longmsg
-		self.log_error("code", code, "message", message)
+		self.log_error("code", code, "message", message, "\n\n", "URL", self.path, "\nquery", self.query, "\nfragment", self.fragment, "\nmethod", self.method)
 		self.send_response(code, message)
 
 		self._send_cookie(cookie=cookie)
@@ -805,7 +817,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self.send_header("Content-Type", error_content_type)
 			self.send_header('Content-Length', str(len(body)))
 
-			# if user Ovverides the CORS policy
+			# if user Overides the CORS policy
 			self.method = "ERROR"
 
 		self.end_headers()
@@ -1143,6 +1155,29 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			return func
 		return decorator
 
+
+	@staticmethod
+	def alt_directory(dir, type='', url='', hasQ=(), QV={}, fragent='', url_regex='', func=null):
+		"""
+		alternative directory handler
+		"""
+		self = __class__
+		
+		@self.on_req(type, url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
+		def alt_dir_function(self: Type[__class__], *args, **kwargs):
+			"""
+			re-direct request to specific directory
+			"""
+
+			file = self.url_path.split("/")[-1]
+			
+			if not os.path.exists(tools.xpath(dir, file)):
+				self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+				return None
+
+			return self.send_file(tools.xpath(dir, file))
+
+
 	def test_req(self, url='', hasQ=(), QV={}, fragent='', url_regex=''):
 		'''test if request is matched'
 
@@ -1242,7 +1277,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 
-	def return_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
+	def return_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None, cache_control=""):
 		'''returns only the head to client
 		and returns a file object to be used by copyfile'''
 		self.log_debug(f'[RETURNED] {code} to client')
@@ -1266,16 +1301,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		self._send_cookie(cookie)
 
-
-
 		self.send_header("Content-Type", content_type)
 		self.send_header("Content-Length", str(len(encoded)))
+
+		if cache_control:
+			self.send_header("Cache-Control", cache_control)
 		self.end_headers()
 		return box
 
 	def send_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''sends the head and file to client'''
-		file = self.return_txt(msg, code, content_type, cookie)
+		file = self.return_txt(msg, code, content_type, cookie, cache_control="no-cache")
 		if self.command == "HEAD":
 			return  # to avoid sending file on get request
 		self.copyfile(file, self.wfile)
@@ -1361,6 +1397,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 						if last_modif <= ims:
 							self.send_response(HTTPStatus.NOT_MODIFIED)
+							self._send_cookie(cookie=cookie)
 							self.end_headers()
 							file.close()
 
@@ -1380,6 +1417,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 				self.send_response(206)
 				self._send_cookie(cookie=cookie)
+
+				if cache_control:
+					self.send_header("Cache-Control", cache_control)
 
 				self.send_header('Accept-Ranges', 'bytes')
 
@@ -2064,7 +2104,7 @@ def get_ip(bind=None):
 	s.settimeout(0)
 	try:
 		# doesn't even have to be reachable
-		s.connect(('10.255.255.255', 1))
+		s.connect(('255.255.255.255', 1))
 		IP = s.getsockname()[0]
 	except:
 		try:
@@ -2102,7 +2142,7 @@ def _get_details():
 	data = {
 		'port': config.port,
 		'hostname': hostname,
-		'local_ip': local_ip,
+		'local_ip': device_ip,
 		'on_network': on_network,
 		'network_address': config.address() # f"http://{IP}:{port}"
 	}
@@ -2111,7 +2151,7 @@ def _get_details():
 
 
 
-def _log_details():	
+def _log_details(force):	
 	data = _get_details()
 
 	port = data['port'] # same as config.port
@@ -2121,9 +2161,12 @@ def _log_details():
 	network_address = data['network_address'] # f"http://{IP}:{port}" or config.address()
 
 
+	if force:
+		func = print
+	else:
+		func = logger.info
 
-
-	logger.info(tools.text_box(
+	func(tools.text_box(
 		# TODO: need to check since the output is "Serving HTTP on :: port 6969"
 		# f"Serving HTTP on {host} port {port} \n",
 		# TODO: need to check since the output is "(http://[::]:6969/) ..."
@@ -2260,7 +2303,7 @@ class EasyServerRunner:
 
 
 
-def runner(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequestHandler, log_details=True) -> EasyServerRunner:
+def runner(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequestHandler, force_log_server_details=False) -> EasyServerRunner:
 	
 	EasyServer = EasyServerRunner(
 		port=port,
@@ -2272,8 +2315,7 @@ def runner(port=0, directory="", bind="", arg_parse=True, handler=SimpleHTTPRequ
 	config.server_init = True
 	config.server_runner = EasyServer.httpd
 
-	if log_details:
-		_log_details()
+	_log_details(force_log_server_details)
 
 	return EasyServer
 
