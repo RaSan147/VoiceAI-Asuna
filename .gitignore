@@ -162,3 +162,5 @@ cython_debug/
 src/log.txt
 /src/patterns.tmp
 /API/*.zip
+src/search_results.html
+src/search_results.txt

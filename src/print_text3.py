@@ -1,4 +1,5 @@
 from queue import Queue
+import threading
 from time import sleep
 import re
 import sys
@@ -480,10 +481,8 @@ class oneLine(XprintClass):
 			# print(to_del)
 			sys.stdout.write("\033[2K\033[1G" + ('\x1b[1A\x1b[2K'*to_del))
 			# sys.stdout.write('\x1b[K' + ('\x1b[1A\x1b[2K'*to_del))
+			# sys.stdout.flush() # do not flush due to cursor movement (it will cause flickering)
 
-			# )#
-			# sys.stdout.flush()
-			# print("boom\n")
 
 		if out_func == "slowtype":
 			self.old_len = self.get_len(self.remove_style(text))
@@ -496,23 +495,45 @@ class oneLine(XprintClass):
 		self.BUSY = False
 
 		if not self.queue.empty():
-			return True
+			return self.next()
+
 
 	def update(self, *text, sep=' ', wait_time=wait_time, end='\n', highlighter=False, auto_resetting=True, run_at_start=null_func):
-		""" Uses xprint and parse string"""
+		"""
+		Uses xprint and parse string
+		"""
 		text = self.make_str(*text, sep=sep, end=end, highlighter=highlighter)
 		text = run_at_start(text)
 		self.queue.put((text, wait_time, auto_resetting, "slowtype"))
-		while self.next() is True:
-			pass
+		
+		self.next()
+
+	def async_update(self, *text, sep=' ', wait_time=wait_time, end='\n', highlighter=False, auto_resetting=True, run_at_start=null_func):
+		"""
+		Uses xprint and parse string in async
+		"""
+		T = threading.Thread(target=self._update, args=(text), kwargs={"sep": sep, "wait_time": wait_time, "end": end, "run_at_start": run_at_start})
+		T.start()
 
 	def _update(self, *text, sep=' ', wait_time=wait_time, end='\n', run_at_start=null_func):
-		""" Uses print and does not parse string"""
+		"""
+		Uses print and does not parse string
+		"""
 		text = run_at_start(text)
 		text = str(sep).join(map(str, text)) + str(end)
 
 		self.queue.put((text, wait_time, False, "print"))
+		
 		self.next()
+
+	def _async_update(self, *text, sep=' ', wait_time=wait_time, end='\n', run_at_start=null_func):
+		"""
+		Uses print and does not parse string in async
+		"""
+		T = threading.Thread(target=self._update, args=(text), kwargs={"sep": sep, "wait_time": wait_time, "end": end, "run_at_start": run_at_start})
+
+		T.start()
+		
 
 	def new(self):
 		self.__init__()
@@ -530,7 +551,13 @@ class oneLine(XprintClass):
 # print(x.splitlines())
 
 XprintEngine = XprintClass()
+
 xprint = XprintEngine.slowtype
+xStart = "/~`"
+xEnd = "`~/"
+def xIgnore(x):
+	return f"{xStart}{x}{xEnd}"
+
 remove_style = XprintEngine.remove_style
 
 

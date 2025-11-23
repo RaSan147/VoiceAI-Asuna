@@ -45,7 +45,9 @@ if os_name == 'nt':
 			self.directsend('open "'+filename+'" alias ' +self._alias )
 			self.directsend('set %s time format milliseconds' % self._alias)
 
-			self._length_ms = int(self.directsend('status %s length' % self._alias).decode())
+			_msg = self.directsend('status %s length' % self._alias).decode()
+			print(_msg)
+			self._length_ms = int()
 			#print(self._length_ms)
 			#self.directsend('play %s from %d to %d'% (self._alias, 0, self._length_ms) )
 		def volume(self, level):

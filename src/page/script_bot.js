@@ -62,7 +62,7 @@ class Bot_{
 			backgroundColor: 0x000000,
 		});
 		
-		// this.cubism4Model = 'http://127.0.0.1:6060/modelll.model3.json'
+		// this.cubism4Model = 'https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json'
 		console.log(this.cubism4Model)
 
 		this.model4 = await PIXI.live2d.Live2DModel.from(this.cubism4Model);
@@ -169,9 +169,9 @@ class Bot_{
 				volume: volume, 
 				expression:expression,
 				crossOrigin: "anonymous",
-				// onEnd: function () {
-				// 	console.log("Finished motion");
-				// }
+				onFinish: function () {
+					console.log("Finished motion");
+				}
 			})
 
 	}

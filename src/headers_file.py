@@ -171,8 +171,8 @@ import random
 def get_header():
 	return random.choice(header_list)
 
-def get_headers():
-    return {
+def get_headers(referrer=None):
+    headers = {
         # ':Authority': 'us.pandora.net',
         # ':Scheme': 'https',
         'Cache-Control': 'max-age=0',
@@ -183,3 +183,8 @@ def get_headers():
         'upgrade-insecure-requests': '1',
         'user-agent': get_header(),
     }
+
+    if referrer:
+        headers['referer'] = referrer
+
+    return headers

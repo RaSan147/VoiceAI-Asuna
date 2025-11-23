@@ -1,9 +1,11 @@
 import sys
 
 import basic_conv_pattern as Constants
-from OS_sys import os_name, os_system
 from print_text3 import xprint
 from NUM_sys import flatten_array
+from platform import system as os_name
+from os import system as os_system
+os_name = os_name()
 
 """ Contains Input and Output functions """
 
