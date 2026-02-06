@@ -140,6 +140,7 @@ def wikisearch(uix='', raw='', user: User = None):
 	if user:
 		uix = symbols_to_names(uix, user)
 
+	log_xprint("\t/c/Searching wolfram alpha:/=//~`", uix, "`~/")
 	wolf = wikix.wolfram(uix)
 	if wolf:
 		return wolf

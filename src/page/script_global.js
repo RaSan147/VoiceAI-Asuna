@@ -217,10 +217,10 @@ class Tools {
 			return
 		}
 		config.Debugging = true;
-		var script = this.add_script("//cdn.jsdelivr.net/npm/eruda");
-		script.onload = function() {
-			eruda.init()
-		};
+		// var script = this.add_script("//cdn.jsdelivr.net/npm/eruda");
+		// script.onload = function() {
+		// 	eruda.init()
+		// };
 	}
 
 

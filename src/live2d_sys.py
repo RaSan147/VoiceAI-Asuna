@@ -10,6 +10,7 @@ class OnLine:
 		self.cached_characters = {}
 
 	def get_characters(self):
+		# print("Getting characters from " + self.latest_link + "/characters.json")
 		r = net_sys.get_page(self.latest_link + "/characters.json",
 							cache=True,
 							do_not_cache=False,

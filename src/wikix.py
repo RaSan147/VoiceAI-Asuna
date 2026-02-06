@@ -20,7 +20,11 @@ session = requests.Session()
 
 URL = "https://en.wikipedia.org/w/api.php"
 
-
+def sanitize_for_wolfram(query):
+	# Fix 1: Force explicit division text
+	# Replaces "/" with " divided by " to kill ambiguity
+	query = query.replace('/', ' divided by ')
+	return query
 
 
 def wolfram(text):
@@ -29,6 +33,7 @@ def wolfram(text):
 	text: query
 	raw: the untouched user input for logging
 	"""
+	text = sanitize_for_wolfram(text)
 	r = session.get("http://api.wolframalpha.com/v1/spoken",
 					params={
 						"i": text,
@@ -36,6 +41,12 @@ def wolfram(text):
 					},
 					timeout=60
 				)
+
+	# print("\t/c/Wolfram Alpha response:/=//~`", r.text, "`~/")
+	# print("\t/c/Status code:/=//~`", r.status_code, "`~/")
+	# print("\t/c/Response headers:/=//~`", r.headers, "`~/")
+	# print("\t/c/Response content:/=//~`", r.reason, "`~/")
+	# print("\t/c/Response URL:/=//~`", r.url, "`~/")
 	if not r:
 		return False
 
