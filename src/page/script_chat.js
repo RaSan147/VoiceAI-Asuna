@@ -378,7 +378,6 @@ class ChatHandler{
 	
 	
 	async minimize(){
-		var that = this;
 		this.minimized = true;
 		
 		pages.to_anime()
@@ -390,24 +389,22 @@ class ChatHandler{
 		this.go_to_bottom()
 		top_bar.hide();
 		this.show_max_btn()
-		
-		this.maximize_btn.onclick = () => {
-			that.maximize()
-		}
 		byId("to-chat").classList.add("invisible")
 	}
 	
 	async maximize() {
-		this.hide_page()
-		this.show_max_btn(false)
-		
-		// fix animation bug
-		await tools.sleep(500);
-		
-		this.page.classList.remove("minimized")
-		byId("to-chat").classList.remove("invisible")
+		// Original behavior: leave minimized overlay and hide chat — full viewport for character only.
 		this.minimized = false;
-		
+		this.page.classList.remove("minimized");
+		this.show_max_btn(false);
+		await this.hide_page();
+		byId("to-chat").classList.remove("invisible");
+		pages.current_page = "home";
+		try {
+			await anime.show_page();
+		} catch (e) {
+			log(e);
+		}
 	}
 	
 

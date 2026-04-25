@@ -1,0 +1,76 @@
+/**
+ * Shared design tokens — loosely aligned with html_login.html (Outfit, deep indigo, violet accent).
+ * Legacy --theme-* / --button-* names are bridged so existing rules keep working.
+ */
+:root {
+	color-scheme: dark;
+
+	--asuna-bg0: #070812;
+	--asuna-bg1: #0e1020;
+	--asuna-elevated: rgba(14, 16, 32, 0.92);
+	--asuna-sidebar: rgba(12, 14, 28, 0.96);
+	--asuna-card: rgba(18, 20, 38, 0.55);
+	--asuna-card-border: rgba(255, 255, 255, 0.09);
+	--asuna-text: #f2f4ff;
+	--asuna-muted: rgba(242, 244, 255, 0.55);
+	--asuna-accent: #8b7cff;
+	--asuna-accent-mid: #6d5efc;
+	--asuna-accent2: #e86fb8;
+	--asuna-radius: 14px;
+	--asuna-radius-lg: 20px;
+	--asuna-font: "Outfit", system-ui, sans-serif;
+	--asuna-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+	--asuna-input-bg: rgba(6, 8, 18, 0.55);
+	--asuna-input-bg-solid: rgb(12, 14, 28);
+	--asuna-glass-blur: 18px;
+	--asuna-shadow-soft: 0 24px 64px rgba(0, 0, 0, 0.42);
+	--asuna-glow-accent: 0 0 48px rgba(109, 94, 252, 0.12);
+
+	/* Legacy bridge (style_page.css, accordions, etc.) */
+	--theme-background: var(--asuna-bg1);
+	--theme-color-focused: var(--asuna-accent);
+	--theme-color: var(--asuna-accent-mid);
+	--theme-color-text: var(--asuna-text);
+	--theme-color-text2: #c4b8ff;
+	--theme-hover-color: rgba(255, 255, 255, 0.08);
+	--button-background-color: rgba(32, 36, 64, 0.88);
+	--button-background-color-focused: rgba(48, 52, 88, 0.95);
+	--button-border-focused: rgba(139, 124, 255, 0.4);
+	--button-border: rgba(255, 255, 255, 0.1);
+	--button-border-radius: 12px;
+	--border-width: 1px;
+	--border-color: var(--asuna-card-border);
+	--space-height: 3em;
+	--tick-spacing: 0;
+
+	--sb-width: 300px;
+	/* Thread inset; top bar gap lives on #chat-page:not(.minimized) */
+	--chat-chats-pad-top: 16px;
+	--chat-input-bar-h: 56px;
+}
+
+@media screen and (max-width: 450px) {
+	:root {
+		--sb-width: 80%;
+	}
+}
+
+@media screen and (max-width: 340px) {
+	:root {
+		--sb-width: 100vw;
+	}
+}
+
+html[data-ui-density="compact"] {
+	--chat-chats-pad-top: 10px;
+	--chat-input-bar-h: 48px;
+}
+
+[data-reduced-glass="1"] {
+	--asuna-glass-blur: 0px;
+}
+
+[data-reduced-glass="1"] .popup-box {
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+}

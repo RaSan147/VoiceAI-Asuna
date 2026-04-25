@@ -133,12 +133,18 @@ def wikisearch(uix='', raw='', user: User = None):
 	2nd, checks if there's any data in wikipedia
 	3rd, after failing above, returns google search link
 	"""
+	uix = (uix or "").strip()
+	if not uix:
+		return None
 
 	if not check_internet():
 		return choice(ot.no_internet)
 
 	if user:
 		uix = symbols_to_names(uix, user)
+		uix = (uix or "").strip()
+		if not uix:
+			return None
 
 	log_xprint("\t/c/Searching wolfram alpha:/=//~`", uix, "`~/")
 	wolf = wikix.wolfram(uix)
@@ -204,7 +210,7 @@ def wikisearch(uix='', raw='', user: User = None):
 		user.flags.on_yes = {
 			"message": "Okayy",
 			"script": f"""
-				window.open('{link}', '_blank')"
+				window.open('{link}', '_blank')
 			"""
 		}
 
@@ -214,7 +220,29 @@ def wikisearch(uix='', raw='', user: User = None):
 
 def find_person(name:str, user:User = None):
 	# return searcher(name)
+	if not (name or "").strip():
+		return None
 	return wikisearch(name, name, user)
+
+
+def rep_wiki_or_find_person(msg, uix, uix_raw, user: User):
+	"""Wiki / person lookup; skips remote calls when the query is blank."""
+	x = wikisearch(uix, uix_raw, user)
+	if x:
+		msg.rep(x)
+		return
+	if (uix_raw or "").strip():
+		y = find_person(uix_raw)
+		if y:
+			msg.rep(y)
+			return
+	msg.rep(
+		Rchoice(
+			"I need a name or topic to look up—could you say that again?",
+			"I'm not sure what to search for yet. What did you mean?",
+			"Could you add a bit more detail so I know what to find?",
+		)
+	)
 
 
 def bbc_news_report(prompt="top"):
@@ -638,8 +666,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 		_what = re_search(ip.whats_, ui)
 		_what_raw = re_search(ip.whats_, ui_raw)
 
-		uiopen = remove_suffix(_what.group("query"))
-		uiopen_raw = remove_suffix(_what_raw.group("query"))
+		uiopen = remove_suffix(_what.group("query")).strip()
+		uiopen_raw = remove_suffix(_what_raw.group("query")).strip()
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
@@ -658,7 +686,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			pass
 
 		else:
-			msg.rep(wikisearch(uiopen_raw, raw=ui, user=user))
+			rep_wiki_or_find_person(msg, uiopen_raw, uiopen_raw, user)
 
 			msg.add_intent("(whats)_something")
 
@@ -842,8 +870,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	elif re_starts(ip.whens_, ui):
 		_when = re_search(ip.whens_, ui)
 		_when_raw = re_search(ip.whens_, ui_raw)
-		uiopen = remove_suffix(_when.group("query"))
-		uiopen_raw = remove_suffix(_when_raw.group("query"))
+		uiopen = remove_suffix(_when.group("query")).strip()
+		uiopen_raw = remove_suffix(_when_raw.group("query")).strip()
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
@@ -858,11 +886,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			msg.add_intent("(when)_my_bday")
 
 		else:
-			x = wikisearch(uiopen, uiopen_raw, user)
-			if x:
-				msg.rep(x)
-			else:
-				msg.rep(find_person(uiopen_raw))
+			rep_wiki_or_find_person(msg, uiopen, uiopen_raw, user)
 
 			msg.add_intent("(when)_something")
 
@@ -870,8 +894,8 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	elif re_starts(ip.whos_, ui):
 		_who = re_search(ip.whos_, ui)
 		_who_raw = re_search(ip.whos_, ui_raw)
-		uiopen = remove_suffix(_who.group("query"))
-		uiopen_raw = remove_suffix(_who_raw.group("query"))
+		uiopen = remove_suffix(_who.group("query")).strip()
+		uiopen_raw = remove_suffix(_who_raw.group("query")).strip()
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
@@ -901,19 +925,15 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 				act += 'ed'
 			msg.rep(choice(ot.created_by) % act)
 		else:
-			x = wikisearch(uiopen, uiopen_raw, user)
-			if x:
-				msg.rep(x)
-			else:
-				msg.rep(find_person(uiopen_raw))
+			rep_wiki_or_find_person(msg, uiopen, uiopen_raw, user)
 
 			msg.add_intent("(who)_something")
 
 	elif re_starts(ip.wheres_, ui):
 		_where = re_search(ip.wheres_, ui)
 		_where_raw = re_search(ip.wheres_, ui_raw)
-		uiopen = remove_suffix(_where.group("query"))
-		uiopen_raw = remove_suffix(_where_raw.group("query"))
+		uiopen = remove_suffix(_where.group("query")).strip()
+		uiopen_raw = remove_suffix(_where_raw.group("query")).strip()
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
@@ -927,11 +947,7 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 			msg.add_intent("(where)_are_you")
 
 		else:
-			x = wikisearch(uiopen, uiopen_raw, user)
-			if x:
-				msg.rep(x)
-			else:
-				msg.rep(find_person(uiopen_raw))
+			rep_wiki_or_find_person(msg, uiopen, uiopen_raw, user)
 
 			msg.add_intent("(where)_something")
 
@@ -939,33 +955,18 @@ def _basic_output(INPUT: str, user: User, ui: str, ui_raw: str, mid: int):
 	elif re_starts(ip.hows_, ui):
 		_how = re_search(ip.hows_, ui)
 		_how_raw = re_search(ip.hows_, ui_raw)
-		uiopen = remove_suffix(_how.group("query"))
-		uiopen_raw = remove_suffix(_how_raw.group("query"))
+		uiopen = remove_suffix(_how.group("query")).strip()
+		uiopen_raw = remove_suffix(_how_raw.group("query")).strip()
 
 		log_xprint("\t/r/query:/=/", uiopen_raw)
 
 		if False:
-			pass # TODO: add MORE CONDITIONS
-			
-
+			pass  # TODO: add MORE CONDITIONS
 
 		else:
-			x = wikisearch(uiopen, uiopen_raw, user)
-			if x:
-				msg.rep(x)
-			else:
-				msg.rep(find_person(uiopen_raw))
+			rep_wiki_or_find_person(msg, uiopen, uiopen_raw, user)
 
-			msg.add_intent("(who)_something")
-
-
-		
-
-		msg.rep(
-			Rchoice("Sorry, I don't remember", "Umm, I forgot", "Well, I don't remember clearly")
-		)
-
-		msg.add_intent("(how)_something")
+			msg.add_intent("(how)_something")
 
 
 	elif re_fullmatch(ip.check_net, ui):

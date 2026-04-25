@@ -1,28 +1,25 @@
 #anime-page.inactive {
-	width: 0; height: 0;
+	width: 0;
+	height: 0;
 	transition: none;
 }
 
 #anime-page {
+	position: relative;
 	display: block;
 	height: 100%;
 	width: 100%;
-	
-	/* padding: 20px; */
-	/* padding-top: 50px; */
-	transition: opacity .5s;
+	transition: opacity 0.5s;
 	background-image: url(https://i.ibb.co/KqYGB5t/image.webp); /* shower */
 	background-image: url(https://i.ibb.co/WVyzpvz/image.webp); /* spring room */
 	background-image: url(https://i.ibb.co/8dbTJbM/image.webp); /* sitting room */
 	background-image: url(https://i.ibb.co/9tbsVCB/image.webp); /* bed room */
 	background-image: url(https://i.ibb.co/jGGGYw4/image.webp); /* japan feild */
-	
 
 	background-repeat: no-repeat;
-	background-color: #cccccc;
+	background-color: var(--asuna-bg1);
 	background-position: center;
 	background-size: auto 100%;
-
 }
 
 #anime-page.hidden {
@@ -36,45 +33,104 @@
 	height: 90%;
 	bottom: 0;
 	z-index: 1;
-	/* transform: translateX(50%); */
 }
 
 .character#canvas {
 	position: absolute;
-	/* margin-left: -100px; */
 }
 
-#to-chat, #to-install, #to-open-pwa , #maximize-page {
+/* Shared chrome for floating controls (position set per ID) */
+.home-btns {
 	position: absolute;
-	/* justify-content: center; */
+	width: auto;
+	min-height: 40px;
+	padding: 10px 14px 8px;
+	font-size: 1rem;
+	font-family: var(--asuna-font), system-ui, sans-serif;
+	font-weight: 600;
+	color: var(--asuna-text);
+	cursor: pointer;
+	background: var(--asuna-card);
+	backdrop-filter: blur(var(--asuna-glass-blur));
+	-webkit-backdrop-filter: blur(var(--asuna-glass-blur));
+	border: 1px solid var(--asuna-card-border);
+	border-radius: var(--asuna-radius-lg);
+	box-shadow: var(--asuna-shadow-soft), var(--asuna-glow-accent);
+	z-index: 10;
+	box-sizing: border-box;
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4em;
+	white-space: nowrap;
+	transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.home-btns:hover {
+	border-color: rgba(139, 124, 255, 0.35);
+	box-shadow: var(--asuna-shadow-soft), 0 0 32px rgba(109, 94, 252, 0.22);
+}
+
+/* Chat — bottom-right */
+#to-chat {
 	bottom: 0;
 	right: 0;
-	width: auto;
-	margin: 20px;
-	padding: 10px 10px 0 10px ;
-	font-size: x-large;
+	margin: 16px;
+	padding: 8px 12px 8px;
+	font-size: 0.95rem;
+	min-height: 40px;
+	border-radius: var(--asuna-radius);
 	transform: translateY(-50%);
-	height: 50px;
-	background-color: #000000;
-	border-top: 1px solid #ddd;
-	border-radius: 10px;
-	z-index: 10;
 }
 
-#to-install, #to-open-pwa, #maximize-page {
+#to-chat:active {
+	transform: translateY(-50%) scale(0.98);
+}
+
+/* Install / Open App — top-right (never combine top:0 + bottom:0 or PWA shows a full-height strip) */
+#to-install,
+#to-open-pwa {
+	top: calc(12px + env(safe-area-inset-top, 0px));
+	right: 16px;
+	bottom: auto;
+	left: auto;
+	margin: 0;
+	transform: none;
 	display: none;
-	
-	top: 0;
-	padding-bottom: 10px;
-	height: 30px;
-	
 }
 
+#to-install:active,
+#to-open-pwa:active {
+	transform: scale(0.98);
+}
 
+/*
+ * "Full screen" / expand-from-minimized: sits in #anime-page (absolute), top-left.
+ * Do not use position:fixed here — it breaks stacking vs .home-btns and overlaps top bar / chat.
+ */
 #maximize-page {
-	display: block;
-	left: 0;
+	top: calc(12px + env(safe-area-inset-top, 0px));
+	bottom: auto;
+	left: 16px;
 	right: auto;
-	width: minimum-content;
-	transition: all 0.5s;
+	margin: 0;
+	min-width: 44px;
+	padding: 10px 12px;
+	transform: none;
+	z-index: 12;
+}
+
+#maximize-page:active {
+	transform: scale(0.96);
+}
+
+#maximize-page.invisible {
+	display: none !important;
+}
+
+[data-reduced-glass="1"] .home-btns,
+[data-reduced-glass="1"] #maximize-page {
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
 }

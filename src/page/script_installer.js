@@ -35,7 +35,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   // Stash the event so it can be triggered later.
   deferredPrompt = e;
   // Update UI to notify the user they can add to home screen
-  install_btn.style.display = 'block';
+  install_btn.style.display = "inline-flex";
   notify_install = true // is INSTALL button visible
 
   install_btn.onclick = () => {
@@ -63,7 +63,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
   // Clear the deferredPrompt so it can be garbage collected
   deferredPrompt = null;
-  open_pwa_btn.style.display = "block"
+  open_pwa_btn.style.display = "inline-flex";
 });
 
 var installedApps;
@@ -71,7 +71,7 @@ async function getInstalledApps() {
   installedApps = await navigator.getInstalledRelatedApps();
   
   if(notify_install && installedApps.length){
-  	open_pwa_btn.style.display = "block"
+  	open_pwa_btn.style.display = "inline-flex";
   }
   
   return installedApps
@@ -137,7 +137,7 @@ function isChrome() {
 }
 
 function to_install_if_not_chrome(){
-	install_btn.style.display="block";
+	install_btn.style.display = "inline-flex";
 	install_btn.onclick= () => {
 
 	const msg = `To install, please click <b>⌂ Add to Home Screen</b> from browser menu <b> &vellip;</b>

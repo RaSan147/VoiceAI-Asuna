@@ -381,8 +381,10 @@ class Top_Bar {
 	}
 
 	hide() {
-		this.top_bar.style.top = "-50px";
+		this.top_bar.style.top = "0";
 		document.body.style.top = "0";
+		/* display:none via inactive — -50px alone leaves a strip if the bar is taller than 50px */
+		this.top_bar.classList.add("inactive");
 	}
 
 }

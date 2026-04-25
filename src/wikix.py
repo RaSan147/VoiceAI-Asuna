@@ -18,6 +18,11 @@ from DS import Flag
 
 session = requests.Session()
 
+# MediaWiki requires a descriptive User-Agent; missing or generic agents may get empty/non-JSON responses.
+_WIKI_UA = (
+	"VoiceAI-Asuna/1.0 (https://github.com/RaSan147/VoiceAI-Asuna; wwwqweasd147@gmail.com)"
+)
+
 URL = "https://en.wikipedia.org/w/api.php"
 
 def sanitize_for_wolfram(query):
@@ -83,7 +88,10 @@ def wiki_summary(uix):
 
 
 
-def search(SEARCHPAGE:str, limit=10):
+def search(SEARCHPAGE: str, limit=10):
+	if not (SEARCHPAGE or "").strip():
+		return []
+
 	PARAMS = {
 		"action": "query",
 		"format": "json",
@@ -95,12 +103,23 @@ def search(SEARCHPAGE:str, limit=10):
 		"srenablerewrites": True,
 	}
 
-	R = session.get(url=URL, params=PARAMS)
-	DATA = R.json()
+	R = session.get(
+		url=URL,
+		params=PARAMS,
+		timeout=30,
+		headers={"User-Agent": _WIKI_UA},
+	)
+	if not R.ok:
+		return []
+	try:
+		DATA = R.json()
+	except ValueError:
+		return []
 
 	#print(*[i for i in DATA['query']['search']], sep="\n\n")
 
-	return [Flag(i) for i in DATA.get('query', {}).get('search', {}) if i]
+	rows = DATA.get("query", {}).get("search") or []
+	return [Flag(i) for i in rows if i]
 
 
 #if DATA['query']['search'][0]['title'] == SEARCHPAGE:

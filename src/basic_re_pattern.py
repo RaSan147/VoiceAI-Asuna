@@ -92,6 +92,10 @@ When___ = r"w(?:h|g)?en"
 How___ = r"how"
 Where___ = r"w(?:h|g)?ere"
 
+# "what is" must consume the auxiliary (do not make `( AuxV)?` optional alone — that
+# captured "is …" as the wiki query). Also match "what's" / informal "whats" (no apostrophe).
+WHAT_WITH_AUX___ = rf"{What___}(?:'(?:s|re|ve|ll|d)\b|s\b|{AuxV___})"
+
 
 DEFINE_WHAT___ = (
 	"("
@@ -100,7 +104,7 @@ DEFINE_WHAT___ = (
 			"|"
 			"define" # define this or that
 			"|"
-			f"{What___}( {AuxV___})?" # what is ....
+			f"{WHAT_WITH_AUX___}" # what is / what's / whats …
 		")"
 		"(?: the)?" #define the ..., what is the ..
 	")"
@@ -452,10 +456,39 @@ ip.my_self = [
 	C(rf"i( to {YOU___})?")
 ]
 
+# "who created you" / "your creator" style (used after my_self in who-query branch)
+ip.created_program = [
+	C(
+		r'(?P<action>'
+			r'created?|'
+			r'program(?:med)?|'
+			r'invent(?:ed)?|'
+			r'design(?:ed)?|'
+			r'ma(?:d|k)e'
+		r') '
+		f'{YOU___}'
+	),
+	C(
+		f"{YOUR___} "
+		r"(?P<action>"
+			r"creat|"
+			r"programm?|"
+			r"invent|"
+			r"design|"
+			r"mak"
+		r")(?:o|e)?r"
+	),
+]
+
+
+# Optional clause-final punctuation (e.g. "who are you?" → query "are you?").
+SENTENCE_END___ = r"(?:[?.!…]+)?"
 
 "what are you?"
 ip.you_self = [
-	C(rf"{YOURE___}( ?self)?( really)?"),
+	C(rf"{YOURE___}( ?self)?( really)?{SENTENCE_END___}"),
+	# Tail after optional `who` prefix (see ip.whos_ + greedy query capture).
+	C(rf"{ARE___} {YOU___}{SENTENCE_END___}"),
 ]
 
 ip.your_bday = [
