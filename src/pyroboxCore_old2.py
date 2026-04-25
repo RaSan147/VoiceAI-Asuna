@@ -1,4 +1,3 @@
-import inspect
 import traceback
 import json
 import string
@@ -15,7 +14,7 @@ import urllib.parse
 import time
 import sys
 import socketserver
-import socket
+import socket  # For gethostbyaddr()
 import shutil
 import posixpath
 import mimetypes
@@ -35,7 +34,7 @@ import tempfile
 
 from typing import Type
 
-__version__ = "0.10.0"
+__version__ = "0.9.6"
 enc = "utf-8"
 DEV_MODE = True
 
@@ -45,6 +44,14 @@ __all__ = [
 	"SimpleHTTPRequestHandler",
 ]
 
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: \n%(message)s')
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+# set INFO to see all the requests
+# set WARNING to see only the requests that made change to the server
+# set ERROR to see only the requests that made the errors
 
 
 endl = "\n"
@@ -201,42 +208,6 @@ class Config:
 		return args
 
 
-	def init_logger(self, logger):
-		"""
-		Initializes the logger
-
-		Use arg parser to get log level, default is INFO
-		"""
-
-		self.parser.add_argument('--log-level', '-l',
-								default='INFO',
-								help='[Log level] Set the log level (default: %(default)s) [DEBUG, INFO, WARNING, ERROR, CRITICAL]')
-		args = self.parser.parse_known_args()[0]
-
-		log_level = args.log_level.upper()
-		if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
-			log_level = 'INFO'
-
-		logger.setLevel(getattr(logging, log_level))
-
-
-
-config = Config()
-
-
-def get_log_level():
-	argparse.add_argument('--log', '-l', default='INFO', help='Log level')
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: \n%(message)s')
-
-logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# set INFO to see all the requests
-# set WARNING to see only the requests that made change to the server
-# set ERROR to see only the requests that made the errors
-config.init_logger(logger)
-
-
-
 class Tools:
 	def __init__(self):
 		self.styles = {
@@ -284,6 +255,7 @@ class Tools:
 
 
 tools = Tools()
+config = Config()
 
 
 
@@ -469,7 +441,6 @@ def URL_MANAGER(url: str):
 class HTTPServer(socketserver.TCPServer):
 
 	allow_reuse_address = True  # Seems to make sense in testing environment
-	allow_reuse_port = True # As per https://github.com/python/cpython/commit/192d17c3fd9945104bc0303cf248bb0d074d260e
 
 	def server_bind(self):
 		"""Override server_bind to store the server name."""
@@ -617,21 +588,21 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 				version_number = int(version_number[0]), int(version_number[1])
 			except (ValueError, IndexError):
 				self.send_error(
-					code=HTTPStatus.BAD_REQUEST,
+					HTTPStatus.BAD_REQUEST,
 					message="Bad request version (%r)" % version)
 				return False
 			if version_number >= (1, 1) and self.protocol_version >= "HTTP/1.1":
 				self.close_connection = False
 			if version_number >= (2, 0):
 				self.send_error(
-					code=HTTPStatus.HTTP_VERSION_NOT_SUPPORTED,
+					HTTPStatus.HTTP_VERSION_NOT_SUPPORTED,
 					message="Invalid HTTP version (%s)" % base_version_number)
 				return False
 			self.request_version = version
 
 		if not 2 <= len(words) <= 3:
 			self.send_error(
-				code=HTTPStatus.BAD_REQUEST,
+				HTTPStatus.BAD_REQUEST,
 				message="Bad request syntax (%r)" % requestline)
 			return False
 		command, path = words[:2]
@@ -639,7 +610,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self.close_connection = True
 			if command != 'GET':
 				self.send_error(
-					code=HTTPStatus.BAD_REQUEST,
+					HTTPStatus.BAD_REQUEST,
 					message="Bad HTTP/0.9 request type (%r)" % command)
 				return False
 		self.command, self.path = command, path
@@ -660,7 +631,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		self.path = self.safe_for_terminal(self.path)
 		if '\x00' in self.path:
 			self.send_error(
-				code=HTTPStatus.BAD_REQUEST,
+				HTTPStatus.BAD_REQUEST,
 				message="Illegal null character in path")
 			return False
 
@@ -672,13 +643,13 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 													_class=self.MessageClass)
 		except http.client.LineTooLong as err:
 			self.send_error(
-				code=HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE,
+				HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE,
 				message="Line too long",
 				explain=str(err))
 			return False
 		except http.client.HTTPException as err:
 			self.send_error(
-				code=HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE,
+				HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE,
 				message="Too many headers",
 				explain=str(err)
 			)
@@ -721,7 +692,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 		False.
 
 		"""
-		self.send_response_only(code=HTTPStatus.CONTINUE)
+		self.send_response_only(HTTPStatus.CONTINUE)
 		self.end_headers()
 		return True
 
@@ -748,7 +719,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 				self.requestline = ''
 				self.request_version = ''
 				self.command = ''
-				self.send_error(code=HTTPStatus.REQUEST_URI_TOO_LONG)
+				self.send_error(HTTPStatus.REQUEST_URI_TOO_LONG)
 				return
 			if not self.raw_requestline:
 				self.close_connection = True
@@ -756,12 +727,12 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			if not self.parse_request():
 				# An error code has been sent, just exit
 				return
-			mname = 'do_HANDLE'
-			self.method = self.command.upper()
+			mname = 'do_' + self.command
+			self.method = self.command
 
 			if not hasattr(self, mname):
 				self.send_error(
-					code=HTTPStatus.NOT_IMPLEMENTED,
+					HTTPStatus.NOT_IMPLEMENTED,
 					message="Unsupported method (%r)" % self.command)
 				return
 			method = getattr(self, mname)
@@ -789,7 +760,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 						)
 
 			try:
-				method(self.command)
+				method()
 			except Exception:
 				ERROR = traceback.format_exc()
 				self.log_error(ERROR)
@@ -854,10 +825,8 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			message = shortmsg
 		if explain is None:
 			explain = longmsg
-		
 		self.log_error("code", code, "message", message, "\n\n", "URL", self.path, "\nquery", self.query, "\nfragment", self.fragment, "\nmethod", self.method)
-
-		self.send_response(code=code, message=message)
+		self.send_response(code, message)
 
 		self._send_cookie(cookie=cookie)
 
@@ -906,7 +875,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 			self.response_code_sent = True
 
 		self.log_request(code)
-		self.send_response_only(code=code, message=message)
+		self.send_response_only(code, message)
 		self.send_header('Server', self.version_string())
 		self.send_header('Date', self.date_time_string())
 
@@ -1210,14 +1179,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		'TRACE': []
 	}
 
-	
-	handler_func = None
-	handler_func_name = None
-	handler_func_args = None
-	handler_func_source = None
-	handler_func_file = None
-	handler_func_lines, handler_func_line = None, None
-
 	def __init__(self, *args, directory=None, **kwargs):
 		if directory is None:
 			directory = os.getcwd()
@@ -1226,29 +1187,27 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		super().__init__(*args, **kwargs)
 		self.query = Callable_dict()
 
+	def do_GET(self):
+		"""Serve a GET request."""
+		try:
+			resp = self.send_head()
+		except Exception as e:
+			traceback.print_exc()
+			self.send_error(500, str(e))
+			return
 
+		if resp:
+			try:
+				self.copyfile(resp, self.wfile)
+			except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
+				self.log_info(tools.text_box(e.__class__.__name__,
+							  e, "\nby ", self.address_string()))
+			finally:
+				resp.close()
 
-	# def do_GET(self):
-	# 	"""Serve a GET request."""
-	# 	try:
-	# 		resp = self.send_head()
-	# 	except Exception as e:
-	# 		traceback.print_exc()
-	# 		self.send_error(code=500, message=str(e))
-	# 		return
-
-	# 	if resp:
-	# 		try:
-	# 			self.copyfile(resp, self.wfile)
-	# 		except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-	# 			self.log_info(tools.text_box(e.__class__.__name__,
-	# 						  e, "\nby ", self.address_string()))
-	# 		finally:
-	# 			resp.close()
-
-	# def do_(self):
-	# 	'''incase of errored request'''
-	# 	self.send_error(code=HTTPStatus.BAD_REQUEST, message="Bad request.")
+	def do_(self):
+		'''incase of errored request'''
+		self.send_error(HTTPStatus.BAD_REQUEST, "Bad request.")
 
 	@staticmethod
 	def on_req(method='', url='', hasQ=(), QV={}, fragent='', url_regex='', func=null):
@@ -1281,7 +1240,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		to_check = (url, hasQ, QV, fragent, url_regex)
 
-		def decorator(func=func):
+		def decorator(func):
 			self.handlers[method].append((to_check, func))
 			return func
 		return decorator
@@ -1346,26 +1305,14 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			requested_file = tools.xpath(dir, file)
 
 			if not os.path.exists(requested_file):
-				self.send_error(code=HTTPStatus.NOT_FOUND, message="File not found")
+				self.send_error(HTTPStatus.NOT_FOUND, "File not found")
 				self.log_info(f'File not found: {requested_file}')
 				return None
 
 			return self.send_file(
 				requested_file, 
-				cookie=cookie,
-				cache_control=cache_control
-				)
-
-
-
-	def log_error(self, *args, **kwargs):
-		"""
-		Log error as well as show the function name and info
-		"""
-		if getattr(self, 'handler_func', None):
-			self.log_info(f'Error on [{self.handler_func_name}] -> [{self.handler_func_args}] -> at line [{self.handler_func_line}] -> in [{self.handler_func_file}]')
-
-		return super().log_error(*args, **kwargs)
+				cache_control=cache_control, 
+				cookie=cookie)
 
 
 	def test_req(self, url='', hasQ=(), QV={}, fragent='', url_regex=''):
@@ -1402,97 +1349,24 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 		return True
 
-	# def do_HEAD(self):
-	# 	"""Serve a HEAD request."""
-	# 	resp = None
-	# 	try:
-	# 		resp = self.send_head()
-	# 	except Exception as e:
-	# 		ERROR = traceback.format_exc()
-	# 		self.log_error(ERROR)
+	def do_HEAD(self):
+		"""Serve a HEAD request."""
+		resp = None
+		try:
+			resp = self.send_head()
+		except Exception as e:
+			ERROR = traceback.format_exc()
+			self.log_error(ERROR)
 
-	# 		self.send_error(code=500, message=str(e))
-	# 		return
-	# 	finally:
-	# 		if resp:
-	# 			resp.close()
+			self.send_error(500, str(e))
+			return
+		finally:
+			if resp:
+				resp.close()
 
-	# def do_POST(self):
-	# 	"""Serve a POST request."""
-	# 	self.range = None, None
-
-	# 	path = self.translate_path(self.path)
-	# 	# DIRECTORY DONT CONTAIN SLASH / AT END
-
-	# 	url_path, query, fragment = self.url_path, self.query, self.fragment
-	# 	spathsplit = self.url_path.split("/")
-
-	# 	try:
-	# 		for case, func in self.handlers['POST']:
-	# 			if self.test_req(*case):
-	# 				try:
-	# 					self.log_info(f'[POST] -> [{func.__name__}] ->  {self.url_path}')
-
-	# 					resp = func(self, url_path=url_path, query=query,
-	# 							fragment=fragment, path=path, spathsplit=spathsplit)
-	# 				except PostError:
-	# 					ERROR = traceback.format_exc()
-	# 					self.log_error(ERROR)
-	# 					# break if error is raised and send BAD_REQUEST (at end of loop)
-	# 					break
-
-	# 				if resp:
-	# 					try:
-	# 						self.copyfile(resp, self.wfile)
-	# 					except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-	# 						self.log_info(tools.text_box(
-	# 							e.__class__.__name__, e, "\nby ", [self.address_string()]))
-	# 					finally:
-	# 						resp.close()
-	# 				return
-
-	# 		return self.send_error(code=HTTPStatus.BAD_REQUEST, message="Invalid request.")
-
-	# 	except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-	# 		self.log_info(tools.text_box(e.__class__.__name__,
-	# 					e, "\nby ", [self.address_string()]))
-	# 		return
-	# 	except Exception as e:
-	# 		ERROR = traceback.format_exc()
-	# 		self.log_error(ERROR)
-
-	# 		self.send_error(code=500, message=str(e))
-	# 		return
-
-
-	
-	def do_HANDLE(self, method:str):
-		"""Serve a REQUEST."""
+	def do_POST(self):
+		"""Serve a POST request."""
 		self.range = None, None
-		method = method.upper()
-		if method == "GET":
-			method = "HEAD"
-
-		if method not in self.handlers:
-			return self.send_error(
-				code=HTTPStatus.NOT_IMPLEMENTED,
-				message="Unsupported method (%r)" % self.command)
-
-
-
-		if 'Range' not in self.headers:
-			self.range = None, None
-			first, last = 0, 0
-
-		else:
-			try:
-				self.range = parse_byte_range(self.headers['Range'])
-				first, last = self.range
-				self.use_range = True
-			except ValueError as e:
-				self.send_error(code=400, message='Invalid byte range')
-				return None
-
 
 		path = self.translate_path(self.path)
 		# DIRECTORY DONT CONTAIN SLASH / AT END
@@ -1501,19 +1375,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		spathsplit = self.url_path.split("/")
 
 		try:
-			for case, func in self.handlers[method]:
+			for case, func in self.handlers['POST']:
 				if self.test_req(*case):
 					try:
-						self.log_info(f'[{method}] -> [{func.__name__}] ->  {self.url_path}')
-
-
-						# save function details in class using inspect
-						self.handler_func = func
-						self.handler_func_name = func.__name__
-						self.handler_func_args = str(inspect.signature(func))
-						self.handler_func_source = inspect.getsource(func)
-						self.handler_func_file = inspect.getfile(func)
-						self.handler_func_lines, self.handler_func_line = inspect.getsourcelines(func)
+						self.log_info(f'[POST] -> [{func.__name__}] ->  {self.url_path}')
 
 						resp = func(self, url_path=url_path, query=query,
 								fragment=fragment, path=path, spathsplit=spathsplit)
@@ -1525,9 +1390,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 					if resp:
 						try:
-							print(method, self.method)
-							if self.method != "HEAD":
-								self.copyfile(resp, self.wfile)
+							self.copyfile(resp, self.wfile)
 						except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
 							self.log_info(tools.text_box(
 								e.__class__.__name__, e, "\nby ", [self.address_string()]))
@@ -1535,7 +1398,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 							resp.close()
 					return
 
-			return self.send_error(code=HTTPStatus.NOT_FOUND, message="File Not Found.")
+			return self.send_error(HTTPStatus.BAD_REQUEST, "Invalid request.")
 
 		except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
 			self.log_info(tools.text_box(e.__class__.__name__,
@@ -1545,54 +1408,54 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			ERROR = traceback.format_exc()
 			self.log_error(ERROR)
 
-			self.send_error(code=500, message=str(e))
+			self.send_error(500, str(e))
 			return
 
 	
-	# def send_head(self):
-	# 	"""Common code for GET and HEAD commands.
+	def send_head(self):
+		"""Common code for GET and HEAD commands.
 
-	# 	This sends the response code and MIME headers.
+		This sends the response code and MIME headers.
 
-	# 	Return value is either a file object (which has to be copied
-	# 	to the outputfile by the caller unless the command was HEAD,
-	# 	and must be closed by the caller under all circumstances), or
-	# 	None, in which case the caller has nothing further to do.
+		Return value is either a file object (which has to be copied
+		to the outputfile by the caller unless the command was HEAD,
+		and must be closed by the caller under all circumstances), or
+		None, in which case the caller has nothing further to do.
 
-	# 	"""
+		"""
 
-	# 	if 'Range' not in self.headers:
-	# 		self.range = None, None
-	# 		first, last = 0, 0
+		if 'Range' not in self.headers:
+			self.range = None, None
+			first, last = 0, 0
 
-	# 	else:
-	# 		try:
-	# 			self.range = parse_byte_range(self.headers['Range'])
-	# 			first, last = self.range
-	# 			self.use_range = True
-	# 		except ValueError as e:
-	# 			self.send_error(code=400, message='Invalid byte range')
-	# 			return None
+		else:
+			try:
+				self.range = parse_byte_range(self.headers['Range'])
+				first, last = self.range
+				self.use_range = True
+			except ValueError as e:
+				self.send_error(400, message='Invalid byte range')
+				return None
 
-	# 	path = self.translate_path(self.path)
-	# 	# DIRECTORY DONT CONTAIN SLASH / AT END
+		path = self.translate_path(self.path)
+		# DIRECTORY DONT CONTAIN SLASH / AT END
 
-	# 	url_path, query, fragment = self.url_path, self.query, self.fragment
+		url_path, query, fragment = self.url_path, self.query, self.fragment
 
-	# 	spathsplit = self.url_path.split("/")
+		spathsplit = self.url_path.split("/")
 
-	# 	# GET WILL Also BE HANDLED BY HEAD
-	# 	for case, func in self.handlers['HEAD']:
-	# 		if self.test_req(*case):
-	# 			return func(self, url_path=url_path, query=query, fragment=fragment, path=path, spathsplit=spathsplit)
+		# GET WILL Also BE HANDLED BY HEAD
+		for case, func in self.handlers['HEAD']:
+			if self.test_req(*case):
+				return func(self, url_path=url_path, query=query, fragment=fragment, path=path, spathsplit=spathsplit)
 
-	# 	return self.send_error(code=HTTPStatus.NOT_FOUND, message="File not found")
+		return self.send_error(HTTPStatus.NOT_FOUND, message="File not found")
 
 
 	def redirect(self, location, cookie:Union[SimpleCookie, str]=None):
 		'''redirect to location'''
 		self.log_info("REDIRECT ", location)
-		self.send_response(code=302)
+		self.send_response(302)
 		self.send_header("Location", location)
 		self._send_cookie(cookie)
 		self.end_headers()
@@ -1619,7 +1482,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		box.write(encoded)
 		box.seek(0)
 
-		self.send_response(code=code)
+		self.send_response(code)
 
 		self._send_cookie(cookie)
 
@@ -1633,7 +1496,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 	def send_txt(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''sends the head and file to client'''
-		file = self.return_txt(msg, code, content_type, cookie=cookie, cache_control="no-cache")
+		file = self.return_txt(msg, code, content_type, cookie, cache_control="no-cache")
 		if self.command == "HEAD":
 			return  # to avoid sending file on get request
 		self.copyfile(file, self.wfile)
@@ -1641,23 +1504,23 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 	def send_text(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/html; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''proxy to send_txt'''
-		self.send_txt(msg, code, content_type, cookie=cookie)
+		self.send_txt(msg, code, content_type, cookie)
 
 	def return_script(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/javascript; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''proxy to send_txt'''
-		return self.return_txt(msg, code, content_type, cookie=cookie)
+		return self.return_txt(msg, code, content_type, cookie)
 
-	def send_script(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/javascript; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
+	def send_script(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/javascript; charset=utf-8"):
 		'''proxy to send_txt'''
-		return self.send_txt(msg, code, content_type, cookie=cookie)
+		return self.send_txt(msg, code, content_type)
 
 	def return_css(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/css; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
 		'''proxy to send_txt'''
-		return self.return_txt(msg, code, content_type, cookie=cookie)
+		return self.return_txt(msg, code, content_type, cookie)
 
-	def send_css(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/css; charset=utf-8", cookie:Union[SimpleCookie, str]=None):
+	def send_css(self, msg:Union[str, bytes, Template], code:int=200, content_type="text/css; charset=utf-8"):
 		'''proxy to send_txt'''
-		return self.send_txt(msg, code, content_type, cookie=cookie)
+		return self.send_txt(msg, code, content_type)
 
 	def send_json(self, obj:Union[object, str, bytes], code=200, cookie:Union[SimpleCookie, str]=None, cache_control=""):
 		"""send object as json
@@ -1670,7 +1533,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		self.copyfile(file, self.wfile)
 		file.close()
 
-	def return_file(self, path, filename=None, download=False, cookie:Union[SimpleCookie, str]=None, cache_control=""):
+	def return_file(self, path, filename=None, download=False, cache_control="", cookie:Union[SimpleCookie, str]=None):
 		file = None
 		is_attachment = "attachment;" if (self.query("dl") or download) else ""
 
@@ -1721,7 +1584,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 						last_modif = last_modif.replace(microsecond=0)
 
 						if last_modif <= ims:
-							self.send_response(code=HTTPStatus.NOT_MODIFIED)
+							self.send_response(HTTPStatus.NOT_MODIFIED)
 							self._send_cookie(cookie=cookie)
 							if C_encoding:
 								self.send_header("Content-Encoding", C_encoding)
@@ -1740,10 +1603,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 					last = file_len - 1
 
 				if first >= file_len:  # PAUSE AND RESUME SUPPORT
-					self.send_error(code=416, message='Requested Range Not Satisfiable', cookie=cookie)
+					self.send_error(416, message='Requested Range Not Satisfiable', cookie=cookie)
 					return None
 
-				self.send_response(code=206)
+				self.send_response(206)
 				self._send_cookie(cookie=cookie)
 
 				if cache_control:
@@ -1760,7 +1623,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 				self.send_header('Content-Length', str(response_length))
 
 			else:
-				self.send_response(code=HTTPStatus.OK)
+				self.send_response(HTTPStatus.OK)
 				self._send_cookie(cookie)
 
 				self.send_header("Content-Length", str(file_len))
@@ -1782,18 +1645,18 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			return file
 
 		except PermissionError:
-			self.send_error(code=HTTPStatus.FORBIDDEN, message="Permission denied", cookie=cookie)
+			self.send_error(HTTPStatus.FORBIDDEN, message="Permission denied", cookie=cookie)
 			return None
 
 		except OSError:
-			self.send_error(code=HTTPStatus.NOT_FOUND, message="File not found", cookie=cookie)
+			self.send_error(HTTPStatus.NOT_FOUND, message="File not found", cookie=cookie)
 			self.log_info(f'File not found: {path}')
 
 			return None
 
 		except Exception:
 			ERR_LOG = traceback.format_exc()
-			self.send_error(code=HTTPStatus.INTERNAL_SERVER_ERROR, message="Internal Server Error", cookie=cookie)
+			self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, message="Internal Server Error", cookie=cookie)
 			self.log_error(ERR_LOG)
 
 			if file and not file.closed:
@@ -1801,9 +1664,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			return None
 
-	def send_file(self, path, filename=None, download=False, cookie:Union[SimpleCookie, str]=None, cache_control=''):
+	def send_file(self, path, filename=None, download=False, cache_control='', cookie:Union[SimpleCookie, str]=None):
 		'''sends the head and file to client'''
-		file = self.return_file(path, filename, download, cookie=cookie, cache_control=cache_control)
+		file = self.return_file(path, filename, download, cache_control, cookie=cookie)
 		if not file:
 			return # already flushed (with error/unchanged)
 		if self.command == "HEAD":
@@ -1834,77 +1697,32 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		"""Return the relative path to the file, FOR WEB."""
 		return urllib.parse.unquote(posixpath.join(self.url_path, filename), errors='surrogatepass')
 
-	def get_web_path(self, string:str, times=1):
-		"""
-		replace current directory with /. Use case, when sending log to client, hide the directory
-		
-		Args:
-			string (str): string to be converted
-			times (int): number of times to replace the directory with / (default: 1)(-1 for all)
-		"""
-		return string.replace(self.directory, "/", times)
+	def get_web_path(self, path:str, times=1):
+		"""replace current directory with /"""
+		return path.replace(self.directory, "/", times)
 
-	def path_safety_check(self, paths: Union[str, List], *more_paths: Union[str, List]):
-		"""Check if paths are safe and do not contain directory traversal attempts.
-		
-		Args:
-			paths: A string or list of paths to check.
-			more_paths: Additional paths to check.
-
-		Returns:
-			bool: True if all paths are safe, False otherwise.
-		"""
+	def path_safety_check(self, paths:Union[str, List], *more_paths:Union[str, List]):
+		"""check if path is safe
+		paths: list of paths to check"""
 		if isinstance(paths, str):
-			paths = [paths]  # Convert single string to list
+			paths = [paths]
 
-		# Process additional paths
-		for path in more_paths:
-			if isinstance(path, str):
-				paths.append(path)
-			elif isinstance(path, (list, tuple, set)):
-				paths.extend(path)  # Extend with actual list contents
-			else:
-				raise TypeError(f"Invalid type {type(path)} for path")
+		if more_paths:
+			for path in more_paths:
+				if isinstance(path, str):
+					paths.append(path)
+				elif isinstance(path, (list, tuple, set)):
+					paths += more_paths
+				else:
+					raise TypeError(f"Invalid type {type(path)} for path")
 
-		if not all(isinstance(path, str) for path in paths):
-			raise TypeError("All paths must be strings")
-			
-
-		# Base directory (change this as needed)
-		base_dir = os.path.abspath(self.directory)  # Assuming self.base_directory exists
-		BAD_FILENAME_CHARS = re.compile(r'[:*?"<>|]')  # Windows-illegal characters
 
 		for path in paths:
-			if not path or not path.strip():  # False on empty paths
-				# logger.info(f"Empty path: {path}")
+			if path.startswith(('../', '..\\', '/../', '\\..\\')) or '/../' in path or '\\..\\' in path or path.endswith(('/..', '\\..')):
 				return False
 
-			path = path.strip().replace('\\', '/').strip('/')  # Remove leading/trailing whitespace
+		return True
 
-			for part in path.split('/'):
-				if part in ('..', '.'):
-					# logger.info(f"Path traversal attempt: {path}")
-					return False
-
-			# Check for illegal characters
-			if BAD_FILENAME_CHARS.search(path):
-				# logger.info(f"Illegal characters in path: {path}")
-				return False
-
-			# Normalize the path to an absolute path
-			abs_path = os.path.abspath(os.path.join(base_dir, path))
-
-			# Check if the resolved path is inside the base directory
-			if not abs_path.startswith(base_dir):
-				# logger.info(f"Path escapes base directory: {path}")
-				# logger.info(f"Base directory: {base_dir}")
-				# logger.info(f"Resolved path: {abs_path}")
-				return False  # Reject any path that escapes the base directory
-
-
-			# check for bad characters
-
-		return True  # If all checks pass, path is safe
 
 
 
@@ -2194,17 +2012,8 @@ class DealPostData:
 
 		return json.loads(line)
 
-	def skip(self, line_count=1, *args, **kwargs):
-		"""skip next line
-		
-		Args:
-			line_count(int): number of lines to skip
-			show(bool): print line
-			strip(bool): strip \r\n at end
-			Timeout(float): if having network issue on any side, will keep trying to get content until Timeout (in seconds)
-		"""
-		for _ in range(line_count):
-			self.get(*args, **kwargs)
+	def skip(self,):
+		self.get()
 
 	def start(self):
 		'''reads upto line 0'''
@@ -2289,7 +2098,7 @@ class FormData:
 
 		return line
 
-	def get_file_name(self, line: Union[bytes, str, None] = None, ignore_folder=False):
+	def get_file_name(self, line: Union[bytes, str, None] = None):
 		"""
 		* get file name from Content-Disposition
 		* return file name
@@ -2298,14 +2107,8 @@ class FormData:
 
 		cd = ContentDisposition(line)
 		fn = cd.get('filename')
-		name = cd.get('name')
-
-		if name == 'folder' and ignore_folder:
-			return None
 
 		if not fn:
-			self.req.log_info(
-				f"Content-Disposition: {line}\nMissing filename in Content-Disposition")
 			raise PostError("Can't find out file name...")
 
 		return fn
