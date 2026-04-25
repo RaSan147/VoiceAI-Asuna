@@ -13,13 +13,13 @@
 
 ### 1. Install
 ```bash
-cd P:\C_coding\Python\VoiceAI-Asuna
+cd P:\C_coding\Python\VoiceAI-Asuna\learning
 pip install -r requirements_training.txt
 ```
 
 ### 2. Train
 ```bash
-cd src
+cd P:\C_coding\Python\VoiceAI-Asuna\learning
 python train_quickstart.py
 ```
 
@@ -334,8 +334,8 @@ If something breaks:
 **Ready? Let's go! 🚀**
 
 ```bash
+cd learning
 pip install -r requirements_training.txt
-cd src
 python train_quickstart.py
 ```
 

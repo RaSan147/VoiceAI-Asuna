@@ -73,6 +73,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _default_best_model_path() -> str:
+    return str(Path(__file__).resolve().parent.parent / "src" / "models" / "asuna_seq2seq" / "best_model")
+
+
 class TransformerFallback:
     """
     Transformer-based fallback for unmatched inputs.
@@ -80,7 +84,7 @@ class TransformerFallback:
     
     def __init__(
         self,
-        model_path: str = "./models/asuna_seq2seq/best_model",
+        model_path: Optional[str] = None,
         device: str = None,
         confidence_threshold: float = 0.5,
         enable_logging: bool = True
@@ -109,16 +113,16 @@ class TransformerFallback:
             else:
                 self.device = torch.device(device)
             
-            model_path = Path(model_path)
+            resolved = Path(model_path if model_path is not None else _default_best_model_path())
             
-            if not model_path.exists():
-                logger.warning(f"Model path does not exist: {model_path}")
+            if not resolved.exists():
+                logger.warning(f"Model path does not exist: {resolved}")
                 logger.warning("Transformer fallback will be disabled")
                 return
             
-            logger.info(f"Loading transformer model from {model_path}")
-            self.tokenizer = AutoTokenizer.from_pretrained(str(model_path))
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(str(model_path))
+            logger.info(f"Loading transformer model from {resolved}")
+            self.tokenizer = AutoTokenizer.from_pretrained(str(resolved))
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(str(resolved))
             self.model.to(self.device)
             self.model.eval()
             
@@ -400,7 +404,7 @@ def example_integration():
     
     # In Chat_raw2.py, at module initialization:
     fallback = TransformerFallback(
-        model_path="./models/asuna_seq2seq/best_model",
+        model_path=_default_best_model_path(),
         confidence_threshold=0.5,
         enable_logging=True
     )
@@ -431,7 +435,7 @@ if __name__ == "__main__":
     print("Testing Transformer Fallback System\n")
     
     fallback = TransformerFallback(
-        model_path="./models/asuna_seq2seq/best_model",
+        model_path=_default_best_model_path(),
         confidence_threshold=0.5
     )
     

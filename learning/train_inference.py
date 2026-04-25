@@ -265,6 +265,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _default_best_model_path() -> str:
+    return str(Path(__file__).resolve().parent.parent / "src" / "models" / "asuna_seq2seq" / "best_model")
+
+
 class TransformerInference:
     """
     Generate responses using trained model.
@@ -635,7 +639,7 @@ class BaselineComparison:
 # Example usage
 if __name__ == "__main__":
     # Load inference
-    inference = TransformerInference("./models/asuna_seq2seq/best_model")
+    inference = TransformerInference(_default_best_model_path())
     
     # Generate sample
     response = inference.generate("what is the time?")

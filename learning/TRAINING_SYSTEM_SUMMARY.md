@@ -264,23 +264,24 @@ Perplexity 8 = ~8 options, Perplexity 100 = ~100 options
 
 ### Step 1: Install
 ```bash
+cd learning
 pip install -r requirements_training.txt
 ```
 
 ### Step 2: Run Training
 ```bash
-cd src
+cd learning
 python train_quickstart.py
 ```
 
-Expected output: Model checkpoint in `models/asuna_seq2seq/best_model/`
+Expected output: Model checkpoint in `src/models/asuna_seq2seq/best_model/`
 
 ### Step 3: Integrate with Chat
-Add to `Chat_raw2.py`:
+Add to `Chat_raw2.py` (adjust import path if `learning` is not on `PYTHONPATH`):
 ```python
 from train_fallback_integration import TransformerFallback
 
-fallback = TransformerFallback("./models/asuna_seq2seq/best_model")
+fallback = TransformerFallback("src/models/asuna_seq2seq/best_model")
 
 # When no regex matches:
 response, meta = fallback.get_response(user_input)

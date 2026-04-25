@@ -16,6 +16,7 @@ This comprehensive training system allows you to fine-tune a transformer model o
 ### 1. Install Requirements
 
 ```bash
+cd learning   # repo root: VoiceAI-Asuna/learning
 # Install training dependencies
 pip install -r requirements_training.txt
 
@@ -49,7 +50,7 @@ You have two options:
 ### 3. Run Training
 
 ```bash
-cd src
+cd learning
 python train_quickstart.py
 ```
 
@@ -243,14 +244,16 @@ CONFIG = {
 
 ## Running the Training
 
+Run the commands below from the `learning/` directory (so imports resolve).
+
 ### Step 1: Prepare Data
 
 ```bash
 python -c "
 from train_data_prep import TrainingDataset
 
-# Quick test to verify data loads
-dataset = TrainingDataset('./Asuna_data/server/')
+# Quick test to verify data loads (defaults to repo src/Asuna_data/server/)
+dataset = TrainingDataset()
 dataset.load_unknown_queries('unknown query.txt')
 print(f'Loaded {len(dataset.examples)} examples')
 "
@@ -269,7 +272,7 @@ ASUNA TRANSFORMER TRAINING PIPELINE
 ======================================================================
 
 Configuration:
-  data_dir: ./Asuna_data/server/
+  data_dir: .../src/Asuna_data/server/
   num_epochs: 3
   batch_size: 16
   ...
