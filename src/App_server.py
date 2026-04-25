@@ -202,8 +202,7 @@ def send_homepage(self: SH, *args, **kwargs):
 @SH.on_req('GET', '/login')
 def send_login(self: SH, *args, **kwargs):
 	"""
-	returns login.html on login request
-	js will redirect here or to home based on wheather user is logged in or not
+	Unified auth page (sign in + create account). Same file as GET /signup.
 	"""
 	user, uid  = handle_user_cookie(self, on_fail="")
 
@@ -215,14 +214,13 @@ def send_login(self: SH, *args, **kwargs):
 @SH.on_req('GET', '/signup')
 def send_signup(self: SH, *args, **kwargs):
 	"""
-	returns signup.html on signup request
-	js will redirect here or to home based on wheather user is logged in or not
+	Same unified auth page as /login; client picks Create account via path or tabs.
 	"""
 	user, uid  = handle_user_cookie(self, on_fail="")
 	if (user, uid) == (0, 0):
 		return None
 
-	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-store")
 
 
 
@@ -251,7 +249,7 @@ def send_test_page(self: SH, *args, **kwargs):
 
 	return self.send_file(join_path(pyrobox_config.ftp_dir, "html_page.html"), cache_control="no-store")
 
-	#return self.send_file(join_path(pyrobox_config.ftp_dir, "html_signup.html"), cache_control="no-store")
+	#return self.send_file(join_path(pyrobox_config.ftp_dir, "html_login.html"), cache_control="no-store")
 
 @SH.on_req('GET', '/dl_data')
 def send_dl_data(self: SH, *args, **kwargs):

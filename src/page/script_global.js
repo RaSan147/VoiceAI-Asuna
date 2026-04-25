@@ -804,7 +804,7 @@ class Toaster {
 	 */
 	async toast(msg, time, bgcolor='') {
 		// toaster is not safe as popup by design
-				var sleep = 3000;
+		var sleep = 3000;
 
 		while (this.queue.length > 2) {
 			await tools.sleep(100)
