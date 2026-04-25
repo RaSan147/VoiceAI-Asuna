@@ -1,0 +1,29 @@
+# TRANSFORMER TRAINING SYSTEM REQUIREMENTS
+# Install with: pip install -r requirements_training.txt
+
+# Core ML libraries
+torch>=2.0.0
+transformers>=4.30.0
+datasets>=2.10.0
+
+# Optimization and utilities
+numpy>=1.24.0
+tqdm>=4.65.0
+
+# Evaluation metrics  
+nltk>=3.8.0
+rouge-score>=0.1.2
+bert-score>=0.3.13
+
+# Data handling
+pandas>=1.5.0
+jsonlines>=3.1.0
+
+# Logging and monitoring
+tensorboard>=2.12.0
+
+# Optional: For GPU support
+# torch-cuda  (automatically installed with torch if CUDA available)
+
+# Optional: For faster inference/training
+# torch-ort>=1.13.0  (ONNX Runtime optimization)
