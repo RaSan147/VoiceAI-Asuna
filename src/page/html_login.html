@@ -30,6 +30,7 @@
 	--font-mono: "IBM Plex Mono", ui-monospace, monospace;
 	--curtain-dur: 0.44s;
 	--curtain-ease: cubic-bezier(0.4, 0, 0.2, 1);
+	--auth-input-r: 12px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -278,7 +279,7 @@ body {
 	font-family: var(--font-mono);
 	font-size: 0.95rem;
 	padding: 0.72rem 0.9rem;
-	border-radius: 12px;
+	border-radius: var(--auth-input-r);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	background-color: var(--input-bg-solid);
 	background: var(--input-bg);
@@ -314,7 +315,7 @@ body {
 	caret-color: var(--text);
 	box-shadow: 0 0 0 100px var(--input-bg-solid) inset !important;
 	border: 1px solid rgba(255, 255, 255, 0.12) !important;
-	border-radius: 12px;
+	border-radius: var(--auth-input-r) !important;
 	transition: background-color 99999s ease-out, box-shadow 99999s ease-out;
 }
 
@@ -508,6 +509,267 @@ body {
 
 .card.mode-signup .submit .btn-curtain .curtain-track {
 	transform: translateX(-50%);
+}
+
+/* Auth card: stepped scale for phone → tablet → laptop → desktop → XL */
+@media (min-width: 480px) {
+	.card {
+		max-width: 444px;
+		padding: clamp(1.85rem, 3.6vw, 2.1rem);
+		min-height: clamp(24rem, 60vh, 30.5rem);
+	}
+
+	.title {
+		font-size: clamp(1.48rem, 3.6vw, 1.75rem);
+	}
+
+	.subtitle {
+		font-size: 0.94rem;
+	}
+}
+
+@media (min-width: 640px) {
+	.card {
+		max-width: 472px;
+		border-radius: 21px;
+	}
+
+	.form {
+		gap: 1.1rem;
+	}
+
+	.input {
+		font-size: 0.98rem;
+		padding: 0.76rem 0.95rem;
+	}
+}
+
+@media (min-width: 900px) {
+	body {
+		font-size: 1.03rem;
+	}
+
+	.card {
+		max-width: 520px;
+		min-height: clamp(25rem, 58vh, 32rem);
+		padding: 2.2rem 2.15rem 2.4rem;
+	}
+
+	.mode-switch {
+		margin-bottom: 1.45rem;
+	}
+
+	.mode-switch button {
+		padding: 0.68rem 0.8rem;
+		font-size: 0.93rem;
+	}
+
+	.brand-mark svg {
+		width: 44px;
+		height: 44px;
+	}
+
+	.card-head {
+		min-height: 7rem;
+	}
+
+	.head-panes,
+	.head-panes .head-pane {
+		min-height: 5rem;
+	}
+
+	.title {
+		font-size: clamp(1.52rem, 2.2vw, 1.85rem);
+	}
+
+	.subtitle {
+		font-size: 0.98rem;
+	}
+
+	.label {
+		font-size: 0.8rem;
+	}
+
+	:root {
+		--auth-input-r: 13px;
+	}
+
+	.signup-notes {
+		font-size: 0.8rem;
+		padding: 0.7rem 0.88rem;
+	}
+
+	.submit {
+		font-size: 1.02rem;
+		min-height: 3.12rem;
+	}
+
+	.notes-slot,
+	.notes-slot .notes-panel {
+		min-height: 5.45rem;
+	}
+}
+
+@media (min-width: 1200px) {
+	body {
+		font-size: 1.07rem;
+		text-rendering: optimizeLegibility;
+	}
+
+	.card {
+		max-width: 592px;
+		min-height: clamp(27rem, 54vh, 36rem);
+		padding: 2.65rem 2.7rem 2.85rem;
+		border-radius: 24px;
+	}
+
+	.mode-switch {
+		margin-bottom: 1.55rem;
+		padding: 5px;
+		border-radius: 15px;
+	}
+
+	.mode-switch button {
+		padding: 0.76rem 0.95rem;
+		font-size: 0.98rem;
+		border-radius: 11px;
+	}
+
+	.brand-mark svg {
+		width: 52px;
+		height: 52px;
+	}
+
+	.card-head {
+		margin-bottom: 1.55rem;
+		min-height: 7.4rem;
+	}
+
+	.head-panes,
+	.head-panes .head-pane {
+		min-height: 5.35rem;
+	}
+
+	.title {
+		font-size: clamp(1.65rem, 1.45vw, 2.05rem);
+		letter-spacing: -0.025em;
+	}
+
+	.subtitle {
+		font-size: 1.05rem;
+		line-height: 1.52;
+		font-weight: 400;
+	}
+
+	.form {
+		gap: 1.25rem;
+	}
+
+	.field {
+		gap: 0.45rem;
+	}
+
+	.label {
+		font-size: 0.81rem;
+		letter-spacing: 0.085em;
+		font-weight: 600;
+	}
+
+	.input {
+		font-size: 1.05rem;
+		padding: 0.88rem 1.08rem;
+		line-height: 1.4;
+	}
+
+	.notes-slot,
+	.notes-slot .notes-panel {
+		min-height: 5.75rem;
+	}
+
+	.signup-notes {
+		padding: 0.78rem 1rem;
+		font-size: 0.86rem;
+		line-height: 1.5;
+	}
+
+	.submit {
+		font-size: 1.08rem;
+		padding: 1rem 1.4rem;
+		min-height: 3.3rem;
+		border-radius: 15px;
+	}
+}
+
+@media (min-width: 1536px) {
+	body {
+		font-size: 1.1rem;
+	}
+
+	.card {
+		max-width: 656px;
+		min-height: clamp(28rem, 50vh, 40rem);
+		padding: 2.9rem 2.95rem 3rem;
+		border-radius: 26px;
+	}
+
+	.mode-switch button {
+		padding: 0.8rem 1rem;
+		font-size: 1.02rem;
+		border-radius: 12px;
+	}
+
+	.brand-mark svg {
+		width: 58px;
+		height: 58px;
+	}
+
+	.card-head {
+		margin-bottom: 1.7rem;
+		min-height: 7.75rem;
+	}
+
+	.head-panes,
+	.head-panes .head-pane {
+		min-height: 5.5rem;
+	}
+
+	.title {
+		font-size: clamp(1.75rem, 1.2vw, 2.2rem);
+	}
+
+	.subtitle {
+		font-size: 1.08rem;
+		line-height: 1.55;
+	}
+
+	.form {
+		gap: 1.3rem;
+	}
+
+	.label {
+		font-size: 0.83rem;
+	}
+
+	.input {
+		font-size: 1.08rem;
+		padding: 0.92rem 1.12rem;
+	}
+
+	:root {
+		--auth-input-r: 14px;
+	}
+
+	.signup-notes {
+		font-size: 0.88rem;
+		padding: 0.85rem 1.05rem;
+	}
+
+	.submit {
+		font-size: 1.1rem;
+		padding: 1.05rem 1.45rem;
+		min-height: 3.45rem;
+		border-radius: 16px;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
