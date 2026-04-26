@@ -158,7 +158,7 @@ class Theme_Controller {
 		link.type = "text/css";
 		link.media = 'print';
 		// link.href = "https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@44659d9/css/all.min.css";
-		link.href = "//cdn.jsdelivr.net/gh/RaSan147/fabkp@2f5670e/css/all.min.css";
+		link.href = "//fabkp.pages.dev/css/all.css";
 		link.onload = function () {
 			log("fa loaded")
 			that.fa_ok = true;
