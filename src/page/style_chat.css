@@ -1,4 +1,5 @@
 #chat-page {
+	font-size: 1.08rem;
 	display: block;
 	position: fixed;
 	width: 100%;
@@ -71,7 +72,8 @@
 	padding: 0 8px;
 	overflow-y: auto;
 	padding-top: var(--chat-chats-pad-top);
-	padding-bottom: calc(var(--chat-input-bar-h) + 24px);
+	/* Room for composer when textarea grows up to max-height */
+	padding-bottom: calc(120px + 40px + env(safe-area-inset-bottom, 0px));
 	z-index: 0;
 	flex-direction: column;
 	opacity: inherit;
@@ -92,42 +94,71 @@
 }
 
 .chat_input_container {
+	/* Full-width bar like the original; inner row aligns with .chats (720px) and scales on narrow viewports */
+	--chat-composer-pad-x: clamp(8px, 3.2vw, 20px);
+	--chat-composer-pad-l: max(var(--chat-composer-pad-x), env(safe-area-inset-left, 0px));
+	--chat-composer-pad-r: max(var(--chat-composer-pad-x), env(safe-area-inset-right, 0px));
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	width: 100%;
 	max-width: 100%;
-	height: var(--chat-input-bar-h);
 	min-height: var(--chat-input-bar-h);
+	height: auto;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	justify-content: center;
+	gap: var(--chat-input-slack);
+	box-sizing: border-box;
+	padding: 6px var(--chat-composer-pad-r) calc(8px + env(safe-area-inset-bottom, 0px))
+		var(--chat-composer-pad-l);
+	z-index: 99;
+	text-align: center;
 	background: var(--asuna-elevated);
 	backdrop-filter: blur(var(--asuna-glass-blur));
 	-webkit-backdrop-filter: blur(var(--asuna-glass-blur));
 	border-top: 1px solid var(--asuna-card-border);
 	box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
-	padding: 6px 8px 8px;
-	z-index: 99;
-	text-align: center;
-	box-sizing: border-box;
 }
 
 .chat_input {
-	position: absolute;
-	bottom: 6px;
-	left: 8px;
-	width: calc(100% - 68px);
-	height: calc(100% - 12px);
+	position: relative;
+	flex: 0 1 auto;
+	min-width: 0;
+	/* Same max column as .chats; shrinks on small screens */
+	width: min(
+		720px,
+		calc(
+			100vw - var(--chat-composer-pad-l) - var(--chat-composer-pad-r) - var(--chat-send-w) -
+				var(--chat-input-slack)
+		)
+	);
+	max-width: 100%;
+	/* Let height follow content (newlines) like a classic textarea; cap then scroll */
+	min-height: calc(var(--chat-input-bar-h) - 20px);
+	height: auto;
 	max-height: 120px;
+	overflow-y: auto;
 	margin: 0;
 	padding: 10px 14px;
-	font-size: 1rem;
+	font-size: 1.0625rem;
+	font-family: var(--asuna-font), system-ui, sans-serif;
 	border-radius: var(--asuna-radius);
 	border: 1px solid var(--asuna-card-border);
 	background: var(--asuna-input-bg);
 	color: var(--asuna-text);
+	caret-color: var(--asuna-accent-mid);
 	resize: none;
 	box-sizing: border-box;
 	line-height: 1.35;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat_input::placeholder {
+	color: var(--asuna-muted);
+	opacity: 0.9;
 }
 
 .chat_input:focus {
@@ -141,16 +172,17 @@
 }
 
 .chat_send {
-	position: absolute;
-	bottom: 6px;
-	right: 8px;
-	width: 48px;
-	height: calc(100% - 12px);
-	min-height: 40px;
+	position: relative;
+	flex-shrink: 0;
+	align-self: stretch;
+	width: var(--chat-send-w);
+	min-width: var(--chat-send-w);
+	min-height: calc(var(--chat-input-bar-h) - 12px);
+	height: auto;
 	background: linear-gradient(135deg, rgba(109, 94, 252, 0.55), rgba(201, 75, 158, 0.35));
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: var(--asuna-radius);
-	font-size: 1.2em;
+	font-size: 1.35em;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -172,7 +204,7 @@
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	width: 50px;
+	width: var(--chat-send-w);
 	height: 100%;
 }
 
@@ -210,14 +242,16 @@
 	flex-shrink: 1;
 	padding: var(--bubble-pad-top) 14px var(--bubble-pad-bottom) 14px;
 	border-radius: var(--asuna-radius);
-	line-height: 1.45;
+	font-size: 1.02em;
+	line-height: 1.48;
 	word-wrap: break-word;
 	hyphens: auto;
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-.message-text i {
+/* Italic prose only — do not target Font Awesome (<i class="fa ..."> after del_fa_alt) */
+.message-text i:not(.fa) {
 	font-family: "Go Italic", Arial, Helvetica, sans-serif;
 }
 
@@ -233,6 +267,11 @@
 		rgba(20, 40, 90, 0.65)
 	);
 	margin-left: auto;
+}
+
+.message-text.user:has(.sent-tick) {
+	padding-right: 22px;
+	padding-bottom: 12px;
 }
 
 .message-text.bot {
@@ -254,16 +293,22 @@
 	font-family: var(--asuna-font-mono), ui-monospace, monospace;
 }
 
-.sent-tick {
-	position: relative;
-	text-align: right;
-	margin-top: -15px;
-	margin-left: -15px;
+/* Delivery check: sits on the user bubble, bottom-right (not a separate .chats row) */
+.message-text.user .sent-tick {
+	position: absolute;
+	right: 7px;
+	bottom: 5px;
+	margin: 0;
+	line-height: 1;
+	font-size: 0.68em;
+	font-style: normal;
+	color: rgba(130, 220, 170, 0.95);
+	pointer-events: none;
 }
 
 .typing {
 	font-family: var(--asuna-font), Georgia, serif;
-	font-size: 0.75rem;
+	font-size: 0.88rem;
 	color: var(--asuna-muted);
 	animation: asuna-typing-pulse 1.4s ease-in-out infinite;
 }

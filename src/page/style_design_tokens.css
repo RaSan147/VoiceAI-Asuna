@@ -46,7 +46,9 @@
 	--sb-width: 300px;
 	/* Thread inset; top bar gap lives on #chat-page:not(.minimized) */
 	--chat-chats-pad-top: 16px;
-	--chat-input-bar-h: 56px;
+	--chat-input-bar-h: 64px;
+	--chat-send-w: 56px;
+	--chat-input-slack: 10px; /* gap between textarea and send */
 }
 
 @media screen and (max-width: 450px) {
@@ -63,7 +65,9 @@
 
 html[data-ui-density="compact"] {
 	--chat-chats-pad-top: 10px;
-	--chat-input-bar-h: 48px;
+	--chat-input-bar-h: 54px;
+	--chat-send-w: 50px;
+	--chat-input-slack: 8px;
 }
 
 [data-reduced-glass="1"] {

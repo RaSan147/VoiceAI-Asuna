@@ -77,11 +77,12 @@
 	bottom: 0;
 	right: 0;
 	margin: 16px;
-	padding: 8px 12px 8px;
-	font-size: 0.95rem;
-	min-height: 40px;
-	border-radius: var(--asuna-radius);
+	padding: 14px 22px 12px;
+	font-size: 1.2rem;
+	min-height: 52px;
+	border-radius: var(--asuna-radius-lg);
 	transform: translateY(-50%);
+	gap: 0.45em;
 }
 
 #to-chat:active {
