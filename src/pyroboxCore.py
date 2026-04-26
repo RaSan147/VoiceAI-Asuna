@@ -26,7 +26,7 @@ import email.utils
 import datetime
 import argparse
 from string import Template
-from typing import List, Union
+from typing import Any, Callable, List, Mapping, Optional, Sequence, TypedDict, Union
 from queue import Queue
 import logging
 import atexit
@@ -38,6 +38,27 @@ from typing import Type
 __version__ = "0.10.0"
 enc = "utf-8"
 DEV_MODE = True
+
+# Callable stored on the class route table; ``on_req`` / ``on_GET`` register it; ``do_HANDLE`` invokes it.
+HTTPRouteHandler = Callable[..., Any]
+
+
+class RouteHandlerEntry(TypedDict):
+	"""One element of ``SimpleHTTPRequestHandler.handlers[method]``.
+
+	``check`` is unpacked into ``test_req`` when dispatching. ``func`` is the
+	handler actually called. ``source`` and ``cache_*`` are filled at route
+	registration so request handling does not call ``inspect`` again.
+	"""
+
+	check: Mapping[str, Any]
+	func: HTTPRouteHandler
+	source: str
+	cache_name: str
+	cache_args: str
+	cache_file: str
+	cache_line: int
+	cache_lines: List[str]
 
 
 __all__ = [
@@ -464,6 +485,73 @@ def URL_MANAGER(url: str):
 
 	return (path, dict_result, parse_result.fragment)
 
+
+# --- Route table (`on_req` / `on_GET` / …) --------------------------------------
+# Each verb maps to a list of RouteHandlerEntry dicts. Registration appends in
+# declaration order; do_HANDLE scans the list and stops on the first test_req match.
+
+def build_route_handler_entry(
+	url: str,
+	hasQ: Optional[Union[str, Sequence[str]]],
+	QV: Optional[Mapping[str, Any]],
+	fragent: str,
+	url_regex: str,
+	func: HTTPRouteHandler,
+) -> RouteHandlerEntry:
+	"""Build one ``handlers[method]`` entry: normalized matcher, callable, inspect snapshot.
+
+	Only ``on_req`` (via its decorator) should call this. Route normalization lives
+	here so ``entry["check"]`` always matches what ``test_req`` expects.
+
+	The value stored under ``func`` is the object invoked on each request (often a
+	decorator wrapper). ``inspect.unwrap(func)`` is used once; file, line number,
+	signature, and source text refer to that unwrapped target for stable debugging.
+	"""
+	# Match ``on_req`` / ``test_req``: a lone query key is normalized to a 1-tuple.
+	if isinstance(hasQ, str):
+		hasQ = (hasQ,)
+	# Empty path + empty pattern means "any path" (regex ``.*`` on url_path).
+	if url == '' and url_regex == '':
+		url_regex = '.*'
+	# Keyword args for ``self.test_req(**check)`` in do_HANDLE.
+	to_check: Mapping[str, Any] = {
+		"url": url,
+		"hasQ": hasQ,
+		"QV": QV,
+		"fragent": fragent,
+		"url_regex": url_regex,
+	}
+	real = inspect.unwrap(func)
+	try:
+		source = inspect.getsource(real)
+	except OSError:
+		source = f"<Source unavailable for {getattr(real, '__name__', type(real).__name__)} - missing physical file>"
+	except TypeError:
+		source = f"<Source unavailable for {getattr(real, '__name__', type(real).__name__)} - built-in/compiled>"
+	# Wrapper may still expose the public route name (e.g. functools.wraps).
+	name = getattr(func, "__name__", repr(func))
+	try:
+		args = str(inspect.signature(real))
+	except (TypeError, ValueError):
+		args = "(signature unavailable)"
+	try:
+		file = inspect.getfile(real)
+	except TypeError:
+		file = "<unknown file>"
+	try:
+		lines, lineno = inspect.getsourcelines(real)
+	except (OSError, TypeError):
+		lines, lineno = [], 0
+	return {
+		"check": to_check,
+		"func": func,
+		"source": source,
+		"cache_name": name,
+		"cache_args": args,
+		"cache_file": file,
+		"cache_line": lineno,
+		"cache_lines": lines,
+	}
 
 
 class HTTPServer(socketserver.TCPServer):
@@ -1198,6 +1286,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			'.br': 'application/x-brotli',
 	})
 
+	# RouteHandlerEntry rows per HTTP method; see ``build_route_handler_entry``.
 	handlers = {
 		'HEAD': [],
 		'POST': [],
@@ -1251,18 +1340,42 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 	# 	self.send_error(code=HTTPStatus.BAD_REQUEST, message="Bad request.")
 
 	@staticmethod
-	def on_req(method='', url='', hasQ=(), QV={}, fragent='', url_regex='', func=null):
-		'''called when request is received
-		type: GET, POST, HEAD, ...
-		url: url (must start with /)
-		hasQ: if url has query
-		QV: match query value
-		fragent: fragent of request
-		url_regex: url regex (must start with /) url regex, the url must start and end with this regex
+	def on_req(
+		method: str = '',
+		url: str = '',
+		hasQ: Optional[Union[str, Sequence[str]]] = None,
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+		func: HTTPRouteHandler = null,
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for an HTTP method and URL/query/fragment shape.
 
-		if query is tuple|list, it will only check existence of key
-		if query is dict, it will check value of key
-		'''
+		Parameters
+		----------
+		method :
+			HTTP verb (e.g. ``GET``, ``POST``, ``HEAD``). ``GET`` is stored with ``HEAD``.
+		url :
+			Exact path to match (``self.url_path``). Empty means no path constraint.
+		hasQ :
+			Query keys that must all be present (values ignored). A single string is
+			treated as one key; use a sequence for several keys.
+		QV :
+			Query keys and exact string values that must match ``self.query``. Skipped
+			if falsy (``None`` or empty mapping). Values are compared with ``!=`` to
+			``self.query[k]``.
+		fragent :
+			URL fragment (hash) that must match ``self.fragment`` if non-empty.
+		url_regex :
+			If non-empty, ``self.url_path`` must match ``^`` + ``url_regex`` + ``$``.
+		func :
+			Handler to register when used as ``@handler.on_req(...)``; may be omitted
+			and supplied by the decorator syntax.
+
+		Returns
+		-------
+		Decorator that appends the route entry to ``handlers[method]``.
+		"""
 		self = __class__
 
 		method = method.upper()
@@ -1272,68 +1385,107 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		if method not in self.handlers:
 			self.handlers[method] = []
 
-		# FIXING TYPE ISSUE
-		if isinstance(hasQ, str):
-			hasQ = (hasQ,)
-
-		if url == '' and url_regex == '':
-			url_regex = '.*'
-
-		to_check = (url, hasQ, QV, fragent, url_regex)
-
-		def decorator(func=func):
-			self.handlers[method].append((to_check, func))
+		def decorator(func: HTTPRouteHandler = func) -> HTTPRouteHandler:
+			# Freeze matcher + handler + inspect snapshot at decoration time (dispatch order = append order).
+			self.handlers[method].append(
+				build_route_handler_entry(
+					url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex, func=func)
+			)
 			return func
 		return decorator
 
 	@staticmethod
-	def on_GET(url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''called when GET request is received'''
+	def on_GET(
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for GET (stored under HEAD with ``on_req``)."""
 		self = __class__
 
 		return self.on_req(method='GET', url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
 
 	@staticmethod
-	def on_POST(url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''called when POST request is received'''
+	def on_POST(
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for POST."""
 		self = __class__
 
 		return self.on_req(method='POST', url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
 
 	@staticmethod
-	def on_HEAD(url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''called when HEAD request is received'''
+	def on_HEAD(
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for HEAD."""
 		self = __class__
 
 		return self.on_req(method='HEAD', url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
 
 	@staticmethod
-	def on_OPTIONS(url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''called when OPTIONS request is received'''
+	def on_OPTIONS(
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for OPTIONS."""
 		self = __class__
 
 		return self.on_req(method='OPTIONS', url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
 
 	@staticmethod
-	def on_DELETE(url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''called when DELETE request is received'''
+	def on_DELETE(
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for DELETE."""
 		self = __class__
 
 		return self.on_req(method='DELETE', url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
 
 	@staticmethod
-	def on_PUT(url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''called when PUT request is received'''
+	def on_PUT(
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> Callable[[HTTPRouteHandler], HTTPRouteHandler]:
+		"""Register a handler for PUT."""
 		self = __class__
 
 		return self.on_req(method='PUT', url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
 
 
 	@staticmethod
-	def alt_directory(dir, method='', url='', hasQ=(), QV={}, fragent='', url_regex='', cache_control="", cookie:Union[SimpleCookie, str]=None):
-		"""
-		alternative directory handler (only handles GET and HEAD request for files)
-		"""
+	def alt_directory(
+		dir: str,
+		method: str = '',
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+		cache_control: str = "",
+		cookie: Optional[Union[SimpleCookie, str]] = None,
+	) -> None:
+		"""Serve one file from ``dir`` by last URL segment; registers via ``on_req``; returns ``None``."""
 		self = __class__
 
 		@self.on_req(method=method, url=url, hasQ=hasQ, QV=QV, fragent=fragent, url_regex=url_regex)
@@ -1368,20 +1520,22 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		return super().log_error(*args, **kwargs)
 
 
-	def test_req(self, url='', hasQ=(), QV={}, fragent='', url_regex=''):
-		'''test if request is matched'
+	def test_req(
+		self,
+		url: str = '',
+		hasQ: Union[str, Sequence[str]] = (),
+		QV: Optional[Mapping[str, Any]] = None,
+		fragent: str = '',
+		url_regex: str = '',
+	) -> bool:
+		"""Return True if the current request matches the registration pattern.
 
-		args:
-			url: url relative path (must start with /)
-			hasQ: if url has query
-			QV: match query value
-			fragent: fragent of request
-			url_regex: url regex, the url must start and end with this regex
-
-
-		'''
-		if url_regex and not re.search("^"+url_regex+'$', self.url_path):
-				return False
+		Parameters match those passed to ``on_req`` / ``on_GET`` / etc.: exact ``url``,
+		presence checks ``hasQ``, value checks ``QV``, optional ``fragent``, and
+		optional full-path ``url_regex`` over ``self.url_path``.
+		"""
+		if url_regex and not re.search("^" + url_regex + '$', self.url_path):
+			return False
 		if url and url != self.url_path:
 			return False
 
@@ -1401,70 +1555,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 			return False
 
 		return True
-
-	# def do_HEAD(self):
-	# 	"""Serve a HEAD request."""
-	# 	resp = None
-	# 	try:
-	# 		resp = self.send_head()
-	# 	except Exception as e:
-	# 		ERROR = traceback.format_exc()
-	# 		self.log_error(ERROR)
-
-	# 		self.send_error(code=500, message=str(e))
-	# 		return
-	# 	finally:
-	# 		if resp:
-	# 			resp.close()
-
-	# def do_POST(self):
-	# 	"""Serve a POST request."""
-	# 	self.range = None, None
-
-	# 	path = self.translate_path(self.path)
-	# 	# DIRECTORY DONT CONTAIN SLASH / AT END
-
-	# 	url_path, query, fragment = self.url_path, self.query, self.fragment
-	# 	spathsplit = self.url_path.split("/")
-
-	# 	try:
-	# 		for case, func in self.handlers['POST']:
-	# 			if self.test_req(*case):
-	# 				try:
-	# 					self.log_info(f'[POST] -> [{func.__name__}] ->  {self.url_path}')
-
-	# 					resp = func(self, url_path=url_path, query=query,
-	# 							fragment=fragment, path=path, spathsplit=spathsplit)
-	# 				except PostError:
-	# 					ERROR = traceback.format_exc()
-	# 					self.log_error(ERROR)
-	# 					# break if error is raised and send BAD_REQUEST (at end of loop)
-	# 					break
-
-	# 				if resp:
-	# 					try:
-	# 						self.copyfile(resp, self.wfile)
-	# 					except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-	# 						self.log_info(tools.text_box(
-	# 							e.__class__.__name__, e, "\nby ", [self.address_string()]))
-	# 					finally:
-	# 						resp.close()
-	# 				return
-
-	# 		return self.send_error(code=HTTPStatus.BAD_REQUEST, message="Invalid request.")
-
-	# 	except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-	# 		self.log_info(tools.text_box(e.__class__.__name__,
-	# 					e, "\nby ", [self.address_string()]))
-	# 		return
-	# 	except Exception as e:
-	# 		ERROR = traceback.format_exc()
-	# 		self.log_error(ERROR)
-
-	# 		self.send_error(code=500, message=str(e))
-	# 		return
-
-
 	
 	def do_HANDLE(self, method:str):
 		"""Serve a REQUEST."""
@@ -1501,39 +1591,51 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		spathsplit = self.url_path.split("/")
 
 		try:
-			for case, func in self.handlers[method]:
-				if self.test_req(*case):
+			# First matching RouteHandlerEntry wins; ``func`` is the registered callable.
+			for entry in self.handlers[method]:
+				if not isinstance(entry, dict):
+					continue
+				check = entry.get("check")
+				func = entry.get("func")
+				if check is None or func is None:
+					continue
+				if not self.test_req(**check):
+					continue
+				try:
+					self.log_info(
+						f'[{method}] -> [{entry.get("cache_name", func.__name__)}] ->  {self.url_path}'
+					)
+
+					# Copy registration-time debug fields (no inspect.* here).
+					self.handler_func = func
+					self.handler_func_name = entry.get("cache_name", func.__name__)
+					self.handler_func_args = entry.get("cache_args", "")
+					self.handler_func_source = entry.get("source", "")
+					self.handler_func_file = entry.get("cache_file", "")
+					clines = entry.get("cache_lines")
+					clineno = entry.get("cache_line")
+					self.handler_func_lines = clines if clines else None
+					self.handler_func_line = clineno if clineno else None
+
+					resp = func(self, url_path=url_path, query=query,
+							fragment=fragment, path=path, spathsplit=spathsplit)
+				except PostError:
+					ERROR = traceback.format_exc()
+					self.log_error(ERROR)
+					# break if error is raised and send BAD_REQUEST (at end of loop)
+					break
+
+				if resp:
 					try:
-						self.log_info(f'[{method}] -> [{func.__name__}] ->  {self.url_path}')
-
-
-						# save function details in class using inspect
-						self.handler_func = func
-						self.handler_func_name = func.__name__
-						self.handler_func_args = str(inspect.signature(func))
-						self.handler_func_source = inspect.getsource(func)
-						self.handler_func_file = inspect.getfile(func)
-						self.handler_func_lines, self.handler_func_line = inspect.getsourcelines(func)
-
-						resp = func(self, url_path=url_path, query=query,
-								fragment=fragment, path=path, spathsplit=spathsplit)
-					except PostError:
-						ERROR = traceback.format_exc()
-						self.log_error(ERROR)
-						# break if error is raised and send BAD_REQUEST (at end of loop)
-						break
-
-					if resp:
-						try:
-							print(method, self.method)
-							if self.method != "HEAD":
-								self.copyfile(resp, self.wfile)
-						except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
-							self.log_info(tools.text_box(
-								e.__class__.__name__, e, "\nby ", [self.address_string()]))
-						finally:
-							resp.close()
-					return
+						print(method, self.method)
+						if self.method != "HEAD":
+							self.copyfile(resp, self.wfile)
+					except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as e:
+						self.log_info(tools.text_box(
+							e.__class__.__name__, e, "\nby ", [self.address_string()]))
+					finally:
+						resp.close()
+				return
 
 			return self.send_error(code=HTTPStatus.NOT_FOUND, message="File Not Found.")
 
@@ -1547,46 +1649,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 			self.send_error(code=500, message=str(e))
 			return
-
-	
-	# def send_head(self):
-	# 	"""Common code for GET and HEAD commands.
-
-	# 	This sends the response code and MIME headers.
-
-	# 	Return value is either a file object (which has to be copied
-	# 	to the outputfile by the caller unless the command was HEAD,
-	# 	and must be closed by the caller under all circumstances), or
-	# 	None, in which case the caller has nothing further to do.
-
-	# 	"""
-
-	# 	if 'Range' not in self.headers:
-	# 		self.range = None, None
-	# 		first, last = 0, 0
-
-	# 	else:
-	# 		try:
-	# 			self.range = parse_byte_range(self.headers['Range'])
-	# 			first, last = self.range
-	# 			self.use_range = True
-	# 		except ValueError as e:
-	# 			self.send_error(code=400, message='Invalid byte range')
-	# 			return None
-
-	# 	path = self.translate_path(self.path)
-	# 	# DIRECTORY DONT CONTAIN SLASH / AT END
-
-	# 	url_path, query, fragment = self.url_path, self.query, self.fragment
-
-	# 	spathsplit = self.url_path.split("/")
-
-	# 	# GET WILL Also BE HANDLED BY HEAD
-	# 	for case, func in self.handlers['HEAD']:
-	# 		if self.test_req(*case):
-	# 			return func(self, url_path=url_path, query=query, fragment=fragment, path=path, spathsplit=spathsplit)
-
-	# 	return self.send_error(code=HTTPStatus.NOT_FOUND, message="File not found")
 
 
 	def redirect(self, location, cookie:Union[SimpleCookie, str]=None):
