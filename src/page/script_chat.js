@@ -23,14 +23,14 @@ class ChatHandler{
 		this.chat_input = byId("chat_input");
 		this.maximize_btn = byId("maximize-page") 
 		this.chat_input.onkeydown = e => {
-			if(e.key == "Enter"){
-				if(e.shiftKey){
-					// that.chat_input.value += "\n";
-					return;
-				}
-				e.preventDefault();
-				that.send_message();
-			}
+			if(e.key != "Enter")
+				return;
+			if(is_mobile_device())
+				return;
+			if(e.shiftKey)
+				return;
+			e.preventDefault();
+			that.send_message();
 		}
 		this.chat_input.onfocus = e => { //that.go_to_bottom()
 		}
@@ -147,13 +147,13 @@ class ChatHandler{
 	}
 
 	success_msg(msg_ele){
-		let tick = createElement("span")
-		tick.className = "fa fa-regular fa-check sent-tick"
+		const tick = createElement("span")
+		tick.className = "fa fa-sharp fa-solid fa-check sent-tick"
 		tick.innerText = "✔"
-		tick.style.color = "green"
-		tick.style.fontSize = "5px"
-
-		this.chats.appendChild(tick)
+		tick.setAttribute("aria-label", "Sent")
+		const bubble = msg_ele.querySelector(".message-text.user")
+		if (bubble) bubble.appendChild(tick)
+		else msg_ele.appendChild(tick)
 		theme_controller.del_fa_alt(tick)
 	}
 

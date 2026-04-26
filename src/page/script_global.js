@@ -62,6 +62,24 @@ function go_link(type_code, locate) {
 	// function to generate link for different types of actions
 	return locate + "?" + type_code;
 }
+
+/**
+ * Touch-first or mobile-style environment (Client Hints mobile, coarse pointer, no fine pointer, or no hover).
+ * Not the same as merely having a touchscreen (many laptops stay mouse-primary).
+ */
+function is_mobile_device(){
+	if(typeof navigator !== "undefined" && navigator.userAgentData && navigator.userAgentData.mobile)
+		return true;
+	const mq = window.matchMedia.bind(window);
+	if(mq("(pointer: coarse)").matches)
+		return true;
+	if(!mq("(pointer: fine)").matches)
+		return true;
+	if(!mq("(hover: hover)").matches)
+		return true;
+	return false;
+}
+
 // getting all the links in the directory
 
 class Config {
@@ -70,8 +88,6 @@ class Config {
 		this.popup_msg_open = false;
 		this.allow_Debugging = true
 		this.Debugging = false;
-		this.is_touch_device = 'ontouchstart' in document.documentElement;
-
 
 		this.previous_type = null;
 		this.themes = ["Tron"];
@@ -81,6 +97,10 @@ class Config {
 		this.is_webkit = navigator.userAgent.indexOf('AppleWebKit') != -1;
 		this.is_edge = navigator.userAgent.indexOf('Edg') != -1;
 
+	}
+
+	get is_mobile_device(){
+		return is_mobile_device();
 	}
 }
 var config = new Config();
@@ -383,13 +403,9 @@ class Tools {
 		return false;
 	}
 
-	/**
-	 * Checks if the current device has touch capabilities.
-	 *
-	 * @returns {boolean} - `true` if the device has touch capabilities, `false` otherwise.
-	 */
-	is_touch_device(){
-		return 'ontouchstart' in document.documentElement;
+	/** @see is_mobile_device */
+	is_mobile_device(){
+		return is_mobile_device();
 	}
 
 
