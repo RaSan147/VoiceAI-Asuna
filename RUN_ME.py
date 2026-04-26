@@ -3,6 +3,8 @@
 
 import os
 import sys
+import subprocess
+subprocess.call([sys.executable, "-m", "pip", "install",  "-r", "requirements.txt"])
 
 mainpyfile = os.path.dirname(os.path.abspath(__file__))+"/src/App_server.py"
 
