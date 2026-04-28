@@ -1,7 +1,17 @@
 /**
- * Shared design tokens — loosely aligned with html_login.html (Outfit, deep indigo, violet accent).
+ * Typography roles (html_page / html_login load the same Google Fonts bundle):
+ *   --asuna-font-ui      — chrome: nav, sidebars, buttons, forms, anime controls, body default
+ *   --asuna-font-chat    — conversational reading: chat thread, composer, help markdown in chat
+ *   --asuna-font-display — short titles: app name in top bar, modal h1s
+ *   --asuna-font-mono    — code, inline spans in markdown, delivery ticks
+ * --asuna-font aliases --asuna-font-ui for older rules.
  * Legacy --theme-* / --button-* names are bridged so existing rules keep working.
  */
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 :root {
 	color-scheme: dark;
 
@@ -18,13 +28,21 @@
 	--asuna-accent2: #e86fb8;
 	--asuna-radius: 14px;
 	--asuna-radius-lg: 20px;
-	--asuna-font: "Outfit", system-ui, sans-serif;
-	--asuna-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+	--asuna-font-ui: "Plus Jakarta Sans", system-ui, sans-serif;
+	--asuna-font-chat: "Source Sans 3", system-ui, sans-serif;
+	--asuna-font-display: "Sora", system-ui, sans-serif;
+	--asuna-font-mono: "JetBrains Mono", ui-monospace, monospace;
+	--asuna-font: var(--asuna-font-ui);
 	--asuna-input-bg: rgba(6, 8, 18, 0.55);
 	--asuna-input-bg-solid: rgb(12, 14, 28);
 	--asuna-glass-blur: 18px;
 	--asuna-shadow-soft: 0 24px 64px rgba(0, 0, 0, 0.42);
 	--asuna-glow-accent: 0 0 48px rgba(109, 94, 252, 0.12);
+	/* Modal overlay (style_page .modal_bg) */
+	--asuna-modal-scrim: rgba(4, 6, 16, 0.78);
+	--asuna-modal-scrim-blur: 12px;
+	/* Above .chat_input_container / toasts (99), sidebar (10), top bar (9) */
+	--asuna-z-modal: 120;
 
 	/* Legacy bridge (style_page.css, accordions, etc.) */
 	--theme-background: var(--asuna-bg1);
@@ -44,9 +62,24 @@
 	--tick-spacing: 0;
 
 	--sb-width: 300px;
-	/* Thread inset; top bar gap lives on #chat-page:not(.minimized) */
-	--chat-chats-pad-top: 16px;
+	/*
+	 * App top bar (.top_bar in style_page.css): padding 8px + safe-area / 8px, 40px row, 1px border-bottom.
+	 * Keep in sync if .top_bar padding or controls change.
+	 */
+	--top-bar-h: calc(8px + 40px + 8px + 1px + env(safe-area-inset-top, 0px));
+	/* Full-screen chat: scroll root uses this — top bar + 16px breathing room */
+	--chat-chats-pad-top: calc(var(--top-bar-h) + 16px);
 	--chat-input-bar-h: 64px;
+	/* Air above fixed composer when scrolled to end (padding lives on #chat-page, not .chats) */
+	--chat-composer-stack-gap: 12px;
+	/*
+	 * Full-screen chat only: #chat-page has margin-bottom: 60px, so the panel already stops short of the
+	 * viewport bottom — smaller scroll-end inset than the minimized sheet (which uses full bar clearance).
+	 */
+	--chat-page-scroll-end-pad: calc(
+		var(--chat-composer-stack-gap) + env(safe-area-inset-bottom, 0px) +
+			max(20px, var(--chat-input-bar-h) - 48px)
+	);
 	--chat-send-w: 56px;
 	--chat-input-slack: 10px; /* gap between textarea and send */
 }
@@ -64,7 +97,12 @@
 }
 
 html[data-ui-density="compact"] {
-	--chat-chats-pad-top: 10px;
+	--chat-chats-pad-top: calc(var(--top-bar-h) + 10px);
+	--chat-composer-stack-gap: 10px;
+	--chat-page-scroll-end-pad: calc(
+		var(--chat-composer-stack-gap) + env(safe-area-inset-bottom, 0px) +
+			max(18px, var(--chat-input-bar-h) - 44px)
+	);
 	--chat-input-bar-h: 54px;
 	--chat-send-w: 50px;
 	--chat-input-slack: 8px;
@@ -75,6 +113,11 @@ html[data-ui-density="compact"] {
 }
 
 [data-reduced-glass="1"] .popup-box {
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+}
+
+[data-reduced-glass="1"] .modal_bg {
 	backdrop-filter: none !important;
 	-webkit-backdrop-filter: none !important;
 }

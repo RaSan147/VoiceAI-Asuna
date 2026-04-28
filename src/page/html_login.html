@@ -10,7 +10,7 @@
 <link rel="icon" href="/icons/icon-512x512.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
 	color-scheme: dark;
@@ -26,8 +26,11 @@
 	--input-bg-solid: rgb(12, 14, 28);
 	--input-focus-bg: rgba(8, 10, 22, 0.92);
 	--radius: 20px;
-	--font: "Outfit", system-ui, sans-serif;
-	--font-mono: "IBM Plex Mono", ui-monospace, monospace;
+	--font-ui: "Plus Jakarta Sans", system-ui, sans-serif;
+	--font-chat: "Source Sans 3", system-ui, sans-serif;
+	--font-display: "Sora", system-ui, sans-serif;
+	--font-mono: "JetBrains Mono", ui-monospace, monospace;
+	--font: var(--font-ui);
 	--curtain-dur: 0.44s;
 	--curtain-ease: cubic-bezier(0.4, 0, 0.2, 1);
 	--auth-input-r: 12px;
@@ -38,6 +41,8 @@
 html {
 	height: 100%;
 	background: var(--bg0);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -45,7 +50,6 @@ body {
 	min-height: 100%;
 	font-family: var(--font);
 	color: var(--text);
-	-webkit-font-smoothing: antialiased;
 	overflow-x: hidden;
 }
 
@@ -243,12 +247,14 @@ body {
 	font-size: clamp(1.45rem, 4vw, 1.7rem);
 	font-weight: 600;
 	letter-spacing: -0.02em;
+	font-family: var(--font-display);
 }
 
 .subtitle {
 	margin: 0.45rem 0 0;
 	font-size: 0.92rem;
-	font-weight: 300;
+	font-weight: 400;
+	font-family: var(--font-chat);
 	color: var(--muted);
 	line-height: 1.45;
 }
@@ -365,6 +371,7 @@ body {
 	padding: 0.65rem 0.85rem;
 	border-radius: 12px;
 	font-size: 0.78rem;
+	font-family: var(--font-chat);
 	line-height: 1.45;
 	color: var(--muted);
 	background: rgba(0, 0, 0, 0.28);
@@ -784,6 +791,8 @@ body {
 </head>
 <body>
 
+<div id="popup-container"></div>
+
 <div class="ambient">
 	<div class="orb orb-a"></div>
 	<div class="orb orb-b"></div>
@@ -871,7 +880,7 @@ body {
 <script src="./script_user.js"></script>
 <script>
 user.get_local_data(false);
-if (typeof tools !== 'undefined' && tools.enable_debug) tools.enable_debug();
+tools.enable_debug();
 
 var authMode = 'login';
 

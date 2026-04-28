@@ -48,15 +48,17 @@ class ChatHandler{
 		
 	}
 	
-	async go_to_bottom(){
-		//alert(this.chats.scrollHeight)
-		await tools.sleep(30)
+	async go_to_bottom(opts = {}){
+		const behavior = opts.behavior !== undefined ? opts.behavior : "smooth";
+		await tools.sleep(30);
 
-		if(this.chats.scrollHeight > 100){
-			this.page.scrollTo({
-			top: this.chats.scrollHeight,
-			left: 0,
-			behavior: 'smooth'
+		const page = this.page;
+		const maxScroll = Math.max(0, page.scrollHeight - page.clientHeight);
+		if (maxScroll > 0) {
+			page.scrollTo({
+				top: maxScroll,
+				left: 0,
+				behavior,
 			});
 		}
 	}
@@ -385,8 +387,10 @@ class ChatHandler{
 		// to_anime() takes 500ms to take action. So wait for 550ms
 		await tools.sleep(550)
 		this.show_page();
-		this.page.classList.add("minimized")
-		this.go_to_bottom()
+		this.page.classList.add("minimized");
+		/* Let max-height transition finish so scrollHeight/clientHeight match the sheet (0.45s CSS). */
+		await tools.sleep(480);
+		await this.go_to_bottom({ behavior: "auto" });
 		top_bar.hide();
 		this.show_max_btn()
 		byId("to-chat").classList.add("invisible")

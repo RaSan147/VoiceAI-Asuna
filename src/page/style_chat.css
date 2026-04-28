@@ -1,4 +1,5 @@
 #chat-page {
+	font-family: var(--asuna-font-chat), system-ui, sans-serif;
 	font-size: 1.08rem;
 	display: block;
 	position: fixed;
@@ -13,11 +14,25 @@
 	max-height: 100%;
 	box-shadow: none;
 	box-sizing: border-box;
+	/*
+	 * Bottom inset for fixed composer: keep on #chat-page (scroll container), not on .chats — otherwise
+	 * DevTools shows a huge green “padding” band on #chats and it feels like wasted space.
+	 */
+	padding-bottom: calc(
+		var(--chat-input-bar-h) + var(--chat-composer-stack-gap) + env(safe-area-inset-bottom, 0px)
+	);
 }
 
-/* Full chat: single clearance for fixed top bar (avoids a strip of content above the bar) */
+/*
+ * Full chat: offset below fixed .top_bar (z-index 9). Padding-top does not “clear” a fixed overlay —
+ * it sits in the same viewport band as the bar and stays hidden under it. Use top so the panel starts
+ * below the bar; --chat-chats-pad-top = top bar height + 16px (see style_design_tokens.css).
+ */
 #chat-page:not(.minimized) {
-	padding-top: calc(54px + env(safe-area-inset-top, 0px));
+	top: var(--chat-chats-pad-top);
+	padding-top: 0;
+	/* Tighter than minimized: margin-bottom: 60px already lifts the panel off the viewport bottom. */
+	padding-bottom: var(--chat-page-scroll-end-pad);
 }
 
 #chat-page.inactive {
@@ -57,8 +72,13 @@
 	transition: max-height 0.45s ease, margin 0.45s ease, opacity 0.45s ease;
 }
 
+/*
+ * Minimized sheet: only #chat-page scrolls. Nested overflow on .chats trapped scroll so the top of
+ * the thread stayed unreachable (see UI before chat composer refactor ~47fdc17).
+ */
 #chat-page.minimized .chats {
 	padding-top: 8px;
+	overflow-y: visible;
 }
 
 .chats {
@@ -70,10 +90,10 @@
 	height: max-content;
 	bottom: 0;
 	padding: 0 8px;
-	overflow-y: auto;
-	padding-top: var(--chat-chats-pad-top);
-	/* Room for composer when textarea grows up to max-height */
-	padding-bottom: calc(120px + 40px + env(safe-area-inset-bottom, 0px));
+	/* Single scroll container is #chat-page — avoids nested scrollports fighting on mobile */
+	overflow-y: visible;
+	padding-top: 0;
+	padding-bottom: 0;
 	z-index: 0;
 	flex-direction: column;
 	opacity: inherit;
@@ -144,7 +164,7 @@
 	margin: 0;
 	padding: 10px 14px;
 	font-size: 1.0625rem;
-	font-family: var(--asuna-font), system-ui, sans-serif;
+	font-family: var(--asuna-font-chat), system-ui, sans-serif;
 	border-radius: var(--asuna-radius);
 	border: 1px solid var(--asuna-card-border);
 	background: var(--asuna-input-bg);
@@ -252,11 +272,14 @@
 
 /* Italic prose only — do not target Font Awesome (<i class="fa ..."> after del_fa_alt) */
 .message-text i:not(.fa) {
-	font-family: "Go Italic", Arial, Helvetica, sans-serif;
+	font-family: var(--asuna-font-chat), system-ui, sans-serif;
+	font-style: italic;
+	font-synthesis: none;
 }
 
 .message-text b {
-	font-family: "Rubik", sans-serif;
+	font-family: var(--asuna-font-chat), system-ui, sans-serif;
+	font-weight: 700;
 	font-optical-sizing: auto;
 }
 
@@ -307,7 +330,7 @@
 }
 
 .typing {
-	font-family: var(--asuna-font), Georgia, serif;
+	font-family: var(--asuna-font-chat), system-ui, sans-serif;
 	font-size: 0.88rem;
 	color: var(--asuna-muted);
 	animation: asuna-typing-pulse 1.4s ease-in-out infinite;

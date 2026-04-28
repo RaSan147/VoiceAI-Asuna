@@ -46,7 +46,7 @@
 	min-height: 40px;
 	padding: 10px 14px 8px;
 	font-size: 1rem;
-	font-family: var(--asuna-font), system-ui, sans-serif;
+	font-family: var(--asuna-font-ui), system-ui, sans-serif;
 	font-weight: 600;
 	color: var(--asuna-text);
 	cursor: pointer;
