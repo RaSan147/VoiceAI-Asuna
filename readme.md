@@ -85,7 +85,6 @@ Welcome to project Asuna.
   * App_server.py is the file that handles client-host request responses.
   * Chat_raw2.py is the tool that actually handles what msg will do what and reply what (can be used as standalone in CLI mode for development mode, will use test account)
 * Don't worry about marge-issue, I'll update the code
-* Most importantly AS A MOBILE CODER, I USUALLY DON'T FOLLOW ANY CODE STYLE GUIDELINE (or pep8), SO PLEASE DON'T WORRY ABOUT THAT TOO MUCH. (I'll try to follow it in future)
 
 # Thanks to:
 0. Reki Kawahara and abec (for creating Asuna)
